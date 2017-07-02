@@ -12,11 +12,10 @@ from tensorflow.python.framework import ops
 plt.style.use('ggplot')
 
 DATA_PATH = '../data/'
-DROPOUT_RATE = 0.1
-DROPOUT_RATE = 0.1
+DROPOUT_RATE = 0.0
 ETA = 0.001 # Learning rate
 EPOCHS = 2000
-BATCH_SIZE = 10
+BATCH_SIZE = 5
 
 
 def read(filepath, pred=False):
@@ -91,6 +90,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 X_train.index = range(len(y_train))
 y_train.index = range(len(y_train))
 
+# WHILE DATA SET IS SMALL, restrict values in new data to the range seen in training data
+for col in list(X_train):
+    mn, mx = np.min(X_train[col]), np.max(X_train[col])
+    X_new[col][X_new[col] < mn] = mn
+    X_new[col][X_new[col] > mx] = mx
+                
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
@@ -113,7 +118,6 @@ def make_drop_layer(in_layer,
         return h_drop
 
 ops.reset_default_graph()
-g = tf.get_default_graph()
 
 N, D = X_train.shape
 
@@ -122,7 +126,7 @@ y = tf.placeholder(tf.float32, shape=None, name='y')
 training = tf.placeholder_with_default(False, shape=(), name='training')
 
 X_drop = tf.layers.dropout(X, DROPOUT_RATE, training=training)
-n_neurons = [D, 27, 20, 15, 10, 5, 1]
+n_neurons = [D, 27, 20, 20, 20, 20, 1]
 
 with tf.name_scope('dnn'):
     # He intialization randomly initalizes weigths and their variances in
@@ -143,7 +147,7 @@ with tf.name_scope('dnn'):
 
 with tf.name_scope('cost'):
     # MSE
-    cost = tf.reduce_sum(tf.pow(preds - y, 2))/(2 * N)
+    cost = tf.reduce_sum(tf.pow(preds - y, 2)) / (2 * N)
 
 with tf.name_scope('train'):
     eta0 = ETA # initial learning rate
@@ -171,16 +175,16 @@ with tf.Session() as s:
             s.run(optimizer, feed_dict={training: True,
                                         X: X_train[idx, :],
                                         y: y_train[idx]})
-            err_train = cost.eval(feed_dict={X: X_train[idx, :],
-                                             y: y_train[idx]})
-            err_test = (cost.eval(feed_dict={X: X_test, y: y_test})
-                        * (N) / (len(y_test))) # rescale for diff y length
-            train_err.append(err_train)
-            test_err.append(err_test)
+        err_train = cost.eval(feed_dict={X: X_train[idx, :],
+                                         y: y_train[idx]})
+        err_test = (cost.eval(feed_dict={X: X_test, y: y_test})
+                    * (N) / (len(y_test))) # rescale for diff y length
+        train_err.append(err_train)
+        test_err.append(err_test)
 
         if epoch % 100 == 0:
             print(
-                '%3d: Train error: %.5f\tTest error: %.9f'
+                '%4d: Train error: %.5f\tTest error: %.9f'
                 %(epoch, err_train, err_test))
 
     save_path = saver.save(s, './nn_mod.ckpt')
@@ -202,5 +206,5 @@ for stock, pred in zip(stocks, new_preds.reshape(new_preds.shape[0])):
     final_out.append([stock, pred])
 
 out = pd.DataFrame(columns=['Stock', 'Prediction'], data=final_out)
-out = out.sort_values('Stock', ascending=False)
+out = out.sort_values('Prediction', ascending=False)
 print(out.head(len(stocks)))
