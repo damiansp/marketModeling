@@ -43,6 +43,7 @@ n <- length(x)
 # given quantile below the trend and sells when a given quantile above.
 # Test a variety of window and quantiles to find optimum
 # Also test % to put in/out at each signal
+"
 regression.signals <- function(
   x, down.q, up.q, sell.percent = 1.0, buy.percent = 1.0, plot = T) {
 
@@ -81,36 +82,36 @@ regression.signals <- function(
 
 # Test
 regression.signals(sp$Adj.Close, 0.05, 0.95)
-
+"
 
 moving.deviation.signals <- function(x, 
-                                     up.q = 0.99, 
-                                     down.q = 0.01, 
-                                     downswing.limit = 0.52,
-                                     upswing.limit = 0.1, 
-                                     peak.percent = 0.1, 
-                                     downtrend.percent = 1.0, 
-                                     bottom.percent = 1.0, 
-                                     uptrend.percent = 1.0) {
+                                     up.q, 
+                                     down.q, 
+                                     downswing.limit,
+                                     upswing.limit, 
+                                     peak.percent, 
+                                     downtrend.percent, 
+                                     bottom.percent, 
+                                     uptrend.percent) {
   n <- length(x)
-  qs <- quantile(x, probs = c(down.q, upswing.limit, downswing.limit, up.q))
+  qs <- quantile(x, probs=c(down.q, upswing.limit, downswing.limit, up.q))
   # peak signal
   if (x[n - 2] > qs[4] & x[n - 1] <= qs[4]) {
-  	return (data.frame(signal = 'sell', percent = peak.percent)) 
+  	return (data.frame(signal='sell', percent=peak.percent)) 
   }
   # init upward trend signal
   if (x[n - 2] <= qs[2] & x[n - 1] > qs[2]) {
-  	return (data.frame(signal = 'buy', percent = downtrend.percent))
+  	return (data.frame(signal='buy', percent=downtrend.percent))
   }
   # init down signal
   if (x[n - 2] > qs[3] & x[n - 1] <= qs[3]) {
-    return (data.frame(signal = 'sell', percent = uptrend.percent))
+    return (data.frame(signal='sell', percent=uptrend.percent))
   }
   # bottom signal
   if (x[n - 2] <= qs[1] & x[n - 1] > qs[1]) {
-    return (data.frame(signal = 'buy', percent = bottom.percent))
+    return (data.frame(signal='buy', percent=bottom.percent))
   }
-  return (data.frame(signal = 'hold', percent = 0))
+  return (data.frame(signal='hold', percent=0))
 }
 
 sliding.window <- function(x, window, func, ...) {
@@ -118,12 +119,10 @@ sliding.window <- function(x, window, func, ...) {
   signals <- data.frame(
     signal = factor(rep(NA, n), levels = c('buy', 'hold', 'sell')), 
     percent = numeric(n))
-  
   for (w in window:n) {
   	signal <- func(x[(w - window + 1) : w], ...)
   	signals[w, ] <- signal
   }
-  
   return (signals)
 }
 
@@ -185,17 +184,17 @@ apply.signals <- function(x, signals, initial.amount, initial.percent.invested) 
     signal, percent, x.change, amount.invested, amount.reserve, amount))
 }
 
-apply.deviate.signals <- apply.signals(x, signals, x[1], 1)
-plot(x, type='l', lwd=2, log='y', ylim=range(x, apply.deviate.signals$amount))
+#apply.deviate.signals <- apply.signals(x, signals, x[1], 1)
+#plot(x, type='l', lwd=2, log='y', ylim=range(x, apply.deviate.signals$amount))
 #buy.idx <- which(apply.deviate.signals$signal == 1)
 #sell.idx <- which(apply.deviate.signals$signal == 3)
 #abline(v = buy.idx, col = rgb(0, 1, 0, 0.2))
 #abline(v = sell.idx, col = rgb(1, 0, 0, 0.2))
-lines(apply.deviate.signals$amount, col = 8)
+#lines(apply.deviate.signals$amount, col = 8)
 
 x <- sp$Adj.Close
 n <- length(x)
-DATE_RANGE <- 1:n
+DATE_RANGE <- 1:n #(n - 500):n # # round(n / 2):n
 
 random.color <- function() {
   max.bright <- 2
@@ -205,25 +204,31 @@ random.color <- function() {
   rgb(r, g, b)
 }
 
+# MF 
+#best <- 13156861356
+#this.best <- 13156861356
+#best.params <- c(
+#  w=10, u=0.9537, d=0.1275, dl=0.1699, ul=0.9897, p=0, b=0.25, dp=0.25, up=0)
+#this.best.params <- c(
+#  w=10, u=0.9537, d=0.1275, dl=0.1699, ul=0.9897, p=0, b=0.25, dp=0.25, up=0)
+
 # stocks
-#best <- 1.963608e+13
+#best <- 13514218758 
 #best <- x[n]
 #best.params <- c(
-# w   u        d       dl      ul      p       b        dp      up
-#  6,  0.2479,  0.9402, 0.8232, 0.9597, 0.0000, 0.8538,  0.4802, 0.0000)
-#  15  0.9856   0.99    0.1029  0.3331  0       0.9427   1.       0
-#  15  0.8317   0.99    0.99    0.01    0       0        0.5762   0.7556
+#  w=10, u=0.9791, d=0.1846, dl=0.1987, ul=0.9774,   p=0,   b=0.0309,     
+#  dp=0.9883, up=0)
+
 # 401(k)
-best <- 11001.04
+best <- 270828
 best.params <- c(
-# w     u       d       dl      ul      p       b       dp      up
-  133,  0.1649, 0.0100, 0.0123, 0.0100, 0.0000, 0.0261, 0.4540, 0.0000)
-  134   0.1303  0.01    0.0114  0.0461  0       0.7980  0.4940  0 
+  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
 
 COLOR1 <- random.color()
 COLOR2 <- random.color()
-iters <- 100
+iters <- 50
 colors <- colorRampPalette(colors=c(COLOR1, COLOR2))(iters)
+colors <- sample(colors)
 # add alpha channel
 for (cl in 1:length(colors)) {
   colors[cl] <- paste(colors[cl], '88', sep='')
@@ -233,17 +238,29 @@ plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
+this.best <- 270828
+abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
+this.best.params <- c(
+  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
+std <- 0.01
+options <- c(0, 0.25, 0.5, 0.75, 1)
 for (i in 1:iters) {	
-  #w  <- max(runif(1, 6, 200), 6)
-  w  <- max(rnorm(1, 133, 4), 125) # 200 is full # n3xt
-  u  <- min(max(rnorm(1, 0.1649, 0.02), 0.01), 0.99)
-  d  <- min(max(rnorm(1, 0.0100, 0.02), 0.01), 0.99)
-  dl <- min(max(rnorm(1, 0.0123, 0.02), 0.01), 0.99)
-  ul <- min(max(rnorm(1, 0.0100, 0.02), 0.01), 0.99)
-  p  <- min(max(rnorm(1, 0.0000, 0.02), 0.00), 1.00)
-  b  <- min(max(rnorm(1, 0.0251, 0.64), 0.00), 1.00)
-  dp <- min(max(rnorm(1, 0.4540, 0.02), 0.00), 1.00)
-  up <- min(max(rnorm(1, 0.0000, 0.02), 0.00), 1.00)
+  #w  <- runif(1, 100, 500)
+  w  <- round(min(max(rnorm(1, this.best.params['w'], 200 * std), 60), 500)) 
+  # signal locations
+  u  <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)
+  d  <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
+  dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.01), 0.99)
+  ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.01), 0.99)
+  # percentages
+  #p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
+  #b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
+  #dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.00), 1.00)
+  #up <- min(max(rnorm(1, this.best.params['up'], std), 0.00), 1.00)
+  p  <- sample(options, 1)
+  b  <- sample(options, 1)
+  dp <- sample(options, 1)
+  up <- sample(options, 1)
   signals <- sliding.window(x[DATE_RANGE], 
                             window = w, 
                             func = moving.deviation.signals, 
@@ -256,11 +273,22 @@ for (i in 1:iters) {
                             downtrend.percent = dp, 
                             uptrend.percent = up)
   apply.deviate.signals <- apply.signals(
-    x[DATE_RANGE], signals, x[1], 1)
+    x[DATE_RANGE], signals, x[DATE_RANGE[1]], 1)
+  adjustment <- 0
+  if (apply.deviate.signals$amount[1] != x[DATE_RANGE[1]]) {
+  	adjustment <- x[DATE_RANGE[1]] - apply.deviate.signals$amount[1]
+  }
+  apply.deviate.signals$amount <- apply.deviate.signals$amount + adjustment
   lines(apply.deviate.signals$amount, col = colors[i])
   final <- apply.deviate.signals$amount[length(apply.deviate.signals$amount)]
   if (final >= 0.5 * best) {
-  	cat('Within 25%: ', w, u, d, dl, ul, p, b, dp, up, '\n')
+  	cat('Within 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
+  }
+  if (final > this.best) {
+  	cat('Best so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
+  		'\n')
+  	this.best <- final
+  	this.best.params <- c(w=w, u=u, d=d, dl=dl, ul=ul, p=p, b=b, dp=dp, up=up)
   }
   if (final > best) {
   	cat('New Best!\n')
@@ -270,6 +298,7 @@ for (i in 1:iters) {
 }
 Sys.time() - t
 best
+this.best.params
 best.params
 
 
