@@ -205,30 +205,22 @@ random.color <- function() {
 }
 
 # MF 
-#best <- 13156861356
-#this.best <- 13156861356
-#best.params <- c(
-#  w=10, u=0.9537, d=0.1275, dl=0.1699, ul=0.9897, p=0, b=0.25, dp=0.25, up=0)
-#this.best.params <- c(
-#  w=10, u=0.9537, d=0.1275, dl=0.1699, ul=0.9897, p=0, b=0.25, dp=0.25, up=0)
 
 # stocks
-#best <- 13514218758 
-#best <- x[n]
-#best.params <- c(
-#  w=10, u=0.9791, d=0.1846, dl=0.1987, ul=0.9774,   p=0,   b=0.0309,     
-#  dp=0.9883, up=0)
+best <- 13156861356
+best.params <- c(
+  w=10, u=0.99, d=0.2066, dl=0.8073, ul=0.99, p=0.5, b=0.75, dp=0.25, up=0.25)
 
 # 401(k)
-best <- 270828
-best.params <- c(
-  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
+#best <- 270828
+#best.params <- c(
+#  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
 
 COLOR1 <- random.color()
 COLOR2 <- random.color()
 iters <- 50
 colors <- colorRampPalette(colors=c(COLOR1, COLOR2))(iters)
-colors <- sample(colors)
+#colors <- sample(colors)
 # add alpha channel
 for (cl in 1:length(colors)) {
   colors[cl] <- paste(colors[cl], '88', sep='')
@@ -238,25 +230,26 @@ plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 270828
+this.best <- 74133515
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
-std <- 0.01
-options <- c(0, 0.25, 0.5, 0.75, 1)
+  w=13, u=0.9522, d=0.2111, dl=0.8277 ul=0.9879, p=0, b=0.5, dp=0.1, up=0)
+std <- 0.001
+options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  # %s of amounts that can be moved
 for (i in 1:iters) {	
   #w  <- runif(1, 100, 500)
-  w  <- round(min(max(rnorm(1, this.best.params['w'], 200 * std), 60), 500)) 
+  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 10), 240)) 
   # signal locations
   u  <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)
   d  <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
   dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.01), 0.99)
   ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.01), 0.99)
-  # percentages
+  # percentages...
   #p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
   #b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
   #dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.00), 1.00)
   #up <- min(max(rnorm(1, this.best.params['up'], std), 0.00), 1.00)
+  # ...or fixed options
   p  <- sample(options, 1)
   b  <- sample(options, 1)
   dp <- sample(options, 1)
