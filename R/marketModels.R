@@ -84,15 +84,9 @@ regression.signals <- function(
 regression.signals(sp$Adj.Close, 0.05, 0.95)
 "
 
-moving.deviation.signals <- function(x, 
-                                     up.q, 
-                                     down.q, 
-                                     downswing.limit,
-                                     upswing.limit, 
-                                     peak.percent, 
-                                     downtrend.percent, 
-                                     bottom.percent, 
-                                     uptrend.percent) {
+moving.deviation.signals <- function(
+    x, up.q, down.q, downswing.limit, upswing.limit, peak.percent, 
+    downtrend.percent, bottom.percent, uptrend.percent) {
   n <- length(x)
   qs <- quantile(x, probs=c(down.q, upswing.limit, downswing.limit, up.q))
   # peak signal
@@ -194,7 +188,7 @@ apply.signals <- function(x, signals, initial.amount, initial.percent.invested) 
 
 x <- sp$Adj.Close
 n <- length(x)
-DATE_RANGE <- 1:n #(n - 500):n # # round(n / 2):n
+DATE_RANGE <- round(0.25*n):n #(n - 500):n # # round(n / 2):n
 
 random.color <- function() {
   max.bright <- 2
@@ -207,14 +201,16 @@ random.color <- function() {
 # MF 
 
 # stocks
-best <- 13156861356
-best.params <- c(
-  w=10, u=0.99, d=0.2066, dl=0.8073, ul=0.99, p=0.5, b=0.75, dp=0.25, up=0.25)
+#best <- 314606430
+#best.params <- c(
+#  w=11, u=0.9778, d=0.1351, dl=0.4901, ul=0.9506, p=0, b=0.1524, dp=0.6738, 
+#  up=0)
 
 # 401(k)
-#best <- 270828
-#best.params <- c(
-#  w=66, u=0.1395, d=0.99, dl=0.2847, ul=0.6285, p=0, b=1, dp=0.5, up=0)
+best <- 192598.1
+best.params <- c(
+  w=60, u=0.99, d=0.99, dl=0.2585, ul=0.3742, p=0.0594, b=0.2407, dp=0.8484, 
+  up=0.)
 
 COLOR1 <- random.color()
 COLOR2 <- random.color()
@@ -230,41 +226,47 @@ plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 74133515
+this.best <- 192598.1
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=13, u=0.9522, d=0.2111, dl=0.8277 ul=0.9879, p=0, b=0.5, dp=0.1, up=0)
-std <- 0.001
-options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  # %s of amounts that can be moved
+  w=60, u=0.99, d=0.99, dl=0.2585, ul=0.3742, p=0.0594, b=0.2407, dp=0.8484, 
+  up=0.)
+  std <- 0.04
+# %s of amounts that can be moved
+options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  
 for (i in 1:iters) {	
   #w  <- runif(1, 100, 500)
-  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 10), 240)) 
+  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 60), 240)) 
   # signal locations
-  u  <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)
-  d  <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
+  #u  <- this.best.params['u'] 
+  u <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)
+  #d  <- this.best.params['d'] 
+  d <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
+  #dl <- this.best.params['d'] 
   dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.01), 0.99)
+  #ul <- this.best.params['ul'] 
   ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.01), 0.99)
   # percentages...
-  #p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
-  #b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
-  #dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.00), 1.00)
-  #up <- min(max(rnorm(1, this.best.params['up'], std), 0.00), 1.00)
+  p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
+  b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
+  dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.00), 1.00)
+  up <- min(max(rnorm(1, this.best.params['up'], std), 0.00), 1.00)
   # ...or fixed options
-  p  <- sample(options, 1)
-  b  <- sample(options, 1)
-  dp <- sample(options, 1)
-  up <- sample(options, 1)
+  #p  <- sample(options, 1)
+  #b  <- sample(options, 1)
+  #dp <- sample(options, 1)
+  #up <- sample(options, 1)
   signals <- sliding.window(x[DATE_RANGE], 
-                            window = w, 
-                            func = moving.deviation.signals, 
-                            up.q = u, 
-                            down.q = d,
-                            downswing.limit = dl,
-                            upswing.limit = ul, 
-                            peak.percent = p, 
-                            bottom.percent = b,
-                            downtrend.percent = dp, 
-                            uptrend.percent = up)
+                            window=w, 
+                            func=moving.deviation.signals, 
+                            up.q=u, 
+                            down.q=d,
+                            downswing.limit=dl,
+                            upswing.limit=ul, 
+                            peak.percent=p, 
+                            bottom.percent=b,
+                            downtrend.percent=dp, 
+                            uptrend.percent=up)
   apply.deviate.signals <- apply.signals(
     x[DATE_RANGE], signals, x[DATE_RANGE[1]], 1)
   adjustment <- 0
@@ -275,19 +277,20 @@ for (i in 1:iters) {
   lines(apply.deviate.signals$amount, col = colors[i])
   final <- apply.deviate.signals$amount[length(apply.deviate.signals$amount)]
   if (final >= 0.5 * best) {
-  	cat('Within 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
+  	cat('\nWithin 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
   }
   if (final > this.best) {
-  	cat('Best so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
+  	cat('\nBest so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
   		'\n')
   	this.best <- final
   	this.best.params <- c(w=w, u=u, d=d, dl=dl, ul=ul, p=p, b=b, dp=dp, up=up)
   }
   if (final > best) {
-  	cat('New Best!\n')
+  	cat('\nNew Best!\n')
     best.params <- c(w, u, d, dl, ul, p, b, dp, up)
     best <- final
   }
+  cat(100 * i / iters, '% complete\r', sep='')
 }
 Sys.time() - t
 best
