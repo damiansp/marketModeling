@@ -188,7 +188,7 @@ apply.signals <- function(x, signals, initial.amount, initial.percent.invested) 
 
 x <- sp$Adj.Close
 n <- length(x)
-DATE_RANGE <- round(0.25*n):n #(n - 500):n # # round(n / 2):n
+DATE_RANGE <- (n-2500):n
 
 random.color <- function() {
   max.bright <- 2
@@ -207,14 +207,14 @@ random.color <- function() {
 #  up=0)
 
 # 401(k)
-best <- 192598.1
+best <- 11563.91
 best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.2585, ul=0.3742, p=0.0594, b=0.2407, dp=0.8484, 
-  up=0.)
+  w=60, u=0.99, d=0.99, dl=0.5724, ul=0.3532, p=0, b=0.3679, dp=0.1994, 
+  up=0)
 
 COLOR1 <- random.color()
 COLOR2 <- random.color()
-iters <- 50
+iters <- 100
 colors <- colorRampPalette(colors=c(COLOR1, COLOR2))(iters)
 #colors <- sample(colors)
 # add alpha channel
@@ -226,15 +226,16 @@ plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 192598.1
+this.best <- 11563.91
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.2585, ul=0.3742, p=0.0594, b=0.2407, dp=0.8484, 
-  up=0.)
+  w=60, u=0.99, d=0.99, dl=0.5724, ul=0.3532, p=0, b=0.3679, dp=0.1994, 
+  up=0)
   std <- 0.04
 # %s of amounts that can be moved
 options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  
 for (i in 1:iters) {	
+  #w <- 60
   #w  <- runif(1, 100, 500)
   w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 60), 240)) 
   # signal locations
@@ -243,9 +244,9 @@ for (i in 1:iters) {
   #d  <- this.best.params['d'] 
   d <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
   #dl <- this.best.params['d'] 
-  dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.01), 0.99)
+  dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.02), 0.98) 
   #ul <- this.best.params['ul'] 
-  ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.01), 0.99)
+  ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.02), 0.98)
   # percentages...
   p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
   b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
@@ -274,11 +275,11 @@ for (i in 1:iters) {
   	adjustment <- x[DATE_RANGE[1]] - apply.deviate.signals$amount[1]
   }
   apply.deviate.signals$amount <- apply.deviate.signals$amount + adjustment
-  lines(apply.deviate.signals$amount, col = colors[i])
+  lines(apply.deviate.signals$amount, col=colors[i])
   final <- apply.deviate.signals$amount[length(apply.deviate.signals$amount)]
-  if (final >= 0.5 * best) {
-  	cat('\nWithin 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
-  }
+  #if (final >= 0.5 * best) {
+  #	cat('\nWithin 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
+  #}
   if (final > this.best) {
   	cat('\nBest so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
   		'\n')
