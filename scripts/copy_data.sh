@@ -1,1 +1,1 @@
-cp ~/Desktop/buyStats.csv ~/Desktop/marketStudies/data/buyStats.csv
+cp ~/Desktop/buyStatsFilled.csv ~/Desktop/marketStudies/data/buyStats.csv
