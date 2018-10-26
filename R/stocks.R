@@ -1,0 +1,1 @@
+stocks <- read.csv('~/Desktop/marketStudies/data/stocks.csv', header = F)$V1

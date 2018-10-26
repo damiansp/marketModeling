@@ -201,15 +201,15 @@ random.color <- function() {
 # MF 
 
 # stocks
-#best <- 314606430
+#best <- 8941.889
 #best.params <- c(
-#  w=11, u=0.9778, d=0.1351, dl=0.4901, ul=0.9506, p=0, b=0.1524, dp=0.6738, 
-#  up=0)
+#  w=11, u=0.9499, d=0.2397, dl=0.98, ul=0.9068, p=0, b=0.5677, dp=0.8989, 
+#  up=0.4456)
 
 # 401(k)
-best <- 11563.91
+best <- 12348.59
 best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.5724, ul=0.3532, p=0, b=0.3679, dp=0.1994, 
+  w=60, u=0.99, d=0.99, dl=0.3469, ul=0.7890, p=0, b=0.9285, dp=0.3190, 
   up=0)
 
 COLOR1 <- random.color()
@@ -222,22 +222,22 @@ for (cl in 1:length(colors)) {
   colors[cl] <- paste(colors[cl], '88', sep='')
 }
 
-plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
+plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(100, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 11563.91
+this.best <- 12348.59
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.5724, ul=0.3532, p=0, b=0.3679, dp=0.1994, 
+  w=60, u=0.99, d=0.99, dl=0.3469, ul=0.7890, p=0, b=0.9285, dp=0.3190, 
   up=0)
-  std <- 0.04
+  std <- 0.004
 # %s of amounts that can be moved
 options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  
 for (i in 1:iters) {	
   #w <- 60
   #w  <- runif(1, 100, 500)
-  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 60), 240)) 
+  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 60), 250)) 
   # signal locations
   #u  <- this.best.params['u'] 
   u <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)

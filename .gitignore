@@ -1,7 +1,22 @@
+# OS
+#------------------------
 .DS_Store
-data/
+*~
+
+
+# Py/Jupter/TF/Keras
+#------------------------
 */checkpoint
 .ipynb_checkpoints
 *.ckpt*
-*~
+
+
+# R
+#------------------------
+.Rapp.history
+
+
+# Dirs
+#------------------------
+data/
 *logs/
