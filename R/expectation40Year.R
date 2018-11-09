@@ -220,16 +220,21 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
 twoK.downtrend <- c(12500, 13500)
 housing.crash <- c(14500, 15000)
 
-# 100%  in at bottom, 75%  in at 2nd
-#  50% out at top,    25% out at 2nd
 sp <- read.and.prep.data() 
 plot.for.ts(sp)
+
+# 100%  in at bottom, 75%  in at 2nd
+#  50% out at top,    25% out at 2nd
+quartz()
+sp.1k.days <- clip.series(sp, n.days=1000)
+plot.for.ts(sp.1k.days, long=4*250)
 
 # 50% in  at bottom, 25% at 2nd
 # 10% out at top,     5% at 2nd
 quartz()
-sp.1k.days <- clip.series(sp, n.days=1000)
-plot.for.ts(sp.1k.days, long=4*250)
+sp.1k.days <- clip.series(sp, n.days=500)
+plot.for.ts(sp.1k.days, long=2*250)
+
 
 # 25%  in at bottom; 10% at 2nd
 #  5% out at top.     1% at 2nd
