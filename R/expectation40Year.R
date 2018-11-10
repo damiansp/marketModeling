@@ -223,20 +223,25 @@ housing.crash <- c(14500, 15000)
 sp <- read.and.prep.data() 
 plot.for.ts(sp)
 
-# 100%  in at bottom, 75%  in at 2nd
+# 100%  in at bottom, 50%  in at 2nd
 #  50% out at top,    25% out at 2nd
 quartz()
-sp.1k.days <- clip.series(sp, n.days=1000)
+sp.1k.days <- clip.series(sp, n.days=8*250)
+plot.for.ts(sp.1k.days, long=8*250)
+
+#  50%  in at bottom, 25%  in at 2nd
+#  25% out at top,    12% out at 2nd
+quartz()
+sp.1k.days <- clip.series(sp, n.days=4*250)
 plot.for.ts(sp.1k.days, long=4*250)
 
-# 50% in  at bottom, 25% at 2nd
+# 20% in  at bottom, 10% at 2nd
 # 10% out at top,     5% at 2nd
 quartz()
-sp.1k.days <- clip.series(sp, n.days=500)
+sp.1k.days <- clip.series(sp, n.days=2*250)
 plot.for.ts(sp.1k.days, long=2*250)
 
-
-# 25%  in at bottom; 10% at 2nd
+# 10%  in at bottom;  5% at 2nd
 #  5% out at top.     1% at 2nd
 quartz()
 sp.1yr <- clip.series(sp, n.days=250)
