@@ -111,12 +111,17 @@ resid.plot <- function(resids) {
   plot(resids, type='l')
   abline(h=0, col='grey')
   abline(
-    h = quantile(
+    h=quantile(
       resids, 
-      probs = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99), 
-      na.rm = T),
-    lty = c(5:1, 2:5),
-    col = colorRampPalette(colors = c('green', 'red'))(9))
+      probs=c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99), 
+      na.rm=T),
+    lty=c(5:1, 2:5),
+    col=colorRampPalette(colors = c('green', 'red'))(9))
+  most.extreme <- quantile(resids, probs=c(0.01, 0.99), na.rm=T)
+  n <- length(resids)
+  if (resids[n] <= most.extreme[1] | resids[n] > most.extreme[2]) {
+  	legend('topleft', legend='Extreme Condition', bg='white')
+  }
 }
 
 
@@ -196,9 +201,9 @@ plot.for.ts <- function(ts, k=250, short=250, long=5*250, proj=T) {
   trend <- get.trend(ts, days)
   y1.val <- get.period.value(ts, n, k, T)
   c.list <- get.colors(k)
-  vols = vol.up.down(ts, n)
-  volUp = vols$volUp
-  volDown = vols$volDown
+  vols <- vol.up.down(ts, n)
+  volUp <- vols$volUp
+  volDown <- vols$volDown
   resids <- get.resids(ts, trend, days, n)
   ema90 <- EMA(ts$Volume, n=90)
   cat('n: ', n)
@@ -220,32 +225,35 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
 twoK.downtrend <- c(12500, 13500)
 housing.crash <- c(14500, 15000)
 
+# 100% out
 sp <- read.and.prep.data() 
 plot.for.ts(sp)
+# 100% in
 
-# 100%  in at bottom, 50%  in at 2nd
-#  50% out at top,    25% out at 2nd
+# 50% out
 quartz()
 sp.1k.days <- clip.series(sp, n.days=8*250)
 plot.for.ts(sp.1k.days, long=8*250)
+# 100% in
 
-#  50%  in at bottom, 25%  in at 2nd
-#  25% out at top,    12% out at 2nd
+# 25% out
 quartz()
 sp.1k.days <- clip.series(sp, n.days=4*250)
 plot.for.ts(sp.1k.days, long=4*250)
+# 50% in
 
-# 20% in  at bottom, 10% at 2nd
-# 10% out at top,     5% at 2nd
+# 15% out
 quartz()
 sp.1k.days <- clip.series(sp, n.days=2*250)
 plot.for.ts(sp.1k.days, long=2*250)
+# 25% in
 
-# 10%  in at bottom;  5% at 2nd
-#  5% out at top.     1% at 2nd
+# 6% out
 quartz()
 sp.1yr <- clip.series(sp, n.days=250)
 plot.for.ts(sp.1yr, long=250, proj=F)
+# 12% in
+
 
 #quartz()
 #twoK <- clip.series(sp, day.range=twoK.downtrend)
