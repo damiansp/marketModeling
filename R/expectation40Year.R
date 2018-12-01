@@ -409,7 +409,6 @@ DAYS_AGO <- round(DAYS_AGO / 2)
 DAYS <- c(n - DAYS_AGO, n)
 
 
-par(mfrow=c(1, 1))
 #DAYS <- c(2*DAYS[1], DAYS[2])
 #DAYS <- DAYS * 4
 
