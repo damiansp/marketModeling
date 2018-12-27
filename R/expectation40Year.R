@@ -225,33 +225,39 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
 twoK.downtrend <- c(12500, 13500)
 housing.crash <- c(14500, 15000)
 
-# 100% out
+# 50% out
 sp <- read.and.prep.data() 
 plot.for.ts(sp)
 # 100% in
 
-# 50% out
+# 37.5% out
 quartz()
-sp.1k.days <- clip.series(sp, n.days=8*250)
-plot.for.ts(sp.1k.days, long=8*250)
-# 100% in
+sp.1k.days <- clip.series(sp, n.days=20*250)
+plot.for.ts(sp.1k.days, long=20*250)
+# 85% in
 
-# 25% out
+# 24% out
 quartz()
-sp.1k.days <- clip.series(sp, n.days=4*250)
-plot.for.ts(sp.1k.days, long=4*250)
+sp.1k.days <- clip.series(sp, n.days=10*250)
+plot.for.ts(sp.1k.days, long=10*250)
+# 75% in
+
+# 12.5% out
+quartz()
+sp.1k.days <- clip.series(sp, n.days=5*250)
+plot.for.ts(sp.1k.days, long=5*250)
 # 50% in
 
-# 15% out
+# 7.5% out
 quartz()
-sp.1k.days <- clip.series(sp, n.days=2*250)
-plot.for.ts(sp.1k.days, long=2*250)
+sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
+plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 25% in
 
-# 6% out
+# 3% out
 quartz()
-sp.1yr <- clip.series(sp, n.days=250)
-plot.for.ts(sp.1yr, long=250, proj=F)
+sp.1yr <- clip.series(sp, n.days=round(1.25*250))
+plot.for.ts(sp.1yr, long=round(1*250), proj=F)
 # 12% in
 
 
@@ -288,23 +294,18 @@ movingDev <- function(
 }
 
 # stocks
-w  <- 11
-u  <- 0.9499
-d  <- 0.2397
+w  <- 10
+u  <- 0.9319
+d  <- 0.1316
 dl <- 0.9800
-ul <- 0.9068
+ul <- 0.9800
 
 # 401-k
 w2  <- 60
-u2  <- 0.99
-d2  <- 0.99
-dl2 <- 0.3469
-ul2 <- 0.7890
-
-# p  <- 0.0000 0.0288 0.6682
-# b  <- 0.3679 0.6375 0.6895
-# dp <- 0.1994 0.9991 1.0000
-# up <- 0.0000 0.0309 0.1598
+u2  <- 0.9870
+d2  <- 0.9894
+dl2 <- 0.3384
+ul2 <- 0.7604
 
 movMedDev <- movingDev(
   sp$Adj.Close, 
@@ -415,38 +416,38 @@ DAYS <- c(n - DAYS_AGO, n)
         
 # FOR Fidelity: Motley Fool--Buy and Hold but follow these recs.
 # STOCKS (E*Trade)--These
-# CURRENT BEST PARAMETERS:				11-day window
-# WHEN REENTERING FROM PEAK: 			Sell: 0%	     p	(at the 94.99%ile u)
-# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 89.89% dp (at the 98.00%ile dl)
-# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:  44.56% up (at the 90.68%ile ul)
-# WHEN REENTERING FROM BOTTOM:			Buy:  56.77% b	(at the 23.97%ile d)
+# CURRENT BEST PARAMETERS:				10-day window
+# WHEN REENTERING FROM PEAK: 			Sell: 0%	     p	(at the 93.19%ile u)
+# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 99.09% dp (at the 98.00%ile dl)
+# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:  67.98% up (at the 98.00%ile ul)
+# WHEN REENTERING FROM BOTTOM:			Buy:   6.99% b	(at the 13.16%ile d)
 #
-
-# 98.00 ---\-----------------------------------------f-------------------------
-#           S 89.89%
-# 94.99 -------------\-------------------------------p-------------------------
-#                     S 0   B 44.56
-# 90.68 -------------------/-------------------------r------------------------- 
-#                                   B 56.77
-# 23.97 ---------------------------/-----------------b------------------------- 
+#                     B: 67.98
+# 98.00 ---\---------/---------------------r, f---------------------------------
+#           S: 99.09
+# 93.19 ----------------\------------------p------------------------------------
+#                        S: 0   B: 6.99
+# 13.16 -----------------------/-----------b------------------------------------ 
 
 
 
 
 # 401(k)
 # CURRENT BEST PARAMETERS:				60-day window
-# WHEN REENTERING FROM PEAK: 			Sell:     0%	 p  (at the 99.00%ile  	u)
-# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 31.90%	 dp	(at the 34.69%ile	dl)
-# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:      0% up (at the 78.90%ile	ul)
-# WHEN REENTERING FROM BOTTOM:			Buy:  92.85% b	(at the 99.00%ile	d)
+# WHEN REENTERING FROM PEAK: 			Sell:     0%	 p  (at the 98.70%ile  	u)
+# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 26.35%	 dp	(at the 33.84%ile	dl)
+# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:      0% up (at the 76.04%ile	ul)
+# WHEN REENTERING FROM BOTTOM:			Buy:  92.08% b	(at the 98.94%ile	d)
 
-#                               B 92.85
-# 99.00 ---\-------------------/-------------------p,b--------------------------
-#           S 0           B 0
-# 78.90 -----------------/---------------------------r--------------------------
+#            B: 92.08
+# 98.94 ----/--------------------------------b--------------------------------
 #
-# 34.69 --------\------------------------------------f--------------------------
-#                S 31.90
+# 98.70 --------\----------------------------p--------------------------------
+#                 S: 0  B: 0
+# 76.04 ---------------/---------------------r--------------------------------
+#
+# 33.84 ---------------------\---------------f--------------------------------
+#                             S: 26.35
 
 
 # Precedence: peak > upward > downward > bottom

@@ -3,8 +3,6 @@ rm(list = ls())
 library(tseries)
 load('~/Desktop/marketStudies/data/randomSignals.csv')
 
-#get.hist.quote('^gspc', start = '1976-01-01', quote = c('Adj.Close, Volume'))
-
 sp <- read.csv('~/Desktop/marketStudies/data/sp1950.csv')
 class(sp$Adj.Close)
 head(sp)
@@ -39,74 +37,33 @@ sp$Volume <- fill(sp$Volume, 'back')
 x <- sp$Adj.Close
 n <- length(x)
 
-# A simple regression-line model that takes an N-day window, and buys when at a 
-# given quantile below the trend and sells when a given quantile above.
-# Test a variety of window and quantiles to find optimum
-# Also test % to put in/out at each signal
-"
-regression.signals <- function(
-  x, down.q, up.q, sell.percent = 1.0, buy.percent = 1.0, plot = T) {
-
-  n <- length(x)
-  periods <- 1:n
-  
-  trend <- lm(log(x) ~ periods)
-  fitted <- predict(trend)
-  resids <- log(x) - fitted
-  signals <- quantile(resids, probs = c(down.q, up.q))
-  today <- resids[length(resids)]
-    
-  if (plot) {
-    par(mfrow = c(2, 1))
-    par(mar = c(2, 4, 0.2, 0.2))
-    plot(log(x) ~ periods, 
-         type = 'l', 
-         ylim = c(0.9 * min(log(x)), 1.1 * max(log(x))))
-    abline(trend, col = 4)
-    lines(fitted + signals[1], col = 2)
-    lines(fitted + signals[2], col = 2)
-  
-    plot(resids ~ periods, type = 'l')
-    abline(h = 0, col = 'grey')
-    abline(h = signals, col = 2)
-  }
-
-  if (today <= signals[1]) {
-  	return (data.frame(signal = 'buy', percent = buy.percent))
-  } else if (today >= signals[2]) {
-  	return (data.frame(signal = 'sell', percent = sell.percent))
-  } else {
-  	return (data.frame(signal = 'hold', percent = 1.0))
-  }
-}
-
-# Test
-regression.signals(sp$Adj.Close, 0.05, 0.95)
-"
 
 moving.deviation.signals <- function(
     x, up.q, down.q, downswing.limit, upswing.limit, peak.percent, 
-    downtrend.percent, bottom.percent, uptrend.percent) {
+    downtrend.percent, bottom.percent, uptrend.percent, 
+    actions=c('sell', 'buy', 'sell', 'buy')) {
   n <- length(x)
   qs <- quantile(x, probs=c(down.q, upswing.limit, downswing.limit, up.q))
   # peak signal
   if (x[n - 2] > qs[4] & x[n - 1] <= qs[4]) {
-  	return (data.frame(signal='sell', percent=peak.percent)) 
+  	return (data.frame(signal=actions[1], percent=peak.percent)) 
   }
   # init upward trend signal
   if (x[n - 2] <= qs[2] & x[n - 1] > qs[2]) {
-  	return (data.frame(signal='buy', percent=downtrend.percent))
+  	return (data.frame(signal=actions[2], percent=downtrend.percent))
   }
   # init down signal
   if (x[n - 2] > qs[3] & x[n - 1] <= qs[3]) {
-    return (data.frame(signal='sell', percent=uptrend.percent))
+    return (data.frame(signal=actions[3], percent=uptrend.percent))
   }
   # bottom signal
   if (x[n - 2] <= qs[1] & x[n - 1] > qs[1]) {
-    return (data.frame(signal='buy', percent=bottom.percent))
+    return (data.frame(signal=actions[4], percent=bottom.percent))
   }
   return (data.frame(signal='hold', percent=0))
 }
+
+
 
 sliding.window <- function(x, window, func, ...) {
   n <- length(x)
@@ -120,31 +77,6 @@ sliding.window <- function(x, window, func, ...) {
   return (signals)
 }
 
-#signals <- sliding.window(sp$Adj.Close, 20, regression.signals, 0.05, 0.95, F)
-#DATE_RANGE <- 1:n
-#x <- sp$Adj.Close[DATE_RANGE]
-#signals <- sliding.window(sp$Adj.Close[DATE_RANGE], 
-#                          window = 9, 
-#                          func = moving.deviation.signals, 
-#                          up.q = 0.99, 
-#                          down.q = 0.01,
-#                          downswing.limit = 0.5,
-#                          upswing.limit = 0.5, 
-#                          peak.percent = 0.0, 
-#                          downtrend.percent = 1.0, 
-#                          bottom.percent = 0.0, 
-#                          uptrend.percent = 1.0)
-
-#plot(log(x), 
-#     type = 'l', 
-#     xlim = c(n - 1000, n), 
-#     ylim = range(log(x)[(n - 1000) : n]))
-#plot(log(x), type = 'l')
-#buy.idx <- which(signals$signal == 'buy')
-#sell.idx <- which(signals$signal == 'sell')
-#abline(v = buy.idx, col = rgb(0, 1, 0, 0.5))
-#abline(v = sell.idx, col = rgb(1, 0, 0, 0.5))
-
 
 apply.signals <- function(x, signals, initial.amount, initial.percent.invested) {
   signal <- signals$signal
@@ -156,8 +88,7 @@ apply.signals <- function(x, signals, initial.amount, initial.percent.invested) 
   amount <- amount.invested <- amount.reserve <- rep(NA, n)
   amount[1] <- initial.amount
   amount.invested[1] <- initial.percent.invested * initial.amount
-  amount.reserve[1] <- amount[1] - amount.invested[1]
-  
+  amount.reserve[1] <- amount[1] - amount.invested[1]  
   for (day in 2:n) {
   	amount.invested[day] <- amount.invested[day - 1] * x.change[day]
   	if (signal[day] == 'buy') {  
@@ -172,23 +103,15 @@ apply.signals <- function(x, signals, initial.amount, initial.percent.invested) 
   	  amount.reserve[day] <- amount.reserve[day - 1]
   	}
   }
-  
   amount <- amount.invested + amount.reserve
   as.data.frame(cbind(
     signal, percent, x.change, amount.invested, amount.reserve, amount))
 }
 
-#apply.deviate.signals <- apply.signals(x, signals, x[1], 1)
-#plot(x, type='l', lwd=2, log='y', ylim=range(x, apply.deviate.signals$amount))
-#buy.idx <- which(apply.deviate.signals$signal == 1)
-#sell.idx <- which(apply.deviate.signals$signal == 3)
-#abline(v = buy.idx, col = rgb(0, 1, 0, 0.2))
-#abline(v = sell.idx, col = rgb(1, 0, 0, 0.2))
-#lines(apply.deviate.signals$amount, col = 8)
 
 x <- sp$Adj.Close
 n <- length(x)
-DATE_RANGE <- (n-2500):n
+DATE_RANGE <- 1:n #(n-2500):n
 
 random.color <- function() {
   max.bright <- 2
@@ -198,23 +121,24 @@ random.color <- function() {
   rgb(r, g, b)
 }
 
-# MF 
 
+# MF 
 # stocks
-#best <- 8941.889
-#best.params <- c(
-#  w=11, u=0.9499, d=0.2397, dl=0.98, ul=0.9068, p=0, b=0.5677, dp=0.8989, 
-#  up=0.4456)
+best <- 1347209568 
+best.params <- c(
+  w=10, u=0.9319, d=0.1316, dl=0.9800, ul=0.9800, p=0.0000, b=0.0699, dp=0.9909, 
+  up=0.6798)
+
 
 # 401(k)
-best <- 12348.59
-best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.3469, ul=0.7890, p=0, b=0.9285, dp=0.3190, 
-  up=0)
+#best <- 2315186
+#best.params <- c(
+#  w=60, u=0.9885, d=0.99, dl=0.3387, ul=0.7602, p=0, b=0.9194, dp=0.2632, 
+#  up=0)
 
 COLOR1 <- random.color()
 COLOR2 <- random.color()
-iters <- 100
+iters <- 30
 colors <- colorRampPalette(colors=c(COLOR1, COLOR2))(iters)
 #colors <- sample(colors)
 # add alpha channel
@@ -222,22 +146,22 @@ for (cl in 1:length(colors)) {
   colors[cl] <- paste(colors[cl], '88', sep='')
 }
 
-plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(100, 1.1 * best))
+plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 12348.59
+this.best <- 1347209568
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=60, u=0.99, d=0.99, dl=0.3469, ul=0.7890, p=0, b=0.9285, dp=0.3190, 
-  up=0)
-  std <- 0.004
+  w=10, u=0.9319, d=0.1316, dl=0.9800, ul=0.9800, p=0.0000, b=0.0699, dp=0.9909, 
+  up=0.6798)
+  std <- 0.002
 # %s of amounts that can be moved
 options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  
 for (i in 1:iters) {	
   #w <- 60
   #w  <- runif(1, 100, 500)
-  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 60), 250)) 
+  w  <- round(min(max(rnorm(1, this.best.params['w'], 100 * std), 10), 250)) 
   # signal locations
   #u  <- this.best.params['u'] 
   u <- min(max(rnorm(1, this.best.params['u'],  std), 0.01), 0.99)
@@ -281,8 +205,9 @@ for (i in 1:iters) {
   #	cat('\nWithin 25%: (', final, ')', w, u, d, dl, ul, p, b, dp, up, '\n')
   #}
   if (final > this.best) {
-  	cat('\nBest so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
-  		'\n')
+  	cat(
+  	  '\nBest so far this round: (', final, ')', w, u, d, dl, ul, p, b, dp, up, 
+  	  '\n')
   	this.best <- final
   	this.best.params <- c(w=w, u=u, d=d, dl=dl, ul=ul, p=p, b=b, dp=dp, up=up)
   }
