@@ -257,7 +257,7 @@ plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 3% out
 quartz()
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
-plot.for.ts(sp.1yr, long=round(1*250), proj=F)
+plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
 # 12% in
 
 
@@ -295,10 +295,10 @@ movingDev <- function(
 
 # stocks
 w  <- 10
-u  <- 0.9319
-d  <- 0.1316
-dl <- 0.9800
-ul <- 0.9800
+u  <- 0.3655
+d  <- 0.1593
+dl <- 0.4325
+ul <- 0.9537
 
 # 401-k
 w2  <- 60
@@ -412,22 +412,24 @@ DAYS <- c(n - DAYS_AGO, n)
 
 #DAYS <- c(2*DAYS[1], DAYS[2])
 #DAYS <- DAYS * 4
-
+# ON the line is BELOW the line
         
 # FOR Fidelity: Motley Fool--Buy and Hold but follow these recs.
 # STOCKS (E*Trade)--These
 # CURRENT BEST PARAMETERS:				10-day window
-# WHEN REENTERING FROM PEAK: 			Sell: 0%	     p	(at the 93.19%ile u)
-# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 99.09% dp (at the 98.00%ile dl)
-# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:  67.98% up (at the 98.00%ile ul)
-# WHEN REENTERING FROM BOTTOM:			Buy:   6.99% b	(at the 13.16%ile d)
+# WHEN REENTERING FROM PEAK: 			Sell: 05.00%	 p	(at the 36.55%ile u)
+# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 95.00% dp (at the 43.25%ile dl)
+# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:  89.73% up (at the 95.37%ile ul)
+# WHEN REENTERING FROM BOTTOM:			Buy:  95.00% b	(at the 15.93%ile d)
 #
-#                     B: 67.98
-# 98.00 ---\---------/---------------------r, f---------------------------------
-#           S: 99.09
-# 93.19 ----------------\------------------p------------------------------------
-#                        S: 0   B: 6.99
-# 13.16 -----------------------/-----------b------------------------------------ 
+#                        B: 89.73 
+# 4) 95.37 -------------/----------------r-----------------------------------------
+#
+# 2) 43.25 -------\----------------------f-----------------------------------------
+#                  S: 95 
+# 1) 36.55 --\---------------------------p-----------------------------------------
+#             S: 5                B: 95
+# 3) 15.93 ----------------------/-------b----------------------------------------- 
 
 
 

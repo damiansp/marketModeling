@@ -124,10 +124,10 @@ random.color <- function() {
 
 # MF 
 # stocks
-best <- 1347209568 
+best <- 91929843 
 best.params <- c(
-  w=10, u=0.9319, d=0.1316, dl=0.9800, ul=0.9800, p=0.0000, b=0.0699, dp=0.9909, 
-  up=0.6798)
+  w=10, u=0.3655, d=0.1593, dl=0.4325, ul=0.9537, p=0.0500, b=0.9500, dp=0.9500, 
+  up=0.8973)
 
 
 # 401(k)
@@ -150,12 +150,12 @@ plot(x[DATE_RANGE], type='l', lwd=2, log='y', ylim=c(1, 1.1 * best))
 abline(h=c(x[DATE_RANGE][1], best), col=rgb(0, 0, 0, 0.5))
 abline(v=0)
 t <- Sys.time()
-this.best <- 1347209568
+this.best <- 91929843 
 abline(h=this.best, col=rgb(0, 0, 0, 0.5), lty=4)
 this.best.params <- c(
-  w=10, u=0.9319, d=0.1316, dl=0.9800, ul=0.9800, p=0.0000, b=0.0699, dp=0.9909, 
-  up=0.6798)
-  std <- 0.002
+  w=10, u=0.3655, d=0.1593, dl=0.4325, ul=0.9537, p=0.0500, b=0.9500, dp=0.9500, 
+  up=0.8973)
+  std <- 0.004
 # %s of amounts that can be moved
 options <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)  
 for (i in 1:iters) {	
@@ -168,14 +168,14 @@ for (i in 1:iters) {
   #d  <- this.best.params['d'] 
   d <- min(max(rnorm(1, this.best.params['d'],  std), 0.01), 0.99)
   #dl <- this.best.params['d'] 
-  dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.02), 0.98) 
+  dl <- min(max(rnorm(1, this.best.params['dl'], std), 0.01), 0.98) 
   #ul <- this.best.params['ul'] 
-  ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.02), 0.98)
+  ul <- min(max(rnorm(1, this.best.params['ul'], std), 0.01), 0.98)
   # percentages...
-  p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.00), 1.00)
-  b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.00), 1.00)
-  dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.00), 1.00)
-  up <- min(max(rnorm(1, this.best.params['up'], std), 0.00), 1.00)
+  p  <- min(max(rnorm(1, this.best.params['p'],  std), 0.05), 0.95)
+  b  <- min(max(rnorm(1, this.best.params['b'],  std), 0.05), 0.95)
+  dp <- min(max(rnorm(1, this.best.params['dp'], std), 0.05), 0.95)
+  up <- min(max(rnorm(1, this.best.params['up'], std), 0.05), 0.95)
   # ...or fixed options
   #p  <- sample(options, 1)
   #b  <- sample(options, 1)
