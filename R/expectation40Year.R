@@ -270,35 +270,25 @@ plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
 #plot.for.ts(hc, proj=F)
 #===============================================================================
 
-movingDev <- function(
-  x, 
-  window = 70, 
-  probs = c(0.005, 0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99, 0.995)) {
-
-  md <- matrix(nrow = length(x), ncol = length(probs))
-  init <- quantile(
-    x[1:window], 
-    probs = probs,
-    na.rm = T)
+movingDev <- function(x, window, probs) {
+  # probs should be listed as upward first, then downward
+  md <- matrix(nrow=length(x), ncol=length(probs))
+  init <- quantile(x[1:window], probs=probs, na.rm=T)
   init <- matrix(rep(init, window), ncol = length(probs), byrow = T)
   md[1:window, ] <- init
-
   for (w in (window + 1):length(x)) {
   	md[w, ] <- quantile(
   	  x[(w - window):w],
   	  probs = probs,
       na.rm = T)
   }
-  
   md
 }
 
 # stocks
-w  <- 10
-u  <- 0.3655
-d  <- 0.1593
-dl <- 0.4325
-ul <- 0.9537
+w  <- 201
+probs <- c(0.7396, 0.7630, 0.1166, # upward
+           0.7617, 0.2846, 0.3369) # downward
 
 # 401-k
 w2  <- 60
@@ -307,10 +297,7 @@ d2  <- 0.9894
 dl2 <- 0.3384
 ul2 <- 0.7604
 
-movMedDev <- movingDev(
-  sp$Adj.Close, 
-  window = w, 
-  probs = c(d, dl, ul, u))
+movMedDev <- movingDev(sp$Adj.Close, window=w, probs=probs)
 
 movMedDev2 <- movingDev(
   sp$Adj.Close, 
@@ -331,8 +318,7 @@ ALPHA <- 0.2
 volume.weighted <- function(x, volume, lambda, gamma) {
   num <- den <- numeric(length(x))
   num[1] <- volume[1] * x[1]
-  den[1] <- volume[1]
-  
+  den[1] <- volume[1]  
   for(i in 2:length(num)) {
     num[i] <- lambda * num[i - 1] + volume[i]^gamma * x[i]
     den[i] <- lambda * den[i - 1] + volume[i]^gamma
@@ -341,7 +327,7 @@ volume.weighted <- function(x, volume, lambda, gamma) {
 }
 
 
-par(mfrow = c(2, 1))
+par(mfrow=c(2, 1))
 par(mar=c(2, 0.5, 0.5, 0.5))
 
 
@@ -368,44 +354,46 @@ par(mar=c(2, 0.5, 0.5, 0.5))
 
 
 plot(sp$Adj.Close, 
-     log = 'y', 
-     type = 'l', 
-     xlim = DAYS,
-     ylim = range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T))#,
-lines(movMedDev[, 1], lty = 1, col = '#A98765')
-lines(movMedDev[, 2], lty = 1, col = '#A9876588')
-lines(movMedDev[, 3], lty = 1, col = '#A9876588')
-lines(movMedDev[, 4], lty = 1, col = '#A98765')
+     log='y', 
+     type='l', 
+     xlim=DAYS,
+     ylim=range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T))
+lines(movMedDev[, 1], col=3)
+lines(movMedDev[, 2], col=3)
+lines(movMedDev[, 3], col=3)
+lines(movMedDev[, 4], col=2)
+lines(movMedDev[, 5], col=2)
+lines(movMedDev[, 6], col=2)
 
-make.poly <- function(movMedDev, x, lower, upper, col = '#A9876554') {
-  polygon(c(1:length(x), length(x):1),
-          c((movMedDev[, lower]), rev(movMedDev[, upper])),
-          col = col,
-          border = NA)
-}
+#make.poly <- function(movMedDev, x, lower, upper, col = '#A9876554') {
+#  polygon(c(1:length(x), length(x):1),
+#          c((movMedDev[, lower]), rev(movMedDev[, upper])),
+#          col = col,
+#          border = NA)
+#}
 
-make.all.poly <- function(movMedDev, x, lowers, uppers, col = '#A9876554') { 
-  for (i in 1:length(lowers)) {
-  	make.poly(movMedDev, x, lowers[i], uppers[i])
-  }
-}
+#make.all.poly <- function(movMedDev, x, lowers, uppers, col = '#A9876554') { 
+#  for (i in 1:length(lowers)) {
+#  	make.poly(movMedDev, x, lowers[i], uppers[i])
+#  }
+#}
 
-make.all.poly(movMedDev, sp$Adj.Close, c(1, 2), c(4, 3))
+#make.all.poly(movMedDev, sp$Adj.Close, c(1, 2), c(4, 3))
 
 
         
-plot(sp$Adj.Close, 
-     log = 'y', 
-     type = 'l', 
-     xlim = DAYS,
-     ylim = range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T),
-     xaxt = 'n')
-lines(movMedDev2[, 1], lty = 1, col = '#A98765')
-lines(movMedDev2[, 2], lty = 1, col = '#A9876588')
-lines(movMedDev2[, 3], lty = 1, col = '#A9876588')
-lines(movMedDev2[, 4], lty = 1, col = '#A98765')
+#plot(sp$Adj.Close, 
+#     log = 'y', 
+#     type = 'l', 
+#     xlim = DAYS,
+#     ylim = range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T),
+#     xaxt = 'n')
+#lines(movMedDev2[, 1], lty = 1, col = '#A98765')
+#lines(movMedDev2[, 2], lty = 1, col = '#A9876588')
+#lines(movMedDev2[, 3], lty = 1, col = '#A9876588')
+#lines(movMedDev2[, 4], lty = 1, col = '#A98765')
 
-make.all.poly(movMedDev2, sp$Adj.Close, c(1, 2), c(4, 3))
+#make.all.poly(movMedDev2, sp$Adj.Close, c(1, 2), c(4, 3))
 DAYS_AGO <- round(DAYS_AGO / 2)
 DAYS <- c(n - DAYS_AGO, n)
 
