@@ -287,22 +287,16 @@ movingDev <- function(x, window, probs) {
 
 # stocks
 w  <- 201
-probs <- c(0.7396, 0.7630, 0.1166, # upward
-           0.7617, 0.2846, 0.3369) # downward
+probs <- c(0.7331, 0.7382, 0.1186, # upward
+           0.7364, 0.2898, 0.3255) # downward
 
 # 401-k
-w2  <- 60
-u2  <- 0.9870
-d2  <- 0.9894
-dl2 <- 0.3384
-ul2 <- 0.7604
-
+w2  <- 213
+probs2 <- c(0.05, 0.7434, # up
+            0.8433, 0.1122) # down
+            
 movMedDev <- movingDev(sp$Adj.Close, window=w, probs=probs)
-
-movMedDev2 <- movingDev(
-  sp$Adj.Close, 
-  window = w2, 
-  probs = c(d2, dl2, ul2, u2))
+movMedDev2 <- movingDev(sp$Adj.Close, window=w2, probs=probs2)
 
 n <- dim(sp)[1]
 DAYS_AGO <- 2000
@@ -365,82 +359,55 @@ lines(movMedDev[, 4], col=2)
 lines(movMedDev[, 5], col=2)
 lines(movMedDev[, 6], col=2)
 
-#make.poly <- function(movMedDev, x, lower, upper, col = '#A9876554') {
-#  polygon(c(1:length(x), length(x):1),
-#          c((movMedDev[, lower]), rev(movMedDev[, upper])),
-#          col = col,
-#          border = NA)
-#}
+plot(sp$Adj.Close, 
+     log = 'y', 
+     type = 'l', 
+     xlim = DAYS,
+     ylim = range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T),
+     xaxt = 'n')
+lines(movMedDev2[, 1], col=3)
+lines(movMedDev2[, 2], col=3)
+lines(movMedDev2[, 3], col=2)
+lines(movMedDev2[, 4], col=2)
 
-#make.all.poly <- function(movMedDev, x, lowers, uppers, col = '#A9876554') { 
-#  for (i in 1:length(lowers)) {
-#  	make.poly(movMedDev, x, lowers[i], uppers[i])
-#  }
-#}
-
-#make.all.poly(movMedDev, sp$Adj.Close, c(1, 2), c(4, 3))
-
-
-        
-#plot(sp$Adj.Close, 
-#     log = 'y', 
-#     type = 'l', 
-#     xlim = DAYS,
-#     ylim = range(sp$Adj.Close[DAYS[1]:DAYS[2]], na.rm = T),
-#     xaxt = 'n')
-#lines(movMedDev2[, 1], lty = 1, col = '#A98765')
-#lines(movMedDev2[, 2], lty = 1, col = '#A9876588')
-#lines(movMedDev2[, 3], lty = 1, col = '#A9876588')
-#lines(movMedDev2[, 4], lty = 1, col = '#A98765')
-
-#make.all.poly(movMedDev2, sp$Adj.Close, c(1, 2), c(4, 3))
 DAYS_AGO <- round(DAYS_AGO / 2)
 DAYS <- c(n - DAYS_AGO, n)
 
 
-#DAYS <- c(2*DAYS[1], DAYS[2])
-#DAYS <- DAYS * 4
 # ON the line is BELOW the line
+# MULTIPLE EVENTS ALLOWABLE
         
 # FOR Fidelity: Motley Fool--Buy and Hold but follow these recs.
 # STOCKS (E*Trade)--These
-# CURRENT BEST PARAMETERS:				10-day window
-# WHEN REENTERING FROM PEAK: 			Sell: 05.00%	 p	(at the 36.55%ile u)
-# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 95.00% dp (at the 43.25%ile dl)
-# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:  89.73% up (at the 95.37%ile ul)
-# WHEN REENTERING FROM BOTTOM:			Buy:  95.00% b	(at the 15.93%ile d)
-#
-#                        B: 89.73 
-# 4) 95.37 -------------/----------------r-----------------------------------------
-#
-# 2) 43.25 -------\----------------------f-----------------------------------------
-#                  S: 95 
-# 1) 36.55 --\---------------------------p-----------------------------------------
-#             S: 5                B: 95
-# 3) 15.93 ----------------------/-------b----------------------------------------- 
+#                      B: 96.97
+# U: 73.82 -----------/---------------------------------------------------------
+# D: 73.64 -----------------------------\---------------------------------------
+#             B: 60.53                   B: 92.48
+# U: 73.31 --/------------------------------------------------------------------
+
+
+# D: 32.55 -------------------------------------------------\-------------------
+#                                                            S:75.80
+# D: 28.98 --------------------------------------\------------------------------
+#                                                 B: 39.66
+
+
+#                               S: 20.71
+# U: 11.86 --------------------/------------------------------------------------
+
 
 
 
 
 # 401(k)
-# CURRENT BEST PARAMETERS:				60-day window
-# WHEN REENTERING FROM PEAK: 			Sell:     0%	 p  (at the 98.70%ile  	u)
-# WHEN DROPPING BELOW THE FALLING LINE:	Sell: 26.35%	 dp	(at the 33.84%ile	dl)
-# WHEN CLIMBING ABOVE THE RISING LINE:	Buy:      0% up (at the 76.04%ile	ul)
-# WHEN REENTERING FROM BOTTOM:			Buy:  92.08% b	(at the 98.94%ile	d)
 
-#            B: 92.08
-# 98.94 ----/--------------------------------b--------------------------------
+#                     
+# D: 84.33 --------------------\-----------------------------------------------
+#                       B: 100  B: 100
+# U: 74.34 ------------/-------------------------------------------------------
 #
-# 98.70 --------\----------------------------p--------------------------------
-#                 S: 0  B: 0
-# 76.04 ---------------/---------------------r--------------------------------
-#
-# 33.84 ---------------------\---------------f--------------------------------
-#                             S: 26.35
 
 
-# Precedence: peak > upward > downward > bottom
-# (i.e., if both peak and downward happen on same day, use 'peak' signal)
-
-# On the line = below the line
+# D: 11.22 ----------------------------\---------------------------------------
+#              S: 43.40                 B 100
+# U: 00.05 ---/----------------------------------------------------------------
