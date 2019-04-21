@@ -1,7 +1,5 @@
 #---------#---------#---------#---------#---------#---------#---------#---------
 rm(list=ls())
-library(tseries)
-library(TTR)
 
 PATH <- '~/Desktop/marketStudies/data/sp1950.csv'
 
