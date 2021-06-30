@@ -9,6 +9,8 @@
 */checkpoint
 .ipynb_checkpoints
 *.ckpt*
+*.pyc
+__pycache__
 
 
 # R
@@ -20,3 +22,5 @@
 #------------------------
 data/
 *logs/
+
+

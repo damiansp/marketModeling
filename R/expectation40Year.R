@@ -4,7 +4,7 @@ library(tseries)
 library(TTR)
 
 SOURCE <- 'sp1950.csv' # 'nya1965.csv'
-PATH <- sprintf('~/Desktop/marketStudies/data/%s', SOURCE)
+PATH <- sprintf('~/Learning/marketModeling/data/%s', SOURCE)
 
 random.color <- function() {
   digits <- sample(unlist(strsplit('0123456789ABCDEF', '')), 6, replace=T)
