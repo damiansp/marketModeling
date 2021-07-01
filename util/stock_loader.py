@@ -54,6 +54,8 @@ class Loader:
         for s in self.symbols:
             if self.verbose:
                 print(f'   ...{s}')
+            if (df.Open[s] == 0).any():
+                df = self._fill_missing_open(df, s)
             df['LogValue', s] = np.log(df.Value[s])
             df['IntradayChange', s] = df.Close[s] / df.Open[s]
             df['DayToDayChange', s] = np.nan
@@ -66,6 +68,17 @@ class Loader:
                 df.loc[(day), ('OvernightChange', s)] = (
                     df.loc[(day), ('Open', s)]
                     / df.loc[(day - 1), ('Close', s)])
+        return df
+
+    @staticmethod
+    def _fill_missing_open(df, s):
+        no_open = df.Open[s][df.Open[s] == 0].index
+        no_open = no_open[no_open > 0]
+        prev = no_open - 1
+        df.loc[(no_open), ('Open', s)] = df.loc[(prev), ('Close', s)]
+        if df.loc[0, ('Open', s)] == 0:
+            df.loc[0, ('Open', s)] = (
+                (df.loc[0, ('High', s)] + df.loc[0, ('Low', s)]) / 2)
         return df
 
 
