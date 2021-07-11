@@ -72,7 +72,7 @@ class Loader:
 
     @staticmethod
     def _fill_missing_open(df, s):
-        no_open = df.Open[s][df.Open[s] == 0].index
+        no_open = df.Open[s][((df.Open[s] == 0) | df.Open[s].isnull())].index
         no_open = no_open[no_open > 0]
         prev = no_open - 1
         df.loc[(no_open), ('Open', s)] = df.loc[(prev), ('Close', s)]
