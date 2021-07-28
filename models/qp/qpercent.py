@@ -62,6 +62,9 @@ class QPercent:
         self.best_returns = (
             best_returns if best_returns is not None
             else {method: None for method in TREND_METHODS})
+        for method, val in self.best_returns.items():
+            if np.isnan(val):
+                self.best_returns[method] = 0
         self.sd = sd
         self.p_change_time_param = p_change_time_param
         self.ma_factor = ma_factor
@@ -302,6 +305,7 @@ class QPercent:
         data = data.loc[data.Date >= self.start_date, :]
         data['reserve'] = 1 - data.invested
         data['total'] = 1
+        data.index = range(data.shape[0])
         for i in data.index[2:]:
             no_trade = (data.loc[i, 'pct_invested']
                         == data.loc[i - 2, 'pct_invested'])

@@ -7,11 +7,11 @@ class Batcher:
         self.symbols = symbols
         self.market_indices = market_indices
 
-    def get_batch_from_weekday(self, weekday):
+    def get_batch_from_weekday(self, weekday, include_weekends=False):
         '''
         weekday (int): datetime.date().weekday() value on [0, 6] (0: Mon)
         '''
-        n_batches = 7
+        n_batches = 7 if include_weekends else 5
         n_per_batch = ceil(len(self.symbols) / n_batches)
         batch = self.symbols[
             (weekday * n_per_batch):(weekday*n_per_batch + n_per_batch)]
