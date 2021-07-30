@@ -146,6 +146,8 @@ class QPercent:
             self.do_nothing_returns = (
                 self._normalize(restr.Value).tolist()[-1])
             print('Do nothing returns:', self.do_nothing_returns)
+            if self.do_nothing_returns > self.best_returns[method]:
+                self.best_returns[method] = self.do_nothing_returns
             #plt.figure(figsize=FIGSIZE)
             plt.subplot(2, 2, i)
             plt.plot(restr.Date, self._normalize(restr.Value))
@@ -182,10 +184,14 @@ class QPercent:
         print('Refitting current best...')
         res = self._backtest(self.best_param_set[method])
         returns = res.total.tolist()[-1]
-        self.best_returns[method] = returns
-        print(f'Current best {method} returns:',
-              self.best_returns[method])
-        current_pct = res.pct_invested.tolist()[-1]
+        if np.isnan(returns) or returns < self.do_nothing_returns:
+            self.best_returns[method] = self.do_nothing_returns
+            current_pct = 1
+        else:
+            self.best_returns[method] = returns
+            print(f'Current best {method} returns:',
+                  self.best_returns[method])
+            current_pct = res.pct_invested.tolist()[-1]
         print('Fraction Invested:', current_pct)
         self.best_param_set[method]['pct'] = current_pct
 
@@ -200,7 +206,12 @@ class QPercent:
             # add to existing plot call in run_sims()
             plt.plot(res.Date, res.total, alpha=0.3)
             returns = res.total.tolist()[-1]
-            if returns > self.best_returns[method]:
+            if np.isnan(returns):
+                continue
+            elif returns < self.do_nothing_returns:
+                self.best_returns[method] = self.do_nothing_returns
+                current_pct = 1
+            else: 
                 print('New best:', returns)
                 self.p_print(params)
                 self.best_param_set[method] = params
@@ -219,7 +230,12 @@ class QPercent:
             # add to existing plot call in run_sims()
             plt.plot(res.Date, res.total, alpha=0.3)
             returns = res.total.tolist()[-1]
-            if returns > self.best_returns[method]:
+            if np.isnan(returns):
+                continue
+            elif returns < self.do_nothing_returns:
+                self.best_returns[method] = self.do_nothing_returns
+                current_pct = 1
+            else:
                 print('New best:', returns)
                 self.p_print(params)
                 self.best_returns[method] = returns
