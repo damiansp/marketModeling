@@ -63,8 +63,11 @@ class QPercent:
             best_returns if best_returns is not None
             else {method: None for method in TREND_METHODS})
         for method, val in self.best_returns.items():
-            if np.isnan(val):
-                self.best_returns[method] = 0
+            try:
+                if val is None or np.isnan(val):
+                    self.best_returns[method] = 0
+            except:
+                print('val:', val, '\nbest_returns:', self.best_returns[method])
         self.sd = sd
         self.p_change_time_param = p_change_time_param
         self.ma_factor = ma_factor
