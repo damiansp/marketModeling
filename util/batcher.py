@@ -1,5 +1,7 @@
 from math import ceil
 
+from numpy import random
+
 
 class Batcher:
     def __init__(self, symbols, market_indices):
@@ -11,6 +13,8 @@ class Batcher:
         '''
         weekday (int): datetime.date().weekday() value on [0, 6] (0: Mon)
         '''
+        if not include_weekends and weekday > 4:
+            weekday = random.choice(range(5))
         n_batches = 7 if include_weekends else 5
         n_per_batch = ceil(len(self.symbols) / n_batches)
         batch = self.symbols[
