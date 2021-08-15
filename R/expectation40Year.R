@@ -4,7 +4,7 @@ library(tseries)
 library(TTR)
 
 SOURCE <- 'sp1950.csv' # 'nya1965.csv'
-PATH <- sprintf('~/Learning/marketModeling/data/%s', SOURCE)
+PATH <- sprintf('~/marketModeling/data/%s', SOURCE)
 
 random.color <- function() {
   digits <- sample(unlist(strsplit('0123456789ABCDEF', '')), 6, replace=T)
@@ -64,8 +64,8 @@ get.period.value <- function(ts, n, period=k, daily.adjust=F) {
   n <- dim(ts)[1]
   gains <- rep(NA, n)
   for (i in 1:(n - period)) {
-  	# Calcualte the overall return (as a product of the initial; e.g. 1 = break 
-  	# even, 1.1 means 10% gain, 0.9 means 10% loss)
+  	# Calcualte the overall return (as a product of the initial; e.g. 1 = 
+  	# break even, 1.1 means 10% gain, 0.9 means 10% loss)
     gains[i] <- ts$Adj.Close[i + period] / ts$Adj.Close[i]
     if (daily.adjust) {
       # Convert overall return to the daily rate of return
@@ -223,7 +223,8 @@ plot.for.ts <- function(ts, k=250, short=250, long=5*250, proj=F) {
   n <- dim(ts)[1]              
   days <- 1:n
   linear.trend <- get.linear.trend(ts, days)
-  trend <- get.trend(ts, window=round(n / 10), lambda=0.99)  ### ADJUST HERE ###
+  ### ADJUST HERE ###
+  trend <- get.trend(ts, window=round(n / 10), lambda=0.99)  
   y1.val <- get.period.value(ts, n, k, T)
   c.list <- get.colors(k)
   vols <- vol.up.down(ts, n)
@@ -258,7 +259,7 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
   return(ts[day.range[1]:day.range[2], ])
 }
 
-#===============================================================================
+#=============================================================================
 CASH_OUT <- 0
 CASH_IN <- 0
 # Guide to move money from Bank accounts
@@ -275,7 +276,8 @@ cash.out.full <- 0.3 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.full))
 cash.in.full <- 0
 (CASH_IN <- max(CASH_IN, cash.in.full))
-(paycheck.in.all <- 0) #  1 if neg, 0 if pos (Buy Guide--2nd line above median)
+#  1 if neg, 0 if pos (Buy Guide--2nd line above median)
+(paycheck.in.all <- 0) 
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
@@ -338,7 +340,7 @@ cash.in.6mo <- 0.06 * 0
 #quartz()
 #hc <- clip.series(sp, day.range=housing.crash)
 #plot.for.ts(hc, proj=F)
-#===============================================================================
+#=============================================================================
 CASH_OUT
 CASH_IN
 (deposits.in <- mean(
