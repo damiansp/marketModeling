@@ -286,12 +286,12 @@ cash.out.20 <- 0.2385 * 1 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.20))
 cash.in.20 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.20))
-(paycheck.in.20 <- 0)
+(paycheck.in.20 <- 1)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
 # 75% in; 18.75% out
-cash.out.10 <- 0.1875 * 1 ## PENDING 1 (full)
+cash.out.10 <- 0.1875 * 0.5 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.10))
 cash.in.10 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.10))
