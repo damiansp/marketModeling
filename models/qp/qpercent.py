@@ -156,8 +156,7 @@ class QPercent:
             plt.plot(restr.Date, self._normalize(restr.Value))
             if self.best_param_set[method] is None:
                 self.best_returns[method] = self.do_nothing_returns
-                self.best_param_set[method] = self._get_default_params(
-                    method)
+                self.best_param_set[method] = self._get_default_params(method)
             self._refit_best_params(method)
             self._run_random_search(n_rand, method)
             self._run_adjusted_search(n_adj, method)
@@ -214,7 +213,7 @@ class QPercent:
             elif returns < self.do_nothing_returns:
                 self.best_returns[method] = self.do_nothing_returns
                 current_pct = 1
-            else: 
+            elif returns > self.best_returns[method]:
                 print('New best:', returns)
                 self.p_print(params)
                 self.best_param_set[method] = params
@@ -238,7 +237,7 @@ class QPercent:
             elif returns < self.do_nothing_returns:
                 self.best_returns[method] = self.do_nothing_returns
                 current_pct = 1
-            else:
+            elif returns > self.best_returns[method]:
                 print('New best:', returns)
                 self.p_print(params)
                 self.best_returns[method] = returns
