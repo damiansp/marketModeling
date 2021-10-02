@@ -282,7 +282,7 @@ cash.in.full <- 0
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
 # 95% in; 23.85% out
-cash.out.20 <- 0.2385 * 1 ## PENDING 1 (full)
+cash.out.20 <- 0.2385 * 0.5 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.20))
 cash.in.20 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.20))
@@ -300,7 +300,7 @@ cash.in.10 <- 0
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 50% in; 12.5% out
-cash.out.5 <- 0.125 * 0.5 ## PENDING 1 (FULL)
+cash.out.5 <- 0.125 * 0 ## PENDING 1 (FULL)
 (CASH_OUT <- max(CASH_OUT, cash.out.5))
 cash.in.5 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
