@@ -329,9 +329,9 @@ plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 6% in; 2% out
 cash.out.6mo <- 0.02 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.6mo))
-cash.in.6mo <- 0.06 * 1
+cash.in.6mo <- 0.06 * 0
 (CASH_IN <- max(CASH_IN, cash.in.6mo))
-(paycheck.in.0.5 <- 1) # IN
+(paycheck.in.0.5 <- 1) #
 
 #quartz()
 #twoK <- clip.series(sp, day.range=twoK.downtrend)
