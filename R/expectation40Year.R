@@ -277,7 +277,7 @@ cash.out.full <- 0.3 * 0
 cash.in.full <- 0
 (CASH_IN <- max(CASH_IN, cash.in.full))
 #  1 if neg, 0 if pos (Buy Guide--2nd line above median)
-(paycheck.in.all <- 1) 
+(paycheck.in.all <- 0) 
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
@@ -286,7 +286,7 @@ cash.out.20 <- 0.2385 * 1 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.20))
 cash.in.20 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.20))
-(paycheck.in.20 <- 1)
+(paycheck.in.20 <- 0)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
@@ -300,7 +300,7 @@ cash.in.10 <- 0
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 50% in; 12.5% out
-cash.out.5 <- 0.125 * 0.5 ## PENDING 1 (FULL)
+cash.out.5 <- 0.125 * 1 ## PENDING 1 (FULL)
 (CASH_OUT <- max(CASH_OUT, cash.out.5))
 cash.in.5 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
@@ -322,12 +322,12 @@ cash.out.1.25 <- 0.03 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.1.25))
 cash.in.1.25 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.1.25))
-(paycheck.in.1.25 <- 1)
+(paycheck.in.1.25 <- 0)
 
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 6% in; 2% out
-cash.out.6mo <- 0.02 * 0
+cash.out.6mo <- 0.02 * 1
 (CASH_OUT <- max(CASH_OUT, cash.out.6mo))
 cash.in.6mo <- 0.06 * 0
 (CASH_IN <- max(CASH_IN, cash.in.6mo))
