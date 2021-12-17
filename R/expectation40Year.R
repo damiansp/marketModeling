@@ -291,7 +291,7 @@ cash.in.20 <- 0
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
 # 75% in; 18.75% out
-cash.out.10 <- 0.1875 * 1 ## PENDING 1 (full)
+cash.out.10 <- 0.1875 * 0.5 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.10))
 cash.in.10 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.10))
@@ -300,7 +300,7 @@ cash.in.10 <- 0
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 50% in; 12.5% out
-cash.out.5 <- 0.125 * 0.5 ## PENDING 1 (FULL)
+cash.out.5 <- 0.125 * 0 ## PENDING 1 (FULL)
 (CASH_OUT <- max(CASH_OUT, cash.out.5))
 cash.in.5 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
@@ -331,7 +331,7 @@ cash.out.6mo <- 0.02 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.6mo))
 cash.in.6mo <- 0.06 * 0
 (CASH_IN <- max(CASH_IN, cash.in.6mo))
-(paycheck.in.0.5 <- 0) #
+(paycheck.in.0.5 <- 1) #
 
 #quartz()
 #twoK <- clip.series(sp, day.range=twoK.downtrend)
