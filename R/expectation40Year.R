@@ -136,13 +136,14 @@ resid.plot <- function(resids, condition) {
   med <- median(resids, na.rm=T)
   n <- length(resids)
   position <- ifelse(condition == 'buy', 'topleft', 'bottomleft')
+  pos2 <- ifelse(condition == 'buy', 'bottomright', 'topright')
   if (resids[n] <= most.extreme[1] | resids[n] > most.extreme[2]) {
   	legend(position, legend='Extreme Condition', bg='white')
   } else if (resids[n] <= near.extreme[1] | resids[n] > near.extreme[2]) {
   	legend(position, legend='Near-Extreme Condition', bg='white')
   } else if ((resids[n - 1] < med & resids[n] >= med) 
              | resids[n - 1] > med & resids[n] <= med) {
-  	legend(position, legend='Median Crossed', bg='white')
+  	legend(pos2, legend='Median Crossed', bg='white')
   }
   legend('left',
          legend=c(sprintf('now: %.4f', resids[n]), 
@@ -300,7 +301,7 @@ cash.in.10 <- 0
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 50% in; 12.5% out
-cash.out.5 <- 0.125 * 0.5 ## PENDING 1 (FULL)
+cash.out.5 <- 0.125 * 1 ## PENDING 1 (FULL)
 (CASH_OUT <- max(CASH_OUT, cash.out.5))
 cash.in.5 <- 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
