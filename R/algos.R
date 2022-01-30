@@ -12,43 +12,47 @@ last <- m
 
 # damiansp1976
 wlsh.osc <- c(
-  -77, -73, -80, -88, -97,-106,-110,-112,-122,-132,-151,-173,-199,-233)
+  -77, -73, -80, -88, -97,-106,-110,-112,-122,-132,-151,-173,-199,-233,-261,-294,
+ -325,-357, -375)
 
 SPActual <- c(df$SPActual,
-    4797,4794,4701,4696,4677,4670,4713,4726,4659,4663,4577,4533,4483,4398)
+    4797,4794,4701,4696,4677,4670,4713,4726,4659,4663,4577,4533,4483,4398,4410,
+    4356,4350,4327,4432)
 SP <- SPActual / SPActual[last]
 SPd <- dailyChange(SP)
 
 FidIn <- c(df$FidIn,
    57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 61104,
-   61104,62434,62434)
+   61104, 62434, 62434, 62434, 62434, 62434,160743,160743) # 1490 
   
 FidVal <- c(df$FidVal,
    94096, 90621, 86085, 86306, 84787, 85416, 87205, 87106, 83943, 83649, 84545,
-   84094, 85649,82388) #
+   84094, 85649, 82388, 83399, 81424, 80533,218550,222221) #
 Fid <- FidVal / FidIn
 Fid <- Fid / Fid[last]
 Fidd <- dailyChange(Fid)
 
 f1kIn <- c(df$f1kIn,
    98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297,
-   98297, 98297, 98297) # 
+   98297, 98297, 98297, 98297, 98297, 98297,0.6935,0.6935) # 
 f1kVal <- c(df$f1kVal,
   157563,158404,157348,153323,153323,151838,151838,153394,153734,150997,151082,
-  147813,146496,145095) #
+  147813,146496,145095,141741,141741,141741,     1,     1) #
 n <- length(f1kIn)
-payment * f1kIn[n] / f1kVal[n] + f1kIn[n]
+#payment * f1kIn[n] / f1kVal[n] + f1kIn[n]
 
 f1k <- f1kVal / f1kIn
 f1k <- f1k / f1k[last]
 f1kd <- dailyChange(f1k)
+f1k[is.na(f1k)] <- NA
+f1kd[is.na(f1kd)] <- NA
 
 OHIn <- c(df$OHIn,
     49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269,
-    49269, 49269, 49269) #
+    49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269) # 1143
 OHVal <- c(df$OHVal, 
    102557,100422, 97844, 98121, 97375, 97932, 98939, 99051, 97002, 96791, 95665,
-    95391, 95163, 93596) #
+    95391, 95163, 93596, 94389, 93136, 92819, 92495, 94639) #
 OH <- OHVal / OHIn
 OH <- OH / OH[last]
 OHd <- dailyChange(OH)
@@ -58,7 +62,7 @@ totalFunds <- FidVal + f1kVal + OHVal
 # Mon
 m1 <- (c(
   100000, 99734, 97021, 92607, 93071, 91736, 92132, 94069, 93531, 90683, 90091,
-   87564, 87271, 86460, 84269)
+   87564, 87271, 86460, 84269, 85206, 82751, 81848, 80050, 82238)
   / 100000)
 qp.start <- 92
 m1.name <- 'sim1'
@@ -66,42 +70,42 @@ m1.name <- 'sim1'
 # Tues
 m2 <- (c(
   100000, 99519, 96234, 91473, 91946, 90337, 90702, 92795, 92113, 88699, 88134,
-   85502, 84905, 84010, 81444)
+   85502, 84905, 84010, 81444, 82682, 80076, 79132, 77316, 79826)
   / 100000) 
 m2.name <- 'sim2'
 
 # Wed
 m3.raw <- c(
   100000, 99890, 96310, 91049, 91683, 89443, 89246, 91155, 90781, 88037, 87453, 
-   85588, 85124, 85345, 82818)
+   85588, 85124, 85345, 82818, 83265, 80641, 79763, 77546, 79590)
 m3 <- m3.raw / 100000
 m3.name <- 'sim3'
 
 # Thur
 m4.raw <- c(
   100000, 99289, 96063, 91314, 91644, 90074, 90327, 92360, 91830, 88380, 88025,
-   85472, 84872, 84283, 81799)
+   85472, 84872, 84283, 81799, 82759, 80245, 79590, 78131, 80209)
 m4 <- m4.raw / 100000
 m4.name <- 'sim4'
 
 # Fri
 m5 <- (c(
   100000, 99775, 96651, 91870, 92422, 91307, 92182, 94394, 93768, 89786, 89177,
-   86127, 85615, 84895, 81979)
+   86127, 85615, 84895, 81979, 83919, 81050, 80084, 77906, 80564)
   / 100000)
 m5.name <- 'sim5'  
 
 # Sat
 m6 <- (c(
   100000,100012, 98204, 96007, 96400, 95686, 96971, 97980, 98605, 95083, 95146,
-   93567, 93268, 93246, 90907)
+   93567, 93268, 93246, 90907, 92420, 90796, 90046, 88126, 91095)
   / 100000)
 m6.name <- 'sim6'  
 
 # Sun
 m7 <- (c(
   100000, 99901, 98262, 96147, 96334, 95340, 95359, 96898, 96645, 95102, 94744,
-   93378, 92032, 92532, 90635)
+   93378, 92032, 92532, 90635, 91392, 89184, 88026, 85549, 87371)
   / 100000)
 m7.name <- 'sim7'  
 
@@ -198,7 +202,7 @@ plot(new.days,
      m1, 
      type='l', 
      xlim=range(days[days >= 0]),
-     ylim=c(0.8,
+     ylim=c(0.6,
             max(c(SP,  tot, 1 + tot - SP, mine, m1,  m2, m3, m4, m5, m6, m7))), 
      lwd=3, 
      log='y')
@@ -347,11 +351,14 @@ abline(h=now, col='grey')
 abline(h=low, col=2)
 abline(h=high, col=3)
 
-lines(FidVal, col=4)
-lines(x, exp.mod(FidVal, x), col=rgb(0, 0, 1, 1))
+lines(FidVal + f1kVal, col=4)
+lines(x, exp.mod(FidVal + f1kVal, x), col=rgb(0, 0, 1, 1))
 
-lines(f1kVal, col=5)
-lines(x, exp.mod(f1kVal, x), col=rgb(0, 1, 1, 1))
+#lines(FidVal, col=4)
+#lines(x, exp.mod(FidVal, x), col=rgb(0, 0, 1, 1))
+
+#lines(f1kVal, col=5)#
+#lines(x, exp.mod(f1kVal, x), col=rgb(0, 1, 1, 1))
 
 lines(OHVal, col=6)
 lines(x, exp.mod(OHVal, x), col=rgb(1, 0, 1, 1))
@@ -371,8 +378,8 @@ legend(
   bg=rgb(1, 1, 1, 0.75))
 legend('bottomright',
        lty=1,
-       col=c(4, 5, 6, 1),
-       legend=c('Fidelity', '401(k)', 'E*Trade', 'Total'),
+       col=c(4, 6, 1),
+       legend=c('Fidelity (+rollover)', 'E*Trade', 'Total'),
        bg=rgb(1, 1, 1, 0.75))
 
 day <- length(f1kIn) - 1 # length(<some new algo>) - 1
@@ -470,7 +477,7 @@ for (p in y) { cat(p, '\n') }
 
 
 #-------------------------------------------------------------
-n <- length(wlsh.osc)
+n <- length(wlsh.osc) 
 ds <- abs(diff(wlsh.osc))
 (thresh <- quantile(ds, p=0.05))
 dif <- wlsh.osc[n] - wlsh.osc[n - 1]
@@ -494,10 +501,10 @@ CASH_OUT
 CASH_IN
 
 (cash.out.fid <- CASH_OUT * FidVal[length(FidVal)])
-cash.out.fid <- 26867 # Update ONLY when new threshold crossed
+cash.out.fid <- 26500 # Update ONLY when new threshold crossed
 
 (cash.out.et <- CASH_OUT * OHVal[length(OHVal)])
-cash.out.et <- 25317
+cash.out.et <- 19573
 
 crypto.frac <- 0.003
 (target.crypo.amt <- crypto.frac * totval[length(totval)]) # in: 1100
@@ -505,13 +512,15 @@ crypto.frac <- 0.003
 # weight by history length
 f <- sqrt
 w <- c(f(50), # nya 50
-       f(35), # nya 35
+       f(40), # nya 40
+       f(30), # nya 30
        f(20), #     20...
        f(10), 
        f(5),
        f(3),  # nya 3
        f(50), # sp 50
-       f(35), # sp 35
+       f(40), # sp 40
+       f(30), # sp 35
        f(20), #    20...
        f(10), 
        f(5),
@@ -519,59 +528,50 @@ w <- c(f(50), # nya 50
 (w <- w / sum(w))
 
 # 0.0001 >= 0.00005 = 5e-5
-# Mon
-wil3 <- c(1, 1, 0.9893)
-nas3 <- c(1, 1, 1)
+nya50 <- c(1, 0.7249)
+nas50 <- c(1, 0.0098)
 
-# Tue
-wil5 <- c(0.9445, 1, 0.9657)
-nas5 <- c(0.0070, 0.0079, 1)
+nya40 <- c(1, 1)
+nas40 <- c(0.9986, 0.0144)
 
-# Wed    
-wil10 <- c(0.9999, 1, 1)
-nas10 <- c(1, 1, 1)
+wil30 <- c(1, 1)
+nas30 <- c(1, 1)
 
-# Thu
-wil20 <- c(1, 1, 0.9999)
-nas20 <- c(1, 1, 0.9999)
+wil20 <- c(0.9974, 0.9992)
+nas20 <- c(0.1596, 0.9999)
 
-# Fri
-nya35 <- c(1, 1, 1)
-nas35 <- c(0.9988, 0.8941, 0.0149)
+wil10 <- c(1, 1)
+nas10 <- c(1, 0.9299)
 
-# Sat
-nya50 <- c(1, 1, 1)
-nas50 <- c(0.0090, 1, 1)
+wil5 <- c(1, 0.5091)
+nas5 <- c(1, 0.0691)
 
+wil3 <- c(1, 0.0652)
+nas3 <- c(0.0101, 1)
 
 
 # Change must be ≥ 10%
 # UPDATE: Fridays or when a percent-in value has changed
-# Fid (buy and hold form Partnership Portfolio) [4-param]
-(fid.amt <- FidVal[length(FidVal)]) # [82388, 90621]
+# Fid (buy and hold form Partnership Portfolio) [2-param]
+(fid.amt <- FidVal[length(FidVal)]) # [80533, 222221]
 (fid.pct.in <- w %*% c(
-   nya50[1], nya35[1], wil20[1], wil10[1], wil5[1], wil3[1], 
-   nas50[1], nas35[1], nas20[1], nas10[1], nas5[1], nas3[1]))
-# 8097
+   nya50[2], nya40[2], wil30[2], wil20[2], wil10[2], wil5[2], wil3[2], 
+   nas50[2], nas40[2], nas30[2], nas20[2], nas10[2], nas5[2], nas3[2]))
+# 6685
 fid.amt.in <- fid.amt * fid.pct.in
 (fid.res <- fid.amt - fid.amt.in)
 
 # OH (e*trade) - traditional strategy [3-param]
-(oh.amt <- OHVal[length(OHVal)]) # [93596, 100422]
+(oh.amt <- OHVal[length(OHVal)]) # [92495, 100422]
 (oh.pct.in <- w %*% c(
-   nya50[2], nya35[2],  wil20[2], wil10[2], wil5[2], wil3[2],
-   nas50[2], nas35[2],  nas20[2], nas10[2], nas5[2], nas3[2])) 
-# 9422
+   nya50[1], nya40[1], wil30[1],  wil20[1], wil10[1], wil5[1], wil3[1],
+   nas50[1], nas40[1], nas30[1],  nas20[1], nas10[1], nas5[1], nas3[1])) 
+# 9099
 oh.amt.in <- oh.amt * oh.pct.in
 (oh.res <- oh.amt - oh.amt.in)
 
 # For 401(k): # Next:13 Feb (≥10%)
-(f1k.total <- f1kVal[length(f1kVal)]) # [145095, 158404] [2-param]
-(f1k.pct.in <- w %*% c(
-   nya50[3], nya35[3], wil20[3], wil10[3], wil5[3], wil3[3],
-   nas50[3], nas35[3], nas20[3], nas10[3], nas5[3], nas3[3])) 
-(0.8795 - 0.8560) # 2.35
-(f1k.res <- 1 - f1k.pct.in)
+(f1k.total <- f1kVal[length(f1kVal)]) # [141741, 158404] [2-param]
 #--------------------------------------------------------
 
 x <- c(1, 2, 4)
@@ -580,19 +580,19 @@ x * c(f1k.pct.in)
 
 #--------------------------------------------------------
 # To Save New `df` at the end of each year:
-df.test <- data.frame(
-  SPActual=SPActual, FidIn=FidIn, FidVal=FidVal, f1kIn=f1kIn, f1kVal=f1kVal, 
-  OHIn=OHIn, OHVal=OHVal)
-matplot(df.test, type='l', lty=1, col=1:7)
-legend('topleft', lty=1, col=1:7, legend=names(df.test))
+#df.test <- data.frame(
+#  SPActual=SPActual, FidIn=FidIn, FidVal=FidVal, f1kIn=f1kIn, f1kVal=f1kVal, 
+#  OHIn=OHIn, OHVal=OHVal)
+#matplot(df.test, type='l', lty=1, col=1:7)
+#legend('topleft', lty=1, col=1:7, legend=names(df.test))
 # Backed up previous?
-save(df.test, file='~/Learning/marketModeling/data/myHistoricTest.RData')
-rm(list=ls())
-load('~/Learning/marketModeling/data/myHistoricTest.RData')
-ls()
-matplot(df.test, type='l', lty=1, col=1:7)
-legend('topleft', lty=1, col=1:7, legend=names(df.test))
+#save(df.test, file='~/Learning/marketModeling/data/myHistoricTest.RData')
+#rm(list=ls())
+#load('~/Learning/marketModeling/data/myHistoricTest.RData')
+#ls()
+#matplot(df.test, type='l', lty=1, col=1:7)
+#legend('topleft', lty=1, col=1:7, legend=names(df.test))
 # OK?
-df <- df.test
-save(df, file='~/Learning/marketModeling/data/myHistoric.RData')
+#df <- df.test
+#save(df, file='~/Learning/marketModeling/data/myHistoric.RData')
 # Delete test and backups
