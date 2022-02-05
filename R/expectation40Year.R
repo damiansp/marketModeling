@@ -272,8 +272,8 @@ tail(sp)
 
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 100% in; 30% out
-cash.out.full <- 0.3 * 0
+# 100% in; 60% out
+cash.out.full <- 0.6 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.full))
 cash.in.full <- 1 * 0
 (CASH_IN <- max(CASH_IN, cash.in.full))
@@ -282,17 +282,17 @@ cash.in.full <- 1 * 0
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
-# 95% in; 23.85% out
-cash.out.20 <- 0.2385 * 0.5 ## PENDING 1 (full)
+# 95% in; 50% out
+cash.out.20 <- 0.5 * 0.5 ## PENDING 1 (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.20))
-cash.in.20 <- 0.95 * 0
+cash.in.20 <- 0.5 * 0
 (CASH_IN <- max(CASH_IN, cash.in.20))
 (paycheck.in.20 <- 1)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
-# 75% in; 18.75% out
-cash.out.10 <- 0.1875 * 0
+# 75% in; 40% out
+cash.out.10 <- 0.4 * 0 # PENDING (full)
 (CASH_OUT <- max(CASH_OUT, cash.out.10))
 cash.in.10 <- 0.75 * 0
 (CASH_IN <- max(CASH_IN, cash.in.10))
@@ -300,8 +300,8 @@ cash.in.10 <- 0.75 * 0
 
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
-# 50% in; 12.5% out
-cash.out.5 <- 0.125 * 0 
+# 50% in; 30% out
+cash.out.5 <- 0.3 * 0 
 (CASH_OUT <- max(CASH_OUT, cash.out.5))
 cash.in.5 <- 0.5 * 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
@@ -309,8 +309,8 @@ cash.in.5 <- 0.5 * 0
 
 sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
-# 25% in; 6.25% out
-cash.out.2.5 <- 0.0625 * 0 ## 
+# 25% in; 20% out
+cash.out.2.5 <- 0.2 * 0 ## 
 (CASH_OUT <- max(CASH_OUT, cash.out.2.5))
 cash.in.2.5 <- 0.25 * 0
 (CASH_IN <- max(CASH_IN, cash.in.5))
@@ -318,8 +318,8 @@ cash.in.2.5 <- 0.25 * 0
 
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
-# 12% in; 3% out 
-cash.out.1.25 <- 0.03 * 0
+# 12% in; 10% out 
+cash.out.1.25 <- 0.1 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.1.25))
 cash.in.1.25 <- 0.12 * 0 # IN
 (CASH_IN <- max(CASH_IN, cash.in.1.25))
@@ -327,10 +327,10 @@ cash.in.1.25 <- 0.12 * 0 # IN
 
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
-# 6% in; 2% out
-cash.out.6mo <- 0.02 * 0
+# 6% in; 5% out
+cash.out.6mo <- 0.05 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.6mo))
-cash.in.6mo <- 0.06 * 0 # IN
+cash.in.6mo <- 0.06 * 0
 (CASH_IN <- max(CASH_IN, cash.in.6mo))
 (paycheck.in.0.5 <- 1) 
 
