@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -23,7 +23,8 @@ class Loader:
         self.symbols = ([symbols] if type(symbols) is str
                         else sorted(symbols))
         self.start = self.str_to_datetime(start)
-        self.end = self.str_to_datetime(end) if end is not None else TODAY
+        self.end = (self.str_to_datetime(end) if end is not None
+                    else TODAY + timedelta(1))
         self.df = None
         self.verbose = verbose
 
