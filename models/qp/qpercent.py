@@ -210,9 +210,6 @@ class QPercent:
             returns = res.total.tolist()[-1]
             if np.isnan(returns):
                 continue
-            elif returns < self.do_nothing_returns:
-                self.best_returns[method] = self.do_nothing_returns
-                current_pct = 1
             elif returns > self.best_returns[method]:
                 print('New best:', returns)
                 self.p_print(params)
@@ -234,9 +231,6 @@ class QPercent:
             returns = res.total.tolist()[-1]
             if np.isnan(returns):
                 continue
-            elif returns < self.do_nothing_returns:
-                self.best_returns[method] = self.do_nothing_returns
-                current_pct = 1
             elif returns > self.best_returns[method]:
                 print('New best:', returns)
                 self.p_print(params)

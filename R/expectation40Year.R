@@ -328,7 +328,7 @@ cash.in.1.25 <- 0.12 # IN
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 6/3% in; 5% out
-cash.out.6mo <- 0.05 * 0
+cash.out.6mo <- 0.05 * 0 
 (CASH_OUT <- max(CASH_OUT, cash.out.6mo))
 cash.in.6mo <- 0.06 * 0
 (CASH_IN <- max(CASH_IN, cash.in.6mo))
