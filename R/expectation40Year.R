@@ -272,8 +272,7 @@ tail(sp)
 
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 100/50% in; 60% out
-cash.out.full <- 0.6 * 0
+# 100/50% in; 60% outcash.out.full <- 0.6 * 0
 (CASH_OUT <- max(CASH_OUT, cash.out.full))
 cash.in.full <- 1 * 0
 (CASH_IN <- max(CASH_IN, cash.in.full))
