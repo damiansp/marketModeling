@@ -31,14 +31,14 @@ Caveats:
   historical data, and the lesser the likelihood of them generalizing well
   going forward.
 '''
-import sys
+#import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+#import pandas as pd
 
-sys.path.append('..')
-from util.util import sharpe_from_daily, silence_pandas
+#sys.path.append('..')
+#from util.util import sharpe_from_daily, silence_pandas
 
 
 FIGSIZE = (16, 8)
@@ -95,7 +95,6 @@ class QPercent:
           - ew=False: (int) the ma window, or number of days to average 
 　　　　　　　over
         '''
-        #silence_pandas(True)
         if ew:
             data['Trend'] = (
                 data.LogValue.ewm(halflife=time_param, ignore_na=True)
@@ -104,7 +103,6 @@ class QPercent:
             data['Trend'] = (data.loc[:, 'LogValue']
                              .rolling(window=int(time_param))
                              .mean())
-        #silence_pandas(False)
         return data
 
     def get_rel_minmax(self, data, time_param, ew=False):
@@ -123,11 +121,16 @@ class QPercent:
                 / (data.RollMax - data.RollMin))
         return data
         
-    def get_deviate_quantiles(self, data):
+    def get_deviate_quantiles(self, data, trend_method):
         '''
         Get deviates (as quantiles) relative to trend
         '''
-        data['Deviates'] = data.LogValue - data.Trend
+        ###
+        if 'minmax' in trend_method:
+            data['Deviates'] = data.Trend
+        else:
+            ###
+            data['Deviates'] = data.LogValue - data.Trend
         n_notnan = len(data.Deviates[~np.isnan(data.Deviates)])
         qs = list(np.linspace(1, 0, n_notnan))
         quantiles  = [np.nan] * self.n
@@ -218,6 +221,7 @@ class QPercent:
                 current_pct = res.pct_invested.to_list()[-1]
                 print('Invested:', current_pct)
                 self.best_param_set[method]['pct'] = current_pct
+        
         print()
 
     def _run_adjusted_search(self, n, method):
@@ -295,13 +299,12 @@ class QPercent:
                     for (rg, amt) in zip(ranges, sorted(list(amts))[::-1])}
         params['q_params'] = q_params
         return params
-        
 
     def p_print(self, params):
         if not self.verbose:
             return
         opn = '{'
-        cls = '}'
+        #cls = '}'
         print(f"{opn}'time_param': {params['time_param']},"
               f"\n 'trend': {params['trend']},"
               f"\n 'q_params': {opn}")
@@ -354,7 +357,8 @@ class QPercent:
             'ma': self.get_ma,
             'rel_minmax': self.get_rel_minmax
         }[trend_method](data, time_param, ew)
-        qs = self.get_deviate_quantiles(data)
+        #qs = self.get_deviate_quantiles(data)
+        qs = self.get_deviate_quantiles(data, trend_method) ###
         pct_invested = [q_params.get(self._get_qrange(q, q_params), np.nan)
                         for q in qs]
         return pct_invested
@@ -373,7 +377,36 @@ class QPercent:
         except ValueError:
             print('in get qrange:', params) 
 
-
+    def plot_best(self, method, stock=False):
+        params = self.best_param_set[method]
+        time_param = params['time_param']
+        trend_method = params['trend']
+        ew = False
+        if 'ew_' in trend_method:
+            ew = True
+            trend_method = trend_method.replace('ew_', '')
+        q_params = params['q_params']
+        # Calculate trend with currrent settings
+        data = {
+            'ma': self.get_ma,
+            'rel_minmax': self.get_rel_minmax
+        }[trend_method](self.data.copy(), time_param, ew)
+        qs = self.get_deviate_quantiles(data, trend_method)
+        pct_invested = [q_params.get(self._get_qrange(q, q_params), np.nan)
+                        for q in qs]
+        if stock:
+            plt.figure(figsize=[12, 4])
+            plt.plot(data.Value)
+        plt.figure(figsize=[12, 4])
+        plt.plot(qs, label='deviate quantile')
+        pct_in = pct_invested[-1]
+        plt.plot(pct_invested, label=f'pct in ({pct_in:.5f})')
+        for k in q_params.keys():
+            plt.axhline(y=k[0], color='k', alpha=0.1)
+        plt.legend()
+        plt.title(method)
+        plt.show()
+        return pct_in
         
 
 
