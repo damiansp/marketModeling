@@ -36,7 +36,7 @@ class Loader:
     def data(self):
         return self.df
 
-    def download(self):
+    def download(self, append=None):
         df = (yf.download(self.symbols, start=self.start, end=self.end)
               .drop('Volume',  axis=1)
               .rename(columns={'Adj Close': 'Value'}))
@@ -44,6 +44,12 @@ class Loader:
             df.columns  = pd.MultiIndex.from_tuples([(x, self.symbols[0])
                                                      for x in list(df)])
         df['Date'] = df.index
+        if append is not None:
+            try:
+                df = pd.concat([df, append], axis=1)
+                self.symbols += list(append['Value'])
+            except:
+                raise
         n = df.shape[0]
         df.index = range(n)
         df = self._get_derived_columns(df, n)

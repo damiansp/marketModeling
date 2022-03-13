@@ -396,7 +396,7 @@ class QPercent:
                         for q in qs]
         if stock:
             plt.figure(figsize=[12, 4])
-            plt.plot(data.Value)
+            plt.plot(data.LogValue)
         plt.figure(figsize=[12, 4])
         plt.plot(qs, label='deviate quantile')
         pct_in = pct_invested[-1]
