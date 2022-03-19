@@ -400,7 +400,7 @@ class QPercent:
         plt.figure(figsize=[12, 4])
         plt.plot(qs, label='deviate quantile')
         pct_in = pct_invested[-1]
-        plt.plot(pct_invested, label=f'pct in ({pct_in:.5f})')
+        plt.plot(pct_invested, alpha=0.5, label=f'pct in ({pct_in:.5f})')
         for k in q_params.keys():
             plt.axhline(y=k[0], color='k', alpha=0.1)
         plt.legend()
