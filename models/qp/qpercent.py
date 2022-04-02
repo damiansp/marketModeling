@@ -54,8 +54,8 @@ class QPercent:
         self._data = data
         self.n = data.shape[0]
         self.n_segments = n_segments
-        self.max_time_param = (max_time_param if max_time_param is not None
-                               else self.n // 5)
+        self.max_time_param = (
+            max_time_param if max_time_param is not None else self.n // 5)
         self.best_param_set = (
             best_param_set if best_param_set is not None
             else {method: None for method in TREND_METHODS})
@@ -100,9 +100,10 @@ class QPercent:
                 data.LogValue.ewm(halflife=time_param, ignore_na=True)
                 .mean())
         else:
-            data['Trend'] = (data.loc[:, 'LogValue']
-                             .rolling(window=int(time_param))
-                             .mean())
+            data['Trend'] = (
+                data.loc[:, 'LogValue']
+                .rolling(window=int(time_param))
+                .mean())
         return data
 
     def get_rel_minmax(self, data, time_param, ew=False):
@@ -125,11 +126,9 @@ class QPercent:
         '''
         Get deviates (as quantiles) relative to trend
         '''
-        ###
         if 'minmax' in trend_method:
             data['Deviates'] = data.Trend
         else:
-            ###
             data['Deviates'] = data.LogValue - data.Trend
         n_notnan = len(data.Deviates[~np.isnan(data.Deviates)])
         qs = list(np.linspace(1, 0, n_notnan))
@@ -162,16 +161,21 @@ class QPercent:
                 self.best_param_set[method] = self._get_default_params(method)
             self._refit_best_params(method)
             self._run_random_search(n_rand, method)
-            self._run_adjusted_search(n_adj, method)
+            if self.best_returns[method] <= self.do_nothing_returns:
+                print('No best to adjust. Continuing random')
+                self._run_random_search(n_adj, method)
+            else:
+                self._run_adjusted_search(n_adj, method)
             plt.title(method)
             plt.yscale('log')
             i += 1
         plt.show()
         
     def _get_default_params(self, method):
-        params = {'trend': method,
-                  'time_param': self.max_time_param // 2,
-                  'q_params': self.default_q_params}
+        params = {
+            'trend': method,
+            'time_param': self.max_time_param // 2,
+            'q_params': self.default_q_params}
         return params
 
     @property
@@ -194,8 +198,7 @@ class QPercent:
             current_pct = 1
         else:
             self.best_returns[method] = returns
-            print(f'Current best {method} returns:',
-                  self.best_returns[method])
+            print(f'Current best {method} returns:', self.best_returns[method])
             current_pct = res.pct_invested.tolist()[-1]
         print('Fraction Invested:', current_pct)
         self.best_param_set[method]['pct'] = current_pct
@@ -220,8 +223,7 @@ class QPercent:
                 self.best_returns[method] = returns
                 current_pct = res.pct_invested.to_list()[-1]
                 print('Invested:', current_pct)
-                self.best_param_set[method]['pct'] = current_pct
-        
+                self.best_param_set[method]['pct'] = current_pct        
         print()
 
     def _run_adjusted_search(self, n, method):
@@ -255,17 +257,18 @@ class QPercent:
         q_params = {rg: amt for (rg, amt) in zip(ranges, amts)}
         time_param = int(round(np.random.uniform(*time_param_range)))
         trend_method = method
-        params = {'time_param': time_param,
-                  'trend': trend_method,
-                  'q_params': q_params}
+        params = {
+            'time_param': time_param,
+            'trend': trend_method,
+            'q_params': q_params}
         return params
 
     def _adjust_params(self, method):
         params = self.best_param_set[method].copy()
         n_params = len(params['q_params'])
-        p_change_time_param = (self.p_change_time_prarm
-                               if self.p_change_time_param is not None
-                               else 1 / (n_params + 1))
+        p_change_time_param = (
+            self.p_change_time_prarm if self.p_change_time_param is not None
+            else 1 / (n_params + 1))
         adj_time_param = np.random.choice(
             [True, False],
             p=(p_change_time_param, 1 - p_change_time_param))
@@ -274,7 +277,8 @@ class QPercent:
             time_param += np.random.normal(scale=self.sd * self.ma_factor)
             time_param = int(
                 round(
-                    max(min(time_param, self.max_time_param),
+                    max(
+                        min(time_param, self.max_time_param),
                         MIN_TIME_PARAM)))
             params['time_param'] = time_param
             return params
@@ -295,8 +299,8 @@ class QPercent:
             if amts[i] <= amts[i - 1] or amts[i] >= amts[i + 1]:
                 amts[i] = np.random.uniform(amts[i -1], amts[i + 1])
             amts = amts[1:-1]
-        q_params = {rg: amt
-                    for (rg, amt) in zip(ranges, sorted(list(amts))[::-1])}
+        q_params = {
+            rg: amt for (rg, amt) in zip(ranges, sorted(list(amts))[::-1])}
         params['q_params'] = q_params
         return params
 
@@ -322,26 +326,26 @@ class QPercent:
         data['total'] = 1
         data.index = range(data.shape[0])
         for i in data.index[2:]:
-            no_trade = (data.loc[i, 'pct_invested']
-                        == data.loc[i - 2, 'pct_invested'])
+            no_trade = (
+                data.loc[i, 'pct_invested'] == data.loc[i - 2, 'pct_invested'])
             if no_trade:
                 # just adjust by day-to-day change
-                data.loc[i, 'invested'] = (data.loc[i - 1, 'invested']
-                                           * data.loc[i, 'DayToDayChange'])
+                data.loc[i, 'invested'] = (
+                    data.loc[i - 1, 'invested'] * data.loc[i, 'DayToDayChange'])
                 data.loc[i, 'reserve'] = data.loc[i - 1, 'reserve']
             else:
-                target = (data.loc[i - 1, 'pct_invested']
-                          * data.loc[i - 1, 'total'])
+                target = (
+                    data.loc[i - 1, 'pct_invested'] * data.loc[i - 1, 'total'])
                 move_amt = target - data.loc[i - 1, 'invested']
-                amt_day_start = (data.loc[i - 1, 'invested']
-                                 * data.loc[i, 'OvernightChange']
-                                 + move_amt)
-                data.loc[i, 'invested'] = (amt_day_start
-                                           * data.loc[i, 'IntradayChange'])
-                data.loc[i, 'reserve'] = (data.loc[i - 1, 'reserve']
-                                          - move_amt)
-            data.loc[i, 'total'] = (data.loc[i, 'reserve']
-                                    + data.loc[i, 'invested'])
+                amt_day_start = (
+                    data.loc[i - 1, 'invested'] * data.loc[i, 'OvernightChange']
+                    + move_amt)
+                data.loc[i, 'invested'] = (
+                    amt_day_start * data.loc[i, 'IntradayChange'])
+                data.loc[i, 'reserve'] = (
+                    data.loc[i - 1, 'reserve'] - move_amt)
+            data.loc[i, 'total'] = (
+                data.loc[i, 'reserve'] + data.loc[i, 'invested'])
         return data
                 
     def _get_pct_invested(self, params, data):
@@ -359,8 +363,8 @@ class QPercent:
         }[trend_method](data, time_param, ew)
         #qs = self.get_deviate_quantiles(data)
         qs = self.get_deviate_quantiles(data, trend_method) ###
-        pct_invested = [q_params.get(self._get_qrange(q, q_params), np.nan)
-                        for q in qs]
+        pct_invested = [
+            q_params.get(self._get_qrange(q, q_params), np.nan) for q in qs]
         return pct_invested
 
     @staticmethod
