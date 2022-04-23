@@ -1,9 +1,8 @@
 #-------#---------#---------#---------#---------#---------#---------#---------
-rm(list=ls())
 library(tseries)
 library(TTR)
 
-SOURCE <- 'sp1950.csv' # 'nya1965.csv'
+SOURCE <- 'nasdaq1965.csv' #'sp1950.csv' # 'nya1965.csv'
 PATH <- sprintf('~/Learning/marketModeling/data/%s', SOURCE)
 
 random.color <- function() {
@@ -261,81 +260,92 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
 }
 
 #=============================================================================
-CASH_OUT <- 0
-CASH_IN <- 0
-# Guide to move money from Bank accounts
 twoK.downtrend <- c(12500, 13500)
 housing.crash <- c(14500, 15000)
 sp <- read.and.prep.data() 
 tail(sp)
 
 
+fracs.out <- c()
+fracs.in <- c()
+
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 100/50% in; 60% outcash.out.full <- 0.6 * 0
-(CASH_OUT <- max(CASH_OUT, cash.out.full))
-cash.in.full <- 1 * 0
-(CASH_IN <- max(CASH_IN, cash.in.full))
-#  1 if neg, 0 if pos (Buy Guide--2nd line above median)
+# 100/50% in; 60%/30% outcash.out.full <- 0.6 * 0
+f.out <- 0
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
-# 95/48% in; 50% out
-cash.out.20 <- 0.5 * 1 ## PENDING 1 (full)
-(CASH_OUT <- max(CASH_OUT, cash.out.20))
-cash.in.20 <- 0.5 * 0
-(CASH_IN <- max(CASH_IN, cash.in.20))
+# 95/48% in; 50%/25% out
+f.out <- 0.5
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
-# 75/38% in; 40% out
-cash.out.10 <- 0.4 * 1 # PENDING (full)
-(CASH_OUT <- max(CASH_OUT, cash.out.10))
-cash.in.10 <- 0.75 * 0
-(CASH_IN <- max(CASH_IN, cash.in.10))
+# 75/38% in; 40%20% out
+f.out <- 0
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
-# 50/25% in; 30% out
-cash.out.5 <- 0.3 * 0 
-(CASH_OUT <- max(CASH_OUT, cash.out.5))
-cash.in.5 <- 0.5 * 0
-(CASH_IN <- max(CASH_IN, cash.in.5))
+# 50/25% in; 30%/15% out
+f.out <- 0
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
-# 25/13% in; 20% out
-cash.out.2.5 <- 0.2 * 0 ## 
-(CASH_OUT <- max(CASH_OUT, cash.out.2.5))
-cash.in.2.5 <- 0.25 * 0
-(CASH_IN <- max(CASH_IN, cash.in.5))
+# 25/13% in; 20%/10% out
+f.out <- 0
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
-# 12/6% in; 10% out 
-cash.out.1.25 <- 0.1 * 0
-(CASH_OUT <- max(CASH_OUT, cash.out.1.25))
-cash.in.1.25 <- 0.12 # IN
-(CASH_IN <- max(CASH_IN, cash.in.1.25))
+# 12/6% in; 10%/5% out 
+f.out <- 0
+f.in <- 0.12
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
-# 6/3% in; 5% out
-cash.out.6mo <- 0.05 * 0 
-(CASH_OUT <- max(CASH_OUT, cash.out.6mo))
-cash.in.6mo <- 0.06 * 0
-(CASH_IN <- max(CASH_IN, cash.in.6mo))
+# 6/3% in; 5%/2.5% out
+f.out <- 0
+f.in <- 0
+fracs.out <- c(fracs.out, f.out)
+fracs.in <- c(fracs.in, f.in)
 
-#quartz()
-#twoK <- clip.series(sp, day.range=twoK.downtrend)
-#plot.for.ts(twoK, proj=F)
-
-#quartz()
-#hc <- clip.series(sp, day.range=housing.crash)
-#plot.for.ts(hc, proj=F)
 #=============================================================================
-CASH_OUT
-CASH_IN
-(deposits.in <- mean(
-  c(paycheck.in.all, paycheck.in.20, paycheck.in.10, paycheck.in.5, 
-    paycheck.in.2.5, paycheck.in.1.25, paycheck.in.0.5)))
+if (length(fracs.out) != 7 | length(fracs.in) != 7) {
+	cat('STOP: missing a fraction out.  Rerun')
+}
+
+remove.subsequent.fractions <- function(fractions) {
+	amt.in <- 1
+	for (f in fractions) {
+		amt.in <- amt.in - f*amt.in
+	}
+	amt.in
+}
+
+add.subsequent.fractions <- function(fractions) {
+	reserves <- 1
+	for (f in fractions) {
+		reserves <- reserves - f*reserves
+	}
+	1 - reserves
+}
+
+
+(pct.invested <- remove.subsequent.fractions(fracs.out))
+(pct.reserves.to.add <- add.subsequent.fractions(fracs.in))
