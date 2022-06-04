@@ -30,7 +30,7 @@ fill <- function(x, direction) {
   	}
   } else {
   	warning('Bad direction.')
-  }x
+  }
   x
 }
 
@@ -297,7 +297,7 @@ sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 40%/20% out; 50/25% in; 
 f.out <- 0
-f.in <- 0.25
+f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
