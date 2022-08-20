@@ -20,11 +20,12 @@ class Loader:
         - start/end (str 'YYYY-MM-DD') start and end dates for stock data. 
             <end> defaults to <TODAY>
         '''
-        self.symbols = ([symbols] if type(symbols) is str
-                        else sorted(symbols))
+        self.symbols = (
+            [symbols] if type(symbols) is str else sorted(symbols))
         self.start = self.str_to_datetime(start)
-        self.end = (self.str_to_datetime(end) if end is not None
-                    else TODAY + timedelta(1))
+        self.end = (
+            self.str_to_datetime(end) if end is not None
+            else TODAY + timedelta(1))
         self.df = None
         self.verbose = verbose
 
@@ -37,12 +38,14 @@ class Loader:
         return self.df
 
     def download(self, append=None):
-        df = (yf.download(self.symbols, start=self.start, end=self.end)
-              .drop('Volume',  axis=1)
-              .rename(columns={'Adj Close': 'Value'}))
+        df = (
+            yf
+            .download(self.symbols, start=self.start, end=self.end)
+            .drop('Volume',  axis=1)
+            .rename(columns={'Adj Close': 'Value'}))
         if len(self.symbols) == 1:
-            df.columns  = pd.MultiIndex.from_tuples([(x, self.symbols[0])
-                                                     for x in list(df)])
+            df.columns  = pd.MultiIndex.from_tuples(
+                [(x, self.symbols[0]) for x in list(df)])
         df['Date'] = df.index
         if append is not None:
             try:
