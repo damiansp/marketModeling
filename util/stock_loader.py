@@ -42,7 +42,8 @@ class Loader:
             yf
             .download(self.symbols, start=self.start, end=self.end)
             .drop('Volume',  axis=1)
-            .rename(columns={'Adj Close': 'Value'}))
+            .rename(columns={'Adj Close': 'Value'})
+            .sort_index())
         if len(self.symbols) == 1:
             df.columns  = pd.MultiIndex.from_tuples(
                 [(x, self.symbols[0]) for x in list(df)])
@@ -63,7 +64,7 @@ class Loader:
         print('Generating derived columns...')
         for s in self.symbols:
             if self.verbose:
-                print(f'   ...{s}')
+                print(f'{s}...', end=' ')
             if (df.Open[s] == 0).any():
                 df = self._fill_missing_open(df, s)
             df['LogValue', s] = np.log(df.Value[s])
@@ -78,6 +79,8 @@ class Loader:
                 df.loc[(day), ('OvernightChange', s)] = (
                     df.loc[(day), ('Open', s)]
                     / df.loc[(day - 1), ('Close', s)])
+        if self.verbose:
+            print()
         return df
 
     @staticmethod
