@@ -289,7 +289,7 @@ sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
 # 50%25% out; 75/38% in; 
 f.out <- 0
-f.in <- 0
+f.in <- 0.75 # active
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -297,15 +297,15 @@ sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
 # 40%/20% out; 50/25% in; 
 f.out <- 0
-f.in <- 0
+f.in <- 0 # active
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in;
-f.out <- 0
-f.in <- 0  # active
+f.out <- 0  # active
+f.in <- 0  
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
