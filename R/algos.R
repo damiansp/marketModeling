@@ -3,14 +3,15 @@ load('~/Learning/marketModeling/data/myHistoric.RData')
 head(df)
 tail(df)
 
-dailyChange <- function(x) {
+get.daily.change <- function(x) {
   (x[2:length(x)] - x[1:(length(x) - 1)]) / x[1:(length(x) - 1)]
 }
 
-m <- dim(df)[1]
-last <- m
 
-SPActual <- c(df$SPActual,
+prev.last <- dim(df)[1]
+
+
+sp.actual <- c(df$SPActual,
   4797,4794,4701,4696,4677,4670,4713,4726,4659,4663,4577,4533,4483,4398,4410,
   4356,4350,4327,4432,4516,4547,4589,4477,4501,4484,4522,4587,4504,4419,4402,
   4471,4475,4380,4349,4305,4226,4289,4385,4374,4306,4387,4363,4329,4201,4171,
@@ -24,11 +25,10 @@ SPActual <- c(df$SPActual,
   4305,4274,4284,4228,4138,4129,4141,4199,4058,4031,3986,3955,3967,3924,3908,
   3980,4006,4067,4110,3933,3946,3901,3873,3900,3856,3790,3758,3693,3655,3647,
   3719,3640,3586,3678,3791,3783,3745,3640,3612,3589,3577,3670,3583,3678,3720,
-  3695,3666,3753,3797,3859,3831,3807,3901,3872,3856,3760,3720,3771)
-SP <- SPActual / SPActual[last]
-SPd <- dailyChange(SP)
+  3695,3666,3753,3797,3859,3831,3807,3901,3872,3856,3760,3720,3771,3807,3828,
+  3749,3956,3993)
 
-FidIn <- c(df$FidIn,
+fid.in <- c(df$FidIn,
    57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 57134, 61104,
    61104, 62434, 62434, 62434, 62434, 62434,160743,160743,160743,161785,161785,
   161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,
@@ -47,8 +47,9 @@ FidIn <- c(df$FidIn,
   161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,
   161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,
   161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,
-  161785,161785,161785,161785,161785,161785,161785,161785,161785,161785) #
-FidVal <- c(df$FidVal,
+  161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,161785,
+  161785,161785,161785,161785) #
+fid.val <- c(df$FidVal,
    94096, 90621, 86085, 86306, 84787, 85416, 87205, 87106, 83943, 83649, 84545,
    84094, 85649, 82388, 83399, 81424, 80533,218550,222221,229970,232595,228121,
   221810,225872,225565,227194,232232,231501,226454,226222,230340,230174,224468,
@@ -67,13 +68,10 @@ FidVal <- c(df$FidVal,
   200533,203662,209931,212532,202224,203649,202214,197177,197952,194256,190725,
   184174,181106,179479,181235,186746,182079,180641,184953,194503,194130,194112,
   185139,181456,178108,178306,178930,172184,179925,183072,177375,178474,180556,
-  180254,187618,184876,185222,187994,186433,187381,179118,177412,175157) #
+  180254,187618,184876,185222,187994,186433,187381,179118,177412,175157,175492,
+  175944,170747,185852,193458) #
 
-Fid <- FidVal / FidIn
-Fid <- Fid / Fid[last]
-Fidd <- dailyChange(Fid)
-
-f1kIn <- c(df$f1kIn,
+f1k.in <- c(df$f1kIn,
    98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297, 98297,
    98297, 98297, 98297, 98297, 98297, 98297,0.6935,0.6935,0.6935,0.6935,0.6935,
   0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,0.6935,
@@ -92,8 +90,9 @@ f1kIn <- c(df$f1kIn,
    11509, 11509, 11509, 11509, 11509, 11509, 11509, 11509, 11509, 11509, 11509,
    12489, 12489, 12489, 12489, 12489, 12489, 12489, 12489, 12489, 12489, 13411,
    13411, 13411, 13411, 13411, 13411, 13411, 13411, 13411, 13411, 14349, 14349,
-   14349, 14349, 14349, 14349, 14349, 14349, 14349, 14349, 15263, 15263) # 961.47
-f1kVal <- c(df$f1kVal,
+   14349, 14349, 14349, 14349, 14349, 14349, 14349, 14349, 15263, 15263, 15263,
+   15263, 15263, 15263, 15263) # 961.47
+f1k.val <- c(df$f1kVal,
   157563,158404,157348,153323,153323,151838,151838,153394,153734,150997,151082,
   147813,146496,145095,141741,141741,141741,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
@@ -112,16 +111,8 @@ f1kVal <- c(df$f1kVal,
    12344, 12543, 12612, 12796, 12885, 12398, 12426, 12275, 12102, 12095, 11902,
    12711, 12548, 12325, 12321, 12411, 12707, 12492, 12372, 12699, 13017, 13991,
    14079, 13597, 13468, 13333, 13346, 13584, 13584, 13584, 13749, 14557, 14540,
-   14789, 14890, 15202, 15031, 14960, 15159, 15109, 15094, 15994,15831) #
-n <- length(f1kIn)
-#payment * f1kIn[n] / f1kVal[n] + f1kIn[n]
-
-f1k <- f1kVal / f1kIn
-f1k <- f1k / f1k[last]
-f1kd <- dailyChange(f1k)
-f1k[is.na(f1k)] <- NA
-f1kd[is.na(f1kd)] <- NA
-
+   14789, 14890, 15202, 15031, 14960, 15159, 15109, 15094, 15994, 15831, 15821,
+   15832, 15913, 15446, 16457) #
 
 self.mng.in <- c(rep(0.8668, 900),
            4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,
@@ -129,20 +120,18 @@ self.mng.in <- c(rep(0.8668, 900),
     4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,
     4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,
     4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,  4460,
-    4460,  4460,  4460,  4460,  6961,  9350,  9350,  9350,  9350,  9350)  ##
+    4460,  4460,  4460,  4460,  6961,  9350,  9350,  9350,  9350,  9350,  9350,
+    9350,  9350,  9350,  9350)  ##
 self.mng.val <- c(rep(1, 900),
            5146,  5196,  5358,  5354,  5423,  5460,  5436,  5330,  5325,  5168,
     5035,  5011,  5034,  5112,  4920,  4865,  4911,  4866,  4757,  4779,  4783,
     4820,  4834,  4874,  4876,  4754,  4742,  4703,  4620,  4568,  4438,  4413,
     4365,  4277,  4321,  4405,  4527,  4481,  4489,  4620,  4667,  4685,  4793,
     4675,  4662,  4616,  4648,  4725,  4615,  4738,  4785,  4698,  4720,  4766,
-    4750,  4860,  4891,  4879,  7652, 10280, 10320, 10197, 10044, 10019)
-self.mng <- self.mng.val / self.mng.in
-self.mng <- self.mng / self.mng[last]
-self.mng.d <- dailyChange(self.mng)
+    4750,  4860,  4891,  4879,  7652, 10280, 10320, 10197, 10044, 10019,  9997,
+   10045,  9698, 10311, 10571)
 
-
-OHIn <- c(df$OHIn,
+et.in <- c(df$OHIn,
     49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269,
     49269, 49269, 49269, 49269, 49269, 49269, 49269, 49269, 49864, 49864, 49864,
     49864, 49864, 49864, 49864, 49864, 49864, 49864, 49864, 49864, 50799, 50799,
@@ -161,8 +150,9 @@ OHIn <- c(df$OHIn,
     72396, 72396, 72396, 72396, 72396, 72396, 72396, 72626, 72862, 72862, 72862,
     72862, 72862, 72862, 72862, 72862, 73280, 73280, 73365, 74177, 74177, 74177,
     74177, 74177, 74177, 74177, 74405, 74405, 74405, 74405, 74405, 74405, 74405,
-    74405, 74405, 74405, 74405, 74867, 74867, 74867, 74867, 74867, 74867) #
-OHVal <-c(df$OHVal,    
+    74405, 74405, 74405, 74405, 74867, 74867, 74867, 74867, 74867, 74867, 74867,
+    74867, 74867, 74867, 75544) #
+et.val <-c(df$OHVal,    
    102557,100422, 97844, 98121, 97375, 97932, 98939, 99051, 97002, 96791, 95665,
     95391, 95163, 93596, 94389, 93136, 92819, 92495, 94639, 99447,100868, 98399,
     94494, 97379, 97364, 98090,100648,100016, 98296, 97198, 99552,100015, 96612,
@@ -181,273 +171,115 @@ OHVal <-c(df$OHVal,
    130544,132639,136705,138637,131067,132050,130672,127973,128554,126151,124052,
    120023,118086,116832,118181,121663,119361,118782,121707,128930,128693,128486,
    122546,120777,118519,118618,119626,114679,119719,121753,118822,119820,121544,
-   121523,126207,124447,124330,126651,125760,125860,120424,119244,117957) #
-OH <- OHVal / OHIn
-OH <- OH / OH[last]
-OHd <- dailyChange(OH)
-totalFunds <- FidVal + f1kVal + OHVal
-
-n.tot <- length(FidIn)
-# Mon NEW
-m1 <- (c(
-  100000, 99734, 97021, 92607, 93071, 91736, 92132, 94069, 93531, 90683, 90091,
-   87564, 87271, 86460, 84269, 85206, 82751, 81848, 80050, 82238, 86565, 87949,
-   86042, 83068, 85330, 85522, 87001, 90263, 89454, 87144, 86604, 89342, 88849,
-   85501, 82663, 81832, 79154, 83928, 85585, 87402, 86468, 86568, 83415, 80900,
-   77588, 77022, 80586, 79208, 75363, 71932, 74564, 79665, 82683, 85919, 84263,
-   87026, 85860, 87058, 85346, 86812, 90121, 88040, 86501, 87299, 90475, 87259,
-   84010, 83687, 81901, 81058, 80459, 82912, 80389, 78921, 81832, 78883, 75269,
-   73241, 75371, 71659, 71117, 72945, 70469, 72978, 72235, 75066, 69732, 66717,
-   61297, 59691, 56166, 58338, 63260, 61025, 63151, 60198, 62075, 61473, 61632,
-   58010, 59528, 61860, 64602, 63146, 61926, 65673, 63181, 63584, 64829, 62363,
-   59158, 55092, 55119, 57372, 54004, 55788, 57284, 57696, 60870, 63247, 57053,
-   58501, 61564, 60948, 63154, 63003, 60110, 59724, 59626, 58456, 60004, 59651,
-   61716, 63962, 64884, 62085, 59063, 61992, 62633, 62680, 62995, 64007, 65654,
-   65788, 66601, 67091, 64831, 67912, 67429, 68755, 68585, 68022, 65904, 65330,
-   62844, 61039, 60813, 61646, 63418, 60836, 59939, 59657, 59179, 57370, 56835)
-  / 100000)
-
-n.since <- length(m1) - n.tot
-m1 <- c(m1, rep(NA, n.since))
-qp.start <- 92
-m1.name <- 'sim1'
-  
-# Tues
-m2 <- (c(
-  100000, 99519, 96234, 91473, 91946, 90337, 90702, 92795, 92113, 88699, 88134,
-   85502, 84905, 84010, 81444, 82682, 80076, 79132, 77316, 79826, 84924, 86845,
-   84916, 81811, 83915, 84091, 85475, 88480, 87430, 84757, 84215, 86909, 86224,
-   82882, 80170, 79277, 76822, 81232, 82869, 84376, 83620, 83943, 80812, 78105,
-   74317, 73857, 77530, 76241, 72815, 69899, 72093, 76498, 78989, 81897, 80630,
-   83072, 81761, 82686, 81217, 82571, 85155, 83529, 82094, 82940, 85501, 82670,
-   79775, 79483, 77784, 76954, 76282, 78337, 76131, 74997, 77613, 75151, 71995,
-   70160, 71885, 68718, 68253, 70129, 67816, 69893, 68939, 70952, 66282, 63781,
-   58921, 57771, 54938, 56562, 60454, 58552, 60800, 58448, 59895, 59358, 59731,
-   56514, 57741, 60025, 62593, 61344, 60351, 63305, 61248, 61616, 62542, 60457,
-   57762, 54362, 54311, 56298, 53213, 54772, 56052, 56447, 59364, 61609, 55965,
-   57344, 60067, 59445, 61342, 61081, 58798, 58044, 57968, 56786, 58132, 57941,
-   59276, 61854, 62869, 60688, 57661, 60138, 60983, 61164, 61507, 62652, 64152,
-   64272, 64950, 65338, 63038, 65829, 65264, 66471, 66516, 65945, 64282, 63806,
-   61651, 60077, 59833, 60579, 62158, 59706, 58881, 58488, 58212, 56430, 56441)
-  / 100000) 
-m2 <- c(m2, rep(NA, n.since))
-m2.name <- 'sim2'
-
-# Wed
-m3.raw <- c(
-  100000, 99890, 96310, 91049, 91683, 89443, 89246, 91155, 90781, 88037, 87453, 
-   85588, 85124, 85345, 82818, 83265, 80641, 79763, 77546, 79590, 84694, 86997,
-   84065, 80991, 82349, 81679, 83145, 87233, 85828, 83761, 83048, 85413, 85793,
-   82981, 80101, 79476, 77510, 84759, 86351, 89583, 87106, 88107, 85490, 83370,
-   80189, 79725, 82573, 81231, 77547, 74984, 77353, 81368, 84414, 87515, 86385,
-   88753, 87410, 88721, 86792, 88646, 91518, 89937, 88551, 89545, 91913, 88982,
-   86036, 85895, 83995, 82998, 82196, 84528, 82200, 80832, 83790, 81297, 77940,
-   75824, 77783, 74449, 73896, 75729, 73478, 75238, 74645, 76035, 71760, 69444,
-   65646, 64752, 62474, 63326, 67463, 66242, 69585, 67034, 68403, 67820, 67875,
-   65479, 66684, 69321, 71693, 70319, 69583, 72723, 70255, 70704, 71497, 68888,
-   66063, 62101, 62117, 64075, 61173, 62354, 63531, 63791, 66091, 68239, 63541,
-   64575, 66779, 66455, 68093, 67946, 65996, 65098, 64946, 63680, 64959, 64847,
-   66604, 68902, 70140, 68096, 65260, 67952, 68775, 68894, 69277, 70495, 71774,
-   72259, 73000, 72962, 71253, 75030, 73746, 75194, 75539, 74631, 72881, 72554,
-   70194, 68294, 68200, 68873, 70639, 67950, 66874, 66535, 66033, 63354, 63630)
-m3 <- m3.raw / 100000
-m3 <- c(m3, rep(NA, n.since))
-m3.name <- 'sim3'
-
-# Thur
-m4.raw <- c(
-  100000, 99289, 96063, 91314, 91644, 90074, 90327, 92360, 91830, 88380, 88025,
-   85472, 84872, 84283, 81799, 82759, 80245, 79590, 78131, 80209, 83986, 85118,
-   84282, 81703, 83586, 83495, 84327, 87216, 86221, 83907, 83463, 86119, 85921,
-   82848, 80632, 79966, 78132, 82004, 83071, 84342, 83314, 83823, 80951, 78736,
-   75363, 74865, 78112, 77060, 73747, 70732, 73045, 77623, 80265, 83692, 82327,
-   84860, 83303, 84431, 83013, 84238, 86767, 85113, 84015, 84779, 86850, 84106,
-   81387, 81126, 79584, 78809, 78162, 80299, 78306, 77228, 79702, 77511, 74441,
-   72509, 74178, 70926, 70529, 72285, 69846, 71661, 70726, 72745, 68116, 65405,
-   60320, 59258, 56414, 57910, 61900, 60036, 61948, 59727, 61018, 60880, 61074,
-   57979, 59113, 61391, 64041, 62777, 61570, 64841, 62550, 62884, 64055, 61967,
-   59263, 55610, 55622, 57509, 54840, 56387, 57843, 58108, 61069, 63199, 56897,
-   58568, 61755, 60914, 63255, 63167, 60209, 59863, 59803, 58903, 60596, 60308,
-   62211, 64077, 65268, 62622, 59423, 62159, 62715, 62869, 63565, 64693, 67073,
-   67060, 67689, 68095, 65872, 68946, 68190, 69814, 69751, 69680, 66706, 66497,
-   64292, 62723, 62425, 63160, 64573, 61977, 60891, 60440, 60272, 58844, 58284)
-m4 <- m4.raw / 100000
-m4 <- c(m4, rep(NA, n.since))
-m4.name <- 'sim4'
-
-# Fri
-m5 <- (c(
-  100000, 99775, 96651, 91870, 92422, 91307, 92182, 94394, 93768, 89786, 89177,
-   86127, 85615, 84895, 81979, 83919, 81050, 80084, 77906, 80564, 86086, 88236,
-   85575, 82009, 84571, 84519, 85750, 89164, 87765, 85391, 84953, 87773, 86529,
-   83335, 80597, 79997, 77851, 82453, 84232, 85985, 85142, 85000, 82028, 79579,
-   76314, 76131, 80113, 78878, 75174, 71810, 74769, 81328, 84511, 88583, 86653,
-   89302, 88138, 88974, 87142, 88853, 92280, 90186, 88372, 89101, 92223, 89249,
-   86336, 85805, 84045, 83406, 82627, 85007, 82435, 81087, 83991, 81153, 77696,
-   75672, 77615, 73847, 73290, 75208, 72323, 74707, 73957, 76467, 70971, 68378,
-   63066, 62220, 59209, 61155, 66022, 63790, 65607, 62780, 64470, 64079, 64225,
-   60701, 62250, 64564, 67228, 65990, 64750, 68496, 66102, 66455, 67677, 65254,
-   62262, 58388, 58333, 60657, 57482, 59196, 60744, 61224, 64591, 67802, 61594,
-   63032, 66011, 65503, 67802, 67831, 65006, 64528, 64452, 63359, 65099, 64955,
-   67068, 69498, 70434, 67718, 64243, 67188, 67920, 68230, 68624, 69897, 72138,
-   72179, 73006, 73648, 71269, 74296, 73756, 75021, 74953, 74484, 72440, 70524, 
-   69521, 67782, 67359, 68203, 69940, 67318, 66528, 66121, 65976, 64712, 64036)
-  / 100000)
-m5 <- c(m5, rep(NA, n.since))
-m5.name <- 'sim5'  
+   121523,126207,124447,124330,126651,125760,125860,120424,119244,117957,118285,
+   118793,115516,126770,133280) #
 
 
-# Sat
-m6 <- (c(
-  100000,100012, 98204, 96007, 96400, 95686, 96971, 97980, 98605, 95083, 95146,
-   93567, 93268, 93246, 90907, 92420, 90796, 90046, 88126, 91095, 95457, 97577,
-   94775, 91892, 93896, 93335, 94248, 97118, 96630, 94595, 94040, 96516, 96062,
-   92644, 89662, 89136, 86860, 91581, 94435, 96429, 94844, 95051, 91299, 87998,
-   82856, 81936, 87122, 85525, 81217, 78300, 81197, 86988, 90084, 95329, 92914,
-   95327, 93939, 95411, 93709, 96084,100081, 98029, 96120, 97397,100495, 96992,
-   93601, 93350, 91191, 90400, 89442, 92042, 89235, 87697, 91168, 88173, 84425,
-   82103, 84200, 80402, 79518, 81849, 78395, 81565, 80631, 83689, 77294, 74176,
-   67817, 66609, 63340, 65512, 71594, 68836, 71399, 68010, 70177, 69702, 69719,
-   65619, 67372, 70416, 73573, 72197, 71214, 74628, 72069, 72287, 73676, 70956,
-   67403, 63040, 62901, 65067, 61598, 63298, 64694, 65143, 68492, 71246, 65019,
-   66250, 69048, 68587, 70633, 70421, 68013, 67057, 66954, 65840, 67313, 67143,
-   69281, 71670, 72941, 70482, 67057, 70215, 71118, 71663, 72111, 73244, 75445,
-   76093, 76429, 76635, 74426, 78139, 77354, 79029, 79336, 78687, 76811, 74856,
-   73910, 71999, 71810, 72501, 74313, 71376, 70349, 70007, 69492, 66767, 66260)
-  / 100000)
-m6.name <- 'sim6'  
-m6 <- c(m6, rep(NA, n.since))
-
-# Sun
-m7 <- (c(
-  100000, 99901, 98262, 96147, 96334, 95340, 95359, 96898, 96645, 95102, 94744,
-   93378, 92032, 92532, 90635, 91392, 89184, 88026, 85549, 87371, 91761, 93129,
-   91146, 88692, 89998, 90197, 90946, 93189, 92856, 91261, 90848, 92961, 93142,
-   90538, 88038, 87669, 86034, 90318, 91664, 93607, 92079, 92963, 90210, 87478,
-   83126, 82742, 86523, 85175, 81054, 77653, 80287, 85058, 88263, 91422, 89849,
-   92723, 91477, 92380, 90661, 92244, 95161, 93805, 92365, 92990, 95293, 92139,
-   89070, 89063, 87319, 86410, 85787, 88088, 85587, 84303, 87236, 84698, 81437,
-   79338, 81615, 77817, 77332, 78610, 76235, 78196, 76737, 78814, 73402, 69301,
-   64540, 63160, 60706, 62340, 65974, 63724, 66402, 63517, 65418, 64702, 64687,
-   61186, 63451, 65966, 68653, 67303, 65926, 69089, 66608, 67109, 68241, 66355,
-   63581, 59985, 60223, 62193, 59387, 60785, 61673, 62340, 65165, 67728, 61469,
-   62999, 66228, 65656, 68188, 68210, 65399, 64630, 64352, 63170, 64768, 64447,
-   66514, 68820, 70262, 67421, 64270, 67443, 68110, 68401, 69091, 70265, 72440,
-   72950, 73675, 73894, 71681, 75192, 74434, 76055, 76222, 75409, 73533, 72864,
-   70599, 68955, 68868, 69496, 71130, 68581, 67639, 67367, 67119, 65174, 64803)
-  / 100000)
-m7 <- c(m7, rep(NA, n.since))
-m7.name <- 'sim7'  
+normalize.to.index <- function(x, index) {
+	x / x[index]
+}
 
 
-totin <- FidIn + f1kIn + OHIn
-totval <- FidVal + f1kVal + OHVal
-tot <- totval / totin 
-tot <- tot / tot[last]
-minein <- FidIn + OHIn + self.mng.in
-mineval <- FidVal + OHVal + self.mng.val
-mine <- mineval / minein
-mine <- mine / mine[last]
-m1 <- m1 / m1[1]
-m2 <- m2 / m2[1]
-m3 <- m3 / m3[1]
-m4 <- m4 / m4[1]
-m5 <- m5 / m5[1]
-m6 <- m6 / m6[1]
-m7 <- m7 / m7[1]
+sp <- normalize.to.index(sp.actual, prev.last)
+spd <- get.daily.change(sp)
+fid <- fid.val / fid.in
+fid <- normalize.to.index(fid, prev.last)
+fidd <- get.daily.change(fid)
+f1k <- f1k.val / f1k.in
+f1k <- normalize.to.index(f1k, prev.last)
+self.mng <- self.mng.val / self.mng.in
+self.mng <- normalize.to.index(self.mng, prev.last)
+self.mng.d <- get.daily.change(self.mng)
+et <- et.val / et.in
+et <- normalize.to.index(et, prev.last)
+etd <- get.daily.change(et)
+tot.in <- fid.in + f1k.in + et.in
+tot.val <- fid.val + f1k.val + et.val
+tot <- tot.val / tot.in
+tot <- normalize.to.index(tot, prev.last)
+mine.in <- fid.in + et.in + self.mng.in
+mine.val <- fid.val + et.val + self.mng.val
+mine <- mine.val / mine.in
+mine <- normalize.to.index(mine, prev.last)
+
 
 # Calculate Sharpe Ratios
-Sharpe <- function(returns, window=length(returns)) {
+get.sharpe.ratio <- function(returns, window=length(returns), rnd=3) {
   if (length(returns) > window) {
     returns <- returns[(length(returns) - window):length(returns)]	  	
   }	
   returns <- returns[!is.na(returns)]
-  (sqrt(252) * mean(returns)) / sd(returns)
+  round((sqrt(252) * mean(returns)) / sd(returns), rnd)
 }
+
 
 get.daily.returns <- function(x) { 
   n <- length(x)
   x[2:n] / x[1:(n - 1)] - 1 
 }
 
-n <- length(m1) 
-m <- length(SP)
-this.year <- (m-n):m
+get.sharpe.from.daily.values <- function(x, rnd=3) {
+  get.sharpe.ratio(get.daily.returns(x), rnd=rnd)
+}
 
-SP.sh  <- round(Sharpe(get.daily.returns(SP[this.year])), 3)
-self.mng.sh <- round(Sharpe(get.daily.returns(self.mng[this.year])), 3)
-tot.sh <- round(Sharpe(get.daily.returns(tot[this.year])), 3)
-mine.sh <- round(Sharpe(get.daily.returns(mine[this.year])), 3)
-m1.sh  <- round(Sharpe(get.daily.returns(m1)), 3)
-m2.sh  <- round(Sharpe(get.daily.returns(m2)), 3)
-m3.sh  <- round(Sharpe(get.daily.returns(m3)), 3)
-m4.sh  <- round(Sharpe(get.daily.returns(m4)), 3)
-m5.sh  <- round(Sharpe(get.daily.returns(m5)), 3)
-m6.sh  <- round(Sharpe(get.daily.returns(m6)), 3)
-m7.sh  <- round(Sharpe(get.daily.returns(m7)), 3)
+
+
+m <- length(sp)
+n <- length(sp) - prev.last
 prev <- m - n
+this.year <- (prev):m
 days <- -prev:(n - 1)
 new.days <- 0:(n - 1)
-  
-#quartz()  
-plot(new.days,
-     m1, 
-     type='l', 
-     xlim=range(days[days >= 0]),
-     ylim=c(0.4,
-            max(c(SP,  tot, 1 + tot - SP, mine, m1,  m2, m3, m4, m5, m6, m7))), 
-     lwd=3, 
-     log='y')
+year.start <- length(tot) - length(new.days)
+
+sp.sh       <- get.sharpe.from.daily.values(sp[this.year])
+self.mng.sh <- get.sharpe.from.daily.values(self.mng[this.year])
+tot.sh      <- get.sharpe.from.daily.values(tot[this.year])
+mine.sh     <- get.sharpe.from.daily.values(mine[this.year])
+f1k.sh      <- get.sharpe.from.daily.values(f1k[this.year]) 
+fid.sh      <- get.sharpe.from.daily.values(fid[this.year]) 
+et.sh       <- get.sharpe.from.daily.values(et[this.year]) 
+
+
+# PLOT 1: This year's returns -----------------------------------------------------
+plot(
+  days, 
+  sp / sp[year.start + 1], 
+  type='l', 
+  col='orange',
+  lwd=3, 
+  xlim=range(days[days >= 0]), 
+  ylim=c(0.6, max(c(sp, tot, 1 + tot - sp, mine))),
+  log='y')
 abline(h=seq(0, 8, 0.1), lty=2, col=rgb(0, 0, 0, 0.2))
 abline(h=seq(0, 8, 0.5), lty=4, col=rgb(0, 0, 0, 0.8))
 abline(v=0, lwd=2)
-lines(days, tot, col=2, lwd=3)
-lines(days, mine, col='cadetblue', lwd=3)
-lines(days, SP, col='yellow', lwd=3)
+lines(days, tot / tot[year.start + 1], lwd=3)
+lines(days, mine / mine[year.start + 1], col='cadetblue', lwd=3)
+lines(days, fid / fid[year.start + 1], col='darkgreen', lwd=3)
+lines(days, et / et[year.start + 1], col='purple', lwd=3)
 lines(days, self.mng, col='sienna', lwd=3)
-lines(new.days, m2, lwd=3, col='coral')
-lines(new.days, m3, lwd=3, col='blue')
-lines(new.days, m4, lwd=3, col='purple')
-lines(new.days, m5, lwd=3, col='cyan')
-lines(new.days, m6, lwd=3, col='grey')
-lines(new.days, m7, lwd=3, col='magenta')
-lines(days, 1 + tot - SP, col='#880000')
+lines(days, f1k / f1k[year.start + 1], lwd=3, col='maroon')
+lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start + 1], col=2)
 legend(
-  'topleft', 
-  lty=1, 
-  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1), 
+  'topleft',
+  lty=1,
+  lwd=c(3, 3, 3, 3, 3, 3, 3, 1),
   col=c(
-    'black', 'red ', 'cadetblue', 'yellow',  'sienna', 'coral', 'blue', 'purple', 
-    'cyan', 'grey', 'magenta', '#880000'),
+    'orange', 'darkgreen', 'purple', 'sienna', 'maroon', 'cadetblue', 'black', 
+    'red'),
   legend=c(
-    paste(m1.sh, m1.name), 
-    paste(tot.sh, 'Actual'), 
+    paste(sp.sh, 'S&P'),
+    paste(fid.sh, 'Fid'),
+    paste(et.sh, 'ETrade'),
+    paste(self.mng.sh, 'Self-Managed'),
+    paste(f1k.sh, '401(k) All'),
     paste(mine.sh, 'Mine'),
-    paste(SP.sh, 'S&P'), 
-    paste(self.mng.sh, 'Self-Mng'), 
-    paste(m2.sh, m2.name), 
-    paste(m3.sh, m3.name), 
-    paste(m4.sh, m4.name), 
-    paste(m5.sh, m5.name), 
-    paste(m6.sh, m6.name), 
-    paste(m7.sh, m7.name), 
-    'Actual Diff'),
-  bty='n')
-abline(v=qp.start)
-abline(h=1, lty=4)
-  
+    paste(tot.sh, 'Total'),
+    paste('Diff(SP)')),
+  bg=rgb(1, 1, 1, alpha=0.8))
+#---------------------------------------------------------------------------------
 
-#______________________________________________________________________________
-
-
-quartz()
-x <- 1:length(totalFunds)
-plot(x, 
-     totalFunds, 
-     type = 'l', 
-     ylim=c(0, max(totalFunds)), 
-     main='1 = 01 Jan 2018')#, log='y')
-#savings.mod <- lm(totalFunds ~ x)
 
 exp.mod <- function(funds, x) {
   savings.exp.mod <- lm(log(funds) ~ x)
@@ -456,171 +288,61 @@ exp.mod <- function(funds, x) {
 }
 
 
-#abline(savings.mod, col=rgb(0, 0, 0, 0.25))
-start <- totalFunds[last]
-now <- totalFunds[length(totalFunds)]
-low <- min(totalFunds[(last):(length(totalFunds))])
-high <- max(totalFunds[(last):(length(totalFunds))])
-earned <- high - start
-down.from.high <- high - now
-amt.down <- round(-100 *  down.from.high / earned, 2)
-lines(x, exp.mod(totalFunds, x), col=rgb(0, 0, 0, 1))
+start <- tot.val[prev.last]
+now <- tot.val[length(tot.val)]
+low <- min(tot.val[(prev.last):(length(tot.val))])
+high <- max(tot.val[(prev.last):(length(tot.val))])
+
+
+# PLOT 2: Total funds over time --------------------------------------------------
+quartz()
+x <- 1:length(tot.val)
+plot(
+  x, 
+  tot.val, 
+  type='l', 
+  ylim=c(0, max(tot.val)), 
+  main='1 = 01 Jan 2018')#, log='y')
+lines(x, exp.mod(tot.val, x), col=rgb(0, 0, 0, 1))
 abline(h=start, col='grey')
 abline(h=now, col='grey')
 abline(h=low, col=2)
 abline(h=high, col=3)
-
-lines(FidVal + f1kVal, col=4)
-lines(x, exp.mod(FidVal + f1kVal, x), col=rgb(0, 0, 1, 1))
-
-lines(f1kVal[790:length(f1kVal)], col=5)
+old.f1k.val <- f1k.val
+old.f1k.val[790:length(f1k.val)] <- 0
+lines(fid.val + old.f1k.val, col=4)
+lines(x, exp.mod(fid.val + old.f1k.val, x), col=rgb(0, 0, 1, 1))
+lines(f1k.val[790:length(f1k.val)], col=5)
 lines(
-  x[790:length(f1kVal) - 789], 
-  exp.mod(f1kVal[790:length(f1kVal)], x[790:length(f1kVal)]), 
+  x[790:length(f1k.val) - 789], 
+  exp.mod(f1k.val[790:length(f1k.val)], x[790:length(f1k.val)]), 
   col=rgb(0, 1, 1, 1))
-
-lines(OHVal, col=6)
-lines(x, exp.mod(OHVal, x), col=rgb(1, 0, 1, 1))
-
+lines(et.val, col=6)
+lines(x, exp.mod(et.val, x), col=rgb(1, 0, 1, 1))
 smv <- self.mng.val[self.mng.val > 1]
 x <- 1:length(smv)
 lines(smv, col='sienna')
 lines(x, exp.mod(smv, x), col='sienna')
-
-# FIX HERE
-#amt.down <- round(100 * pct, 2)
-amt.up <- round(100 * ((totalFunds[length(totalFunds)] / start) - 1), 2)
 legend(
-  'topleft', 
-  text.col=c('green', 'black', 'red'), 
-  legend=c(sprintf('$%d', max(totalFunds)),
-  sprintf('$%d\n(%.2f%% down\n  %.2f%% up)',
-          totalFunds[length(totalFunds)],
-          amt.down,
-          amt.up),
-          sprintf('$%d', low)), 
-  bg=rgb(1, 1, 1, 0.75))
-legend('bottomright',
-       lty=1,
-       col=c(4, 6, 1),
-       legend=c('Fidelity (+rollover)', 'E*Trade', 'Total'),
-       bg=rgb(1, 1, 1, 0.75))
-
-day <- length(f1kIn) - 1 # length(<some new algo>) - 1
-# Pad with leading NAs to make all vectors of equal length
-tLength <- length(SP)
-#Fid     <- c(rep(NA, tLength - length(Fid)),     Fid)
-#OH      <- c(rep(NA, tLength - length(OH)),      OH)
-#f1k     <- c(rep(NA, tLength - length(f1k)),     f1k)
-days <- seq(to=day, by=1, length=tLength)
-
-d <- data.frame(SP, Fid, OH, f1k, self.mng)
-realWts <- matrix(data=c(FidVal, OHVal, f1kVal, self.mng.val), ncol=4)
-realWts <- realWts / rowSums(realWts, na.rm = T)
-realWts[is.na(realWts)] <- 0 
-nWts <- length(realWts[, 1])
-meanReal <- (
-  Fid[(length(Fid)          - nWts + 1):length(Fid)]      * realWts[, 1] +
-  OH[(length(OH)            - nWts + 1):length(OH)]       * realWts[, 2] +
-  f1k[(length(OH)           - nWts + 1):length(f1k)]      * realWts[, 3])
-#meanReal <- c(rep(NA, 249), meanReal)
-colors <- c(
-  SP='yellow', Fid='red', OH='green', f1k='#cc0088', self.mng='sienna', 
-  meanReal='grey')	   
-quartz()
-matplot(
-  days,
-  d,
-  type='l', 
-  lty=1, 
-  col=colors, 
-  lwd=2, 
-  main='Performance of Funds (2018)',
-  xlab='Market Days Elapsed', ylab = 'Times Original Value', 
-  log='y', 
-  xlim=c(0, day + 5), 
-  ylim=c(
-    min(d[days >= 0, ], meanReal - SP + 1, na.rm=T), 
-	max(d[days >= 0, ], meanReal - SP + 1, na.rm=T)))
-lines(days, (meanReal - SP) + 1, lwd=1)
-lines(days, d[, 'SP'], col = 'yellow', lwd=3)
-lines(days, meanReal, col = colors['meanReal'], lwd=1)
-
-abline(h=1, lwd = 2)
-abline(v=0, lwd = 2)
-abline(v=last - 1)
-#abline(v=c(30, 75), lty=4, col=rgb(0, 0, 0, 0.4))
-abline(h=seq(0.1, 5.0, 0.1), col=rgb(0, 0, 0, 0.4), lty=2:1)
-
-SP.Sharpe       <- round(Sharpe(SPd),        3)
-Fid.Sharpe      <- round(Sharpe(Fidd),       3)
-OH.Sharpe       <- round(Sharpe(OHd),        3)
-f1k.Sharpe      <- round(Sharpe(f1kd),       3)
-self.mng.Sharpe <- round(Sharpe(self.mng.d), 3)
-real.Sharpe     <- round(Sharpe(dailyChange(meanReal)), 3)
-
-all.n <- length(SPd)
-SP.Sharpe1yr       <- round(Sharpe(SPd[last:all.n],        250), 3)
-Fid.Sharpe1yr      <- round(Sharpe(Fidd[last:all.n],       250), 3)
-OH.Sharpe1yr       <- round(Sharpe(OHd[last:all.n],        250), 3)
-f1k.Sharpe1yr      <- round(Sharpe(f1kd[last:all.n],       250), 3)
-self.mng.Sharpe1yr <- round(Sharpe(self.mng.d[last:all.n], 250), 3)
-real.Sharpe1yr <- round(Sharpe(dailyChange(meanReal)[last:all.n], 250), 3)
-
-legend(
-  'topleft', 
-  title='All data',
-  legend=c(
-    sprintf('%11s: %+.3f', 'SP500',    SP.Sharpe), 
-    sprintf('%15s: %+.3f', 'Fid',      Fid.Sharpe), 
-    sprintf('%13s: %+.3f', 'OH',       OH.Sharpe), 
-    sprintf('%15s: %+.3f', 'f1k',      f1k.Sharpe), 
-    sprintf('%15s: %+.3f', 'self.mng', self.mng.Sharpe), 
-    sprintf('%s: %+.3f',   'meanReal', real.Sharpe),
-    sprintf('%s', 'diff')),
-  lty=1, 
-  col=c(colors, 'black'), 
-  lwd=c(2, 2, 2, 2, 2, 1, 1), 
-  bg=rgb(1, 1, 1, 0.8), 
-  cex=0.6)
-legend(
-  'bottomleft', 
-  title='Last year only',
-  legend = c(
-    sprintf('%11s: %+.3f', 'SP500',    SP.Sharpe1yr), 
-    sprintf('%15s: %+.3f', 'Fid',      Fid.Sharpe1yr), 
-    sprintf('%13s: %+.3f', 'OH',       OH.Sharpe1yr), 
-    sprintf('%15s: %+.3f', 'f1k',      f1k.Sharpe1yr), 
-    sprintf('%15s: %+.3f', 'self.mng', self.mng.Sharpe1yr), 
-    sprintf('%s: %+.3f', 'meanReal',   real.Sharpe1yr),
-    sprintf('%s', 'diff')),
-  lty=1, 
-  col=c(colors, 'black'), 
-  lwd=c(2, 2, 2, 2, 2,  2, 1, 1), 
-  bg=rgb(1, 1, 1, 0.8), 
-  cex=0.6)
+  'topleft',
+  lty=1,
+  col=c('black', 'blue', 'magenta', 'cyan', 'sienna'),
+  legend=c('Total', 'Fidelity', 'ETrade', '401(k)', 'Self-Managed'),
+  bg='white')
+#---------------------------------------------------------------------------------
 
 
-
-
-#-------------------------------------------------------------
-x <- 1:length(totalFunds)
-savings.exp.mod <- lm(log(totalFunds) ~ x)
-x <- last + seq(250, 3750, by=250)[1:11]
+x <- 1:length(tot.val)
+savings.exp.mod <- lm(log(tot.val) ~ x)
+x <- prev.last + seq(250, 3750, by=250)[1:11]
 log.y <- coef(savings.exp.mod)[1] + x*coef(savings.exp.mod)[2]
 y <- round(exp(log.y))
 for (p in y) { cat(p, '\n') }
-#-------------------------------------------------------------
 
-
-
-#-------------------------------------------------------------
-
-
-(fid.amt <- FidVal[length(FidVal)])                  # [80533, 258258]
-(oh.amt <- OHVal[length(OHVal)])                     # [92495, 152346] # E*Trade
-(f1k.total <- f1kVal[length(f1kVal)])                # [    0,  12711] 
-(self.mng.amt <- self.mng.val[length(self.mng.val)]) # [ 4321,   5460]
+(fid.amt <- fid.val[length(fid.val)])                # [80533, 258258]
+(et.amt <- et.val[length(et.val)])                   # [92495, 152346]
+(f1k.total <- f1k.val[length(f1k.val)])              # [    0,  16457] 
+(self.mng.amt <- self.mng.val[length(self.mng.val)]) # [ 4321,  10571]
 
 
 
@@ -642,3 +364,9 @@ for (p in y) { cat(p, '\n') }
 #df <- df.test
 #save(df, file='~/Learning/marketModeling/data/myHistoric.RData')
 # Delete test and backups
+
+
+
+
+
+
