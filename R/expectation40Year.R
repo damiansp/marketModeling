@@ -1,4 +1,4 @@
----------#---------#---------#---------#---------#---------#---------#---------
+-------#---------#---------#---------#---------#---------#---------#---------
 library(tseries)
 library(TTR)
 
@@ -305,7 +305,7 @@ sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in;
 f.out <- 0
-f.in <- 0   # active top
+f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
