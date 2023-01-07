@@ -11,19 +11,35 @@ get.daily.change <- function(x) {
 prev.last <- dim(df)[1]
 
 
-sp.actual <- c(df$sp.actual)
+sp.actual <- c(
+  df$sp.actual,    3824,  3853,  3808,  3895)
 
-fid.in <- c(df$fid.in) #
-fid.val <- c(df$fid.val) #
+fid.in <- c(
+  df$fid.in,     161785,161785,161785,161785) #
+fid.val <- c(
+  df$fid.val,    172350,175073,172978,176119) #
 
-f1k.in <- c(df$f1k.in) # 961.47
-f1k.val <- c(df$f1k.val) #
+f1k.in <- c(
+  df$f1k.in,      18031, 18031, 18031, 18031) # (961.47)
+f1k.val <- c(
+  df$f1k.val,     17787, 17715, 17856, 17766) #
 
-self.mng.in <- c(df$self.mng.in)  ##
-self.mng.val <- c(df$self.mng.val)
+self.mng.in <- c(
+  df$self.mng.in,  9350,  9350,  9350,  9350)  ##
+self.mng.val <- c(
+  df$self.mng.val, 9189,  9333,  9243,  9351)
 
-et.in <- c(df$et.in) #
-et.val <-c(df$et.val) #
+et.in <- c(
+  df$et.in,       76890, 78443, 78443, 78443) #
+et.val <-c(
+  df$et.val,     123916,128480,126726,128449) #
+  
+adl <- (c(
+          100000, 99991,100215, 99629,100129)
+  / 100000)
+rsi <- (c(
+          100000,100000,100000,100000,100000)
+  / 100000)
 
 
 normalize.to.index <- function(x, index) {
@@ -53,7 +69,6 @@ mine.val <- fid.val + et.val + self.mng.val
 mine <- mine.val / mine.in
 mine <- normalize.to.index(mine, prev.last)
 
-
 # Calculate Sharpe Ratios
 get.sharpe.ratio <- function(returns, window=length(returns), rnd=3, ignore0=F) {
   if (length(returns) > window) {
@@ -82,7 +97,7 @@ m <- length(sp)
 n <- length(sp) - prev.last
 prev <- m - n
 this.year <- (prev):m
-days <- -prev:(n - 1)
+days <- -prev:(n - 1) + 1
 new.days <- 0:(n - 1)
 year.start <- length(tot) - length(new.days)
 
@@ -92,36 +107,39 @@ tot.sh      <- get.sharpe.from.daily.values(tot[this.year])
 mine.sh     <- get.sharpe.from.daily.values(mine[this.year])
 f1k.sh      <- get.sharpe.from.daily.values(f1k[this.year]) 
 fid.sh      <- get.sharpe.from.daily.values(fid[this.year]) 
-et.sh       <- get.sharpe.from.daily.values(et[this.year]) 
-
+et.sh       <- get.sharpe.from.daily.values(et[this.year])
+adl.sh      <- get.sharpe.from.daily.values(adl)
+rsi.sh      <- get.sharpe.from.daily.values(rsi)
 
 # PLOT 1: This year's returns -----------------------------------------------------
 plot(
   days, 
-  sp / sp[year.start + 1], 
+  sp / sp[year.start], 
   type='l', 
   col='orange',
   lwd=3, 
   xlim=range(days[days >= 0]), 
-  ylim=c(0.6, max(c(sp, tot, 1 + tot - sp, mine))),
+  ylim=c(0.95, 1.05),
   log='y')
 abline(h=seq(0, 8, 0.1), lty=2, col=rgb(0, 0, 0, 0.2))
 abline(h=seq(0, 8, 0.5), lty=4, col=rgb(0, 0, 0, 0.8))
 abline(v=0, lwd=2)
-lines(days, tot / tot[year.start + 1], lwd=3)
-lines(days, mine / mine[year.start + 1], col='cadetblue', lwd=3)
-lines(days, fid / fid[year.start + 1], col='darkgreen', lwd=3)
-lines(days, et / et[year.start + 1], col='purple', lwd=3)
+lines(days, tot / tot[year.start], lwd=3)
+lines(days, mine / mine[year.start], col='cadetblue', lwd=3)
+lines(days, fid / fid[year.start], col='darkgreen', lwd=3)
+lines(days, et / et[year.start], col='purple', lwd=3)
 lines(days, self.mng, col='sienna', lwd=3)
-lines(days, f1k / f1k[year.start + 1], lwd=3, col='maroon')
+lines(days, f1k / f1k[year.start], lwd=3, col='maroon')
 lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start + 1], col=2)
+lines(0:(length(adl) - 1), adl, lwd=3, col='limegreen')
+lines(0:(length(rsi) - 1), rsi, lwd=3, col='hotpink')
 legend(
   'topleft',
   lty=1,
-  lwd=c(3, 3, 3, 3, 3, 3, 3, 1),
+  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 1),
   col=c(
     'orange', 'darkgreen', 'purple', 'sienna', 'maroon', 'cadetblue', 'black', 
-    'red'),
+    'limegreen', 'hotpink', 'red'),
   legend=c(
     paste(sp.sh, 'S&P'),
     paste(fid.sh, 'Fid'),
@@ -130,6 +148,8 @@ legend(
     paste(f1k.sh, '401(k) All'),
     paste(mine.sh, 'Mine'),
     paste(tot.sh, 'Total'),
+    paste(adl.sh, 'Adelaide'),
+    paste(rsi.sh, 'RSI'),
     paste('Diff(SP)')),
   bg=rgb(1, 1, 1, alpha=0.8))
 #---------------------------------------------------------------------------------
