@@ -1,0 +1,30 @@
+{
+  "blast_off": [
+    "ABMD", "ABNB", "ADYEY", "AMD", "AMGN", "ANET", "AXON", "BYND", "CHWY",
+    "DDOG", "DOCS", "DOCU", "EDIT", "ETSY", "FLGT", "GH", "GMED", "IDXX", 
+    "ISRG", "JD", "LRCX", "LSPD", "LULU", "MDB", "MELI", "MNST", "MTCH", 
+    "NVCR", "ODFL", "OKTA", "OPEN", "PAC", "PANW", "PAYC", "PINS", "PTON",
+    "PYPL", "QDEL", "RBLX", "RDFN", "RGEN", "ROKU", "SE", "SHOP", "SNOW", 
+    "TASK", "TDOC", "TEAM", "TREX", "TSCO", "TTD", "TTWO", "TWLO",  "UPST", 
+    "VEEV", "VRTX", "ZM"
+  ],
+  "stock_watcher": [
+    "AAPL", "ACN", "ADBE", "AMZN", "ASML", "CRWD", "DGX", "DIS", "FTNT",
+    "GOOG", "KNSL", "MA", "MASI", "MSFT", "NET", "NOW", "NVDA", "RIVN", "RMD", 
+    "RVLV", "SAM", "SBUX", "TMUS", "TSLA", "TTC", "TYL", "ZBRA"
+  ],
+  "lingerers": [
+    "AGI", "AMEH", "APPS", "APT", "BROS", "BRTX", "BTTR", "BYRN", "CEF", "CENN",
+    "CGAU", "COOP", "CTGO", "DQ", "DTST", "DUOL", "DYAI", "EA", "EP", "EPSN",
+    "ESOA", "FCUV", "FNV", "FSI", "GCBC", "GME", "GNRC", "GTLS", "HBM", "HMY",
+    "HNRG", "IDR", "INTG", "INTZ", "LPLA", "MCVT", "MICS", "MNMD", "MOBQ", 
+    "MTA", "OMQS", "PACB", "PETV", "POWW", "PRPH", "RVP", "RVYL", "SAND", 
+    "SOBR", "STKL", "UI", "VIRT", "VLD", "WAVD", "WKHS", "WRN", "XPEV", "ZEST",
+    "ZYXI"
+  ],
+  "best_weighted": [
+    "AORT", "ATVI", "BHC", "CHS", "CNXN", "CRMT", "CRUS", "CUBI", "DORM",
+    "FKWL", "LFMD", "PARR", "POWL", "SIX", "SRC", "URBN", "USPH", "VERU",
+    "VTSI", "WGO"
+  ]
+}
