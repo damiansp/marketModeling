@@ -15,6 +15,7 @@ class StockHoldingsUpdater:
         self._insert_current_best_stocks()
         self._handle_old_best()
         self.current_stocks['best_weighted'] = self.best
+        self._clean_current_stocks()
         return self.current_stocks, self.buy_stats
 
     def _update_lingerers(self):
@@ -71,3 +72,7 @@ class StockHoldingsUpdater:
             else:
                 if stock in self.current_stocks['lingerers']:
                     self.current_stocks['lingerers'].remove(stock)
+
+    def _clean_current_stocks(self):
+        for group, stocks in self.current_stocks.items():
+            self.current_stocks[group] = sorted(list(set(stocks)))

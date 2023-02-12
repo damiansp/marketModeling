@@ -12,7 +12,7 @@ from best_stock_by_state import get_daily_returns
 TOMORROW = (datetime.now() + timedelta(1)).date()
 # symbols to exclude (e.g., some are state or municipality specific and cannot
 # be purchased externally
-ALWAYS_EXCLUDE = ['EP', 'NXN', 'NXP']
+ALWAYS_EXCLUDE = ['EP', 'NXN', 'NXP', 'SVA']
 FIGSIZE = [20, 12]
 LABEL_SIZE = 20
 

@@ -68,6 +68,7 @@ class StockMetricsCalculator:
         stock_data = self._get_updown_geomean(stock_data, n)
         stock_data = self._get_fair_value(stock_data, n)
         stats = (
+            stock_data.AdjClose.tolist()[-1],
             stock_data.direction.tolist()[-1],
             stock_data.rsi.tolist()[-1],
             stock_data.resid.tolist()[-1],  # 'fair value'
@@ -197,12 +198,12 @@ class StockMetricsCalculator:
         out_df = pd.DataFrame(
             data=out,
             columns=[
-                'stock', 'direction', 'RSI', 'fair_value_mult', 'geomean',
-                'sharpe', 'weighted_sharpe'])
+                'stock', 'price', 'direction', 'RSI', 'fair_value_mult',
+                'geomean', 'sharpe', 'weighted_sharpe'])
         out_df.RSI.fillna(out_df.RSI.median())
         out_df['RSIRev'] = 1 - out_df.RSI
         out_df = out_df[[
-            'stock', 'direction', 'RSI', 'RSIRev', 'fair_value_mult',
+            'stock', 'price', 'direction', 'RSI', 'RSIRev', 'fair_value_mult',
             'geomean', 'sharpe', 'weighted_sharpe']]
         out_df.weighted_sharpe.fillna(
             out_df.weighted_sharpe.mean(), inplace=True)
