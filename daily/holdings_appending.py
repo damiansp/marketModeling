@@ -11,7 +11,7 @@ TOMORROW = (NOW + timedelta(1)).date()
 class HoldingsAppender:
     def __init__(self, stock_metrics):
         self.stock_metrics = stock_metrics
-        self.SYMBOLS = stock_metrics.index.tolist()
+        self.SYMBOLS = list(set(stock_metrics.index.tolist()))
         self.binder = pd.DataFrame(index=self.SYMBOLS)
 
     def append_holdings(self):
@@ -91,7 +91,7 @@ class HoldingsAppender:
     def _upload_tdameritrade(self):
         print('Uploading TD Ameritrade data...')
         filename = (
-            f'Postions_damiansp_Stocks_{str(TODAY).replace("-", "_")}.xls')
+            f'Positions_damiansp_Stocks_{str(TODAY).replace("-", "_")}.xls')
         try:
             tdam = self._parse_tdam_file(filename)
         except FileNotFoundError:
@@ -108,6 +108,7 @@ class HoldingsAppender:
         inds = []
         data = []
         is_header = True
+        print('reading from', filename)
         with open(f'{DOWNLOADS}/{filename}', 'r') as f:
             for line in f:
                 if not is_header:
@@ -120,8 +121,8 @@ class HoldingsAppender:
                             data.append(value)
                         except IndexError:
                             print('Cannot parse:', line)
-                    if line.startswith('Symbol'):
-                        is_header = False
+                if line.startswith('Symbol'):
+                    is_header = False
         return pd.DataFrame({'TD': data}, index=inds)
             
     @staticmethod

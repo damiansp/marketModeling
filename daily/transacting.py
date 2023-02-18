@@ -6,6 +6,7 @@ class TransactionDeterminer:
     def __init__(self, metrics, next_day_distributions, buy_stats, frac_in):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
+        print(next_day_distributions.head())
         self.buy_stats = buy_stats.set_index('stock')
         self.frac_in = frac_in
 
@@ -86,15 +87,57 @@ class TransactionDeterminer:
         self._df['tdam_norm'] = capped_tdam / capped_tdam.sum()
 
     def get_target_amounts(self, account, amount):
-        print('Getting target amounts...')
+        print(f'Getting target amounts for {account}...')
         self._df[f'{account}_target'] = (
             amount * self.frac_in * self._df[f'{account}_norm'])
         self._df[f'{account}_diff'] = (
             self._df[f'{account}_target'] - self._df[account])
-        self._df.to_csv('/tmp/test.csv')
 
-    def get_bid_ask_price(self, account):
-        pass
+    def get_bid_ask_prices(self, account):
+        print(f'Getting bid and ask prices for {account}...')
+        bid_ask_multiplier = (
+            self
+            ._df[['direction', 'status_scaled', f'{account}_diff']]
+            .apply(lambda row: self._get_bid_ask(row, account), axis=1))
+        self._df[f'{account}_bid_ask'] = bid_ask_multiplier * self._df.price
+        
+    def _get_bid_ask(self, row, account):
+        distr = self._get_status_distribution(row, account)
+        q = self._get_bid_ask_quantile_from_status_scaled(
+            row.status_scaled, account, row[f'{account}_diff'])
+        return distr.quantile(q=q)
+
+    def _get_status_distribution(self, row, account):
+        symbol = row.name
+        trend = row.direction
+        status = row.status_scaled
+        high_low = 'low' if row[f'{account}_diff'] > 0 else 'high'
+        distr = self.next_day_distributions.loc[
+            self.next_day_distributions[f'{symbol}_trend'] == trend,
+            f'{symbol}_{high_low}_mult']
+        distr = distr[distr.notnull()]
+        return distr
+
+    @staticmethod
+    def _get_bid_ask_quantile_from_status_scaled(status, account, diff):
+        # Prob of which buy/sell should happen given neutral status (0)
+        P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'tdam': 0.5}[account]
+        P_STATUS0 = P_STATUS0_BUY if diff >= 0 else 1 - P_STATUS0_BUY
+        MIN_P = 0.01  # p(buy | strong sell sig) or vice versa
+        MAX_P = 0.95  # p(buy | strong buy sig)  ...
+        # Piecewise linear interpolation: y = mx + b: b = P_STATUS_0
+        # rise = P_STATUS0 - MIN if negative status (sell signal)
+        # rise = MAX - P_STATUS0 if + status (buy signal)
+        rise = P_STATUS0 - MIN_P if status <= 0 else MAX_P - P_STATUS0
+        m = rise / 5
+        q = m*status + P_STATUS0
+        return q
 
     def get_n_shares_to_buy_or_sell(self, account):
+        self._df[f'{account}_nshares'] = (
+            self._df[f'{account}_diff'] / self._df[f'{account}_bid_ask']
+        ).round().astype(int)
+        self._df.to_csv('/tmp/test.csv')
+
+    def list_transactions(self, account, amount):
         pass
