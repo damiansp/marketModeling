@@ -134,10 +134,76 @@ class TransactionDeterminer:
         return q
 
     def get_n_shares_to_buy_or_sell(self, account):
+        print('Determining ideal number of shares to buy/sell...')
         self._df[f'{account}_nshares'] = (
             self._df[f'{account}_diff'] / self._df[f'{account}_bid_ask']
         ).round().astype(int)
+
+    def list_transactions(self, account, invested_amt, daily_transaction_amt):
+        ''' Determine the specific stocks and no. shares to buy/sell each day
+        Args:
+        - account (str): account name
+        - invested_amt (float): total $ that should be invested as of today for
+          <account>
+        - daily_transaction_amt (float): ideal amt to buy/sell each day (may be
+          more if % funds invested changes).
+        '''
+        print('Getting transactions...')
+        self._df['up_down'] = 1 * (self._df[f'{account}_diff'] > 0)
+        self._df['exact_amt'] = (
+            self._df[f'{account}_nshares'] * self._df[f'{account}_bid_ask'])
+        err = self._df[f'{account}_diff'].sum()  # optimal amount to buy/sell
+        print(
+            f'Ideal invested amt: ${invested_amt:,.2f}\n'
+            f'Currently off by: ${err:,.2f}\n'
+            f'Ideal transaction amt: ${daily_transaction_amt:,.2f}')
+        if abs(err) >= daily_transaction_amt:
+            # all buys or all sells
+            if err < 0:
+                print('Just selling today\n')
+                self._handle_transactions(account, err, 'sell')
+            else:
+                print('Just buying today\n')
+                self._handle_buys(account, err, 'buy')
+        else:
+            print('Buying and selling today\n')
+            primary = abs(err)
+            remainder = daily_transaction_amt - primary
+            primary += remainder / 2
+            secondary = remainder / 2
+            if err <= 0:
+                # primary is sell
+                self._handle_transactions(account, primary, 'sell')
+                self._handle_transactions(account, secondary, 'buy')
+            else:
+                # primary is buy
+                self._handle_transactions(account, primary, 'buy')
+                self._handle_transactions(account, secondary, 'sell')
         self._df.to_csv('/tmp/test.csv')
 
-    def list_transactions(self, account, amount):
-        pass
+    def _sort_by_transaction_order(self, transaction_type):
+        if transaction_type == 'sell':
+            ascending = [True, True]
+        elif transaction_type == 'buy':
+            ascending = [False, False]
+        else:
+            raise ValueError('transaction_type must be "buy" or "sell"')
+        self._df.sort_values(
+            ['up_down', 'status_scaled'], ascending=ascending, inplace=True)
+
+    def _handle_transactions(self, account, err, transaction_type):
+        self._sort_by_transaction_order(transaction_type)
+        cum = self._df.exact_amt.cumsum()
+        for i, (trans_total, symbol, shares, bid_ask) in enumerate(
+                zip(
+                    cum,
+                    self._df.index,
+                    self._df[f'{account}_nshares'],
+                    self._df[f'{account}_bid_ask'])):
+            if shares == 0:
+                continue
+            print(
+                f'{transaction_type.title()} {abs(shares)} shares of {symbol} '
+                f'at ${bid_ask:,.2f}')
+            if abs(trans_total) >= abs(err):
+                return

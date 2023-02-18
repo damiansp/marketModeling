@@ -2,10 +2,25 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
+
+def get_adjusted_date():
+    '''Treat weekend dates as preceding Friday'''
+    NOW = datetime.now()
+    #today = NOW.date()
+    weekday = NOW.weekday()
+    if weekday == 5:    # Sat
+        return NOW - timedelta(1)
+    elif weekday == 6:  # Sun
+        return NOW - timedelta(2)
+    return NOW
+
+
 DOWNLOADS = '/Users/damiansp/Downloads'
-NOW = datetime.now()
-TODAY = NOW.date()
-TOMORROW = (NOW + timedelta(1)).date()
+now = get_adjusted_date()
+TODAY = now.date()
+TOMORROW = (now + timedelta(1)).date()
+print('TODAY:', TODAY)
+print('TOMORROW:', TOMORROW)
 
 
 class HoldingsAppender:

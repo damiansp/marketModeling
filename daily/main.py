@@ -141,10 +141,19 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
     determiner.compile_data()
     for account, amt in zip(
             ['et', 'fid', 'tdam'], [ET_VALUE, FID_VALUE, TDAM_VALUE]):
+        print('\n\n' + '=' * 50)
+        print(f'{account.upper()} Transactions')
+        print('=' * 50)
         determiner.get_target_amounts(account, amt)
         determiner.get_bid_ask_prices(account)
         determiner.get_n_shares_to_buy_or_sell(account)
-        determiner.list_transactions(account, PCT_TO_TRADE_DAILY * amt)
-        
+        # total dollars that should be invested as of today
+        invested_amt = amt * FRAC_IN
+        # ideal amount ($) to buy/sell today
+        daily_transaction_amt = PCT_TO_TRADE_DAILY * amt
+        determiner.list_transactions(
+            account, invested_amt, daily_transaction_amt)
+
+
 if __name__ == '__main__':
     main()
