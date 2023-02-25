@@ -27,12 +27,15 @@ ET_VALUE = 142_044
 TDAM_VALUE = 10_111
 FRAC_IN = 0.6800
 FID_MAX = 0.14  # max weight to give my picks in fid acct
+RSI_VALUE = 102_555
+ADEL_VALUE = 102_011
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
 INDICES = ['^GSPC', '^NYA', '^IXIC', '^W5000']
 START = '1965-01-01'
 DATA = '../data'
+DOWNLOADS = '/Users/damiansp/Downloads'
 # Model params
 NEXT_DAY_DISTRIB_WINDOW = 120
 PCT_TO_TRADE_DAILY = 0.05
@@ -51,27 +54,29 @@ BUY_STATS = TRANSACTIONS
 
 
 def main():
-    current_stocks = load_current_stocks()
-    run_hmm_models()
-    best_stock_by_state.main()
-    current_best_stocks = select_state_based_stocks(20)
-    buy_stats = pd.read_csv(BUY_STATS).rename(columns={'Unnamed: 0': 'stock'})
+    #current_stocks = load_current_stocks()
+    #run_hmm_models()
+    #best_stock_by_state.main()
+    #current_best_stocks = select_state_based_stocks(20)
+    #buy_stats = pd.read_csv(BUY_STATS).rename(columns={'Unnamed: 0': 'stock'})
     # save backup
-    buy_stats.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
-    current_stocks, buy_stats = update_current_stocks(
-        current_stocks, current_best_stocks, buy_stats)
-    print('Current stocks:')
-    print(current_stocks)
-    get_next_day_distributions(current_stocks)
-    next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
-    get_stock_metrics(current_stocks)
-    stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
-    stock_metrics = append_current_holdings(stock_metrics)
-    transactions = get_transactions(
-        stock_metrics, next_day_distributions, buy_stats)
-    save_current_stocks(current_stocks)
-    transactions.to_csv(TRANSACTIONS)
-    print(f'Saved data to {TRANSACTIONS}')
+    #buy_stats.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
+    #current_stocks, buy_stats = update_current_stocks(
+    #    current_stocks, current_best_stocks, buy_stats)
+    #print('Current stocks:')
+    #print(current_stocks)
+    #get_next_day_distributions(current_stocks)
+    #next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
+    #get_stock_metrics(current_stocks)
+    #stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
+    #stock_metrics = append_current_holdings(stock_metrics)
+    #transactions = get_transactions(
+    #    stock_metrics, next_day_distributions, buy_stats)
+    #save_current_stocks(current_stocks)
+    #transactions.to_csv(TRANSACTIONS)
+    #print(f'Saved data to {TRANSACTIONS}')
+    ## Extras
+    append_game_data()
 
 
 def load_current_stocks():
@@ -174,6 +179,54 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt)
     return determiner.df
+
+
+def append_game_data():
+    df = pd.read_csv(
+        TRANSACTIONS, index_col=0
+    )[['direction', 'RSI', 'weighted_sharpe', 'status_scaled']]
+    rsi_file = f'{DOWNLOADS}/Holdings - Damian Satterthwaite-Phillips.csv'
+    adel_file = rsi_file.replace('.', '(1).')
+    df = append_file(df, rsi_file, 'rsi_mod')
+    df = append_file(df, adel_file, 'adel')
+    for field in ['RSI', 'weighted_sharpe', 'status_scaled']:
+        df[f'z_{field}'] = get_rescaled_zscore(df[field])
+    df.z_RSI = 1 - df.z_RSI  # reverse order
+    df['score'] = df.z_RSI * df.z_weighted_sharpe * df.z_status_scaled
+    df = get_deltas(df, 'adel', 'score', ADEL_VALUE)
+    df = get_deltas(df, 'rsi_mod', 'z_RSI', RSI_VALUE)
+    df.to_csv('~/Desktop/game.csv')
+
+
+def get_rescaled_zscore(series):
+    mu = series.mean()
+    sig = series.std()
+    series =  (series - mu) / sig
+    series -= series.min()
+    series /= series.max()
+    return series
+    
+
+def append_file(df, path, name):
+    other_df = pd.read_csv(path, index_col=0)[['Value']]
+    other_df.Value = other_df.Value.apply(
+        lambda x: float(x.strip('$').replace(',', '')))
+    other_df.Value.fillna(0., inplace=True)
+    df = pd.concat([df, other_df], axis=1)
+    df.Value.fillna(0., inplace=True)
+    df.rename(columns={'Value': name}, inplace=True)
+    return df
+    
+
+def get_deltas(df, current_amt, criterion, total):
+    PORTFOLIO_SIZE = 20
+    df.sort_values(criterion, inplace=True, ascending=False)
+    df[criterion][PORTFOLIO_SIZE:] = 0
+    df[criterion] /= df[criterion].sum()
+    df[f'{current_amt}_target'] = df[criterion] * total
+    df[f'{current_amt}_diff'] = df[f'{current_amt}_target'] - df[current_amt]
+    return df
+    
 
 
 if __name__ == '__main__':
