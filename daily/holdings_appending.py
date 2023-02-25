@@ -35,9 +35,11 @@ class HoldingsAppender:
         for v in fidelity.values():
             out = pd.concat([out, v], axis=1)
         out = out.astype(float).fillna(0).round().astype(int)
-        out.columns = ['et', 'tdam', 'rollover', 'roth', 'simple']
+        out_cols = ['et', 'tdam', 'rollover', 'roth', 'simple']
+        out.columns = out_cols
         out['fid'] = out.rollover + out.roth + out.simple
         metrics = pd.concat([self.stock_metrics, out], axis=1)
+        metrics['Owned'] = metrics[out_cols].sum(axis=1)
         return metrics
 
     def _upload_files(self):

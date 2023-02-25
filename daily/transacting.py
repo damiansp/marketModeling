@@ -6,9 +6,12 @@ class TransactionDeterminer:
     def __init__(self, metrics, next_day_distributions, buy_stats, frac_in):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
-        print(next_day_distributions.head())
         self.buy_stats = buy_stats.set_index('stock')
         self.frac_in = frac_in
+
+    @property
+    def df(self):
+        return self._df
 
     def compile_data(self):
         self._add_account_indicators()
@@ -20,11 +23,22 @@ class TransactionDeterminer:
         self._get_tdam_proportions()
         
     def _add_account_indicators(self):
+        df_stocks = set(self._df.index)
+        bs_stocks = set(self.buy_stats.index)
+        print('bs only:', bs_stocks - df_stocks)
+        print('df only:', df_stocks - bs_stocks)
         self._df = pd.concat(
             [self._df,
              self.buy_stats[[
                  'inEt', 'inFid', 'in_self_managed', 'currentlyActive']]],
             axis=1)
+        #drops = []
+        #or stock in self._df.index:
+        #    if stock not in stocks and self._df.loc[stock, 'Owned'] == 0:
+        #        drops.append(stock)
+        #print('Dropping the following unowned stocks:', drops)
+        #self._df.drop(drops, inplace=True)
+        
         
     def _add_status(self):
         SCALED_BOUNDS = 5
@@ -136,8 +150,11 @@ class TransactionDeterminer:
     def get_n_shares_to_buy_or_sell(self, account):
         print('Determining ideal number of shares to buy/sell...')
         self._df[f'{account}_nshares'] = (
-            self._df[f'{account}_diff'] / self._df[f'{account}_bid_ask']
-        ).round().astype(int)
+            self._df[f'{account}_diff'] / self._df[f'{account}_bid_ask'])
+        self._df[f'{account}_nshares'].replace(
+            [np.inf, -np.inf, np.nan], 0, inplace=True)
+        self._df[f'{account}_nshares'] = (
+            self._df[f'{account}_nshares'].round().astype(int))
 
     def list_transactions(self, account, invested_amt, daily_transaction_amt):
         ''' Determine the specific stocks and no. shares to buy/sell each day
@@ -179,7 +196,6 @@ class TransactionDeterminer:
                 # primary is buy
                 self._handle_transactions(account, primary, 'buy')
                 self._handle_transactions(account, secondary, 'sell')
-        self._df.to_csv('/tmp/test.csv')
 
     def _sort_by_transaction_order(self, transaction_type):
         if transaction_type == 'sell':

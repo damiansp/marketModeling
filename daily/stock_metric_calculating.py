@@ -38,6 +38,7 @@ class StockMetricsCalculator:
             .download(self.stocks, start=str(self.start), end=str(TOMORROW))
             .rename(columns={'Adj Close': 'AdjClose'})
             .sort_index())
+        data.fillna(method='ffill')
         data['state'] = self.states.state
         return data
 

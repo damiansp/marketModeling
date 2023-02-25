@@ -12,11 +12,21 @@ from stock_holdings_updating import StockHoldingsUpdater
 from stock_metric_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
+# Order of operations:
+# Clear out downloads
+# Get updated Nasdaq data
+# Run R files
+# Download files form brokerages
+# Clean files
+# Update daily inputs below
+
+
 # Daily inputs:
-ET_VALUE = 147_197
-FID_VALUE = 203_374
-TDAM_VALUE = 10_474
+FID_VALUE = 197_423
+ET_VALUE = 142_044
+TDAM_VALUE = 10_111
 FRAC_IN = 0.6800
+FID_MAX = 0.14  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -24,12 +34,11 @@ INDICES = ['^GSPC', '^NYA', '^IXIC', '^W5000']
 START = '1965-01-01'
 DATA = '../data'
 # Model params
-FID_MAX = 0.3
 NEXT_DAY_DISTRIB_WINDOW = 120
 PCT_TO_TRADE_DAILY = 0.05
 
 # File paths
-BUY_STATS = f'{DATA}/buyStats_csv.csv' # to be replaced by transactions
+#BUY_STATS = f'{DATA}/buyStats_csv.csv' # to be replaced by transactions
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
 DAR_BY_STATE = f'{DATA}/dar_by_state.csv'  # daily average returns
 HMM_EXPECTED_RETURNS = f'{DATA}/hmm_exp_returns.csv'
@@ -38,31 +47,36 @@ NEXT_DAY_DISTRIBUTIONS = f'{DATA}/next_day_distributions.csv'
 STOCK_METRICS = f'{DATA}/stock_metrics.csv'
 TRANSACTIONS = f'{DATA}/transactions.csv'
 TRANSITION_PROBS = f'{DATA}/transition_probs.csv'
+BUY_STATS = TRANSACTIONS
 
 
 def main():
     current_stocks = load_current_stocks()
-    #run_hmm_models()
-    #best_stock_by_state.main()
-    #current_best_stocks = select_state_based_stocks(20)
-    current_best_stocks = ['AREN', 'AXON', 'BB', 'CHUY', 'CSIQ', 'CUBI', 'DYAI', 'FSM', 'LFMD', 'LVS', 'OPNT', 'OSTK', 'PBF', 'PFIE', 'SBSW', 'SSTK', 'TSLA', 'URBN', 'VTSI', 'WYNN']
-    buy_stats = pd.read_csv(BUY_STATS)
+    run_hmm_models()
+    best_stock_by_state.main()
+    current_best_stocks = select_state_based_stocks(20)
+    buy_stats = pd.read_csv(BUY_STATS).rename(columns={'Unnamed: 0': 'stock'})
+    # save backup
+    buy_stats.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
     current_stocks, buy_stats = update_current_stocks(
         current_stocks, current_best_stocks, buy_stats)
     print('Current stocks:')
     print(current_stocks)
-    #get_next_day_distributions(current_stocks)
+    get_next_day_distributions(current_stocks)
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
-    print(f'next day distrib:\n{next_day_distributions.head()}')
-    #get_stock_metrics(current_stocks)
+    get_stock_metrics(current_stocks)
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = append_current_holdings(stock_metrics)
-    get_transactions(stock_metrics, next_day_distributions, buy_stats)
+    transactions = get_transactions(
+        stock_metrics, next_day_distributions, buy_stats)
+    save_current_stocks(current_stocks)
+    transactions.to_csv(TRANSACTIONS)
+    print(f'Saved data to {TRANSACTIONS}')
 
 
 def load_current_stocks():
     print('Loading current stock lists...')
-    with open(CURRENT_STOCKS, 'rb') as f:
+    with open(CURRENT_STOCKS, 'r') as f:
         current_stocks = json.load(f)
     return current_stocks
 
@@ -99,8 +113,14 @@ def update_current_stocks(current_stocks, current_best_stocks, buy_stats):
         current_stocks, current_best_stocks, buy_stats, FID_MAX
     ).update_current_stocks()
     return current_stocks, buy_stats
-    
 
+
+def save_current_stocks(current_stocks):
+    with open(CURRENT_STOCKS, 'w') as f:
+        current_stocks = json.dump(current_stocks, f)
+    print(f'Saved current stocks to {CURRENT_STOCKS}')
+
+    
 def get_next_day_distributions(current_stocks):
     print('Getting next-day distributions...')
     stocks = ['^GSPC']
@@ -153,6 +173,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         daily_transaction_amt = PCT_TO_TRADE_DAILY * amt
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt)
+    return determiner.df
 
 
 if __name__ == '__main__':
