@@ -6,7 +6,8 @@ class TransactionDeterminer:
     def __init__(self, metrics, next_day_distributions, buy_stats, frac_in):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
-        self.buy_stats = buy_stats.set_index('stock')
+        #self.buy_stats = buy_stats.set_index('stock')
+        self.buy_stats = buy_stats
         self.frac_in = frac_in
 
     @property
@@ -181,7 +182,7 @@ class TransactionDeterminer:
                 self._handle_transactions(account, err, 'sell')
             else:
                 print('Just buying today\n')
-                self._handle_buys(account, err, 'buy')
+                self._handle_transactions(account, err, 'buy')
         else:
             print('Buying and selling today\n')
             primary = abs(err)

@@ -22,13 +22,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 197_423
-ET_VALUE = 142_044
-TDAM_VALUE = 10_111
-FRAC_IN = 0.6800
-FID_MAX = 0.14  # max weight to give my picks in fid acct
-RSI_VALUE = 102_555
-ADEL_VALUE = 102_011
+FID_VALUE = 204_734
+ET_VALUE = 146_294
+TDAM_VALUE = 10_376
+FRAC_IN = 0.8000
+FID_MAX = 0.06  # max weight to give my picks in fid acct
+RSI_VALUE = 107_149
+ADEL_VALUE = 105_450
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -54,27 +54,30 @@ BUY_STATS = TRANSACTIONS
 
 
 def main():
-    #current_stocks = load_current_stocks()
-    #run_hmm_models()
-    #best_stock_by_state.main()
-    #current_best_stocks = select_state_based_stocks(20)
-    #buy_stats = pd.read_csv(BUY_STATS).rename(columns={'Unnamed: 0': 'stock'})
+    current_stocks = load_current_stocks()
+    run_hmm_models()
+    best_stock_by_state.main()
+    current_best_stocks = select_state_based_stocks(20)
+    #current_best_stocks =  []
+    transactions = (
+        pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
     # save backup
-    #buy_stats.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
-    #current_stocks, buy_stats = update_current_stocks(
-    #    current_stocks, current_best_stocks, buy_stats)
-    #print('Current stocks:')
-    #print(current_stocks)
-    #get_next_day_distributions(current_stocks)
-    #next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
-    #get_stock_metrics(current_stocks)
-    #stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
-    #stock_metrics = append_current_holdings(stock_metrics)
-    #transactions = get_transactions(
-    #    stock_metrics, next_day_distributions, buy_stats)
-    #save_current_stocks(current_stocks)
-    #transactions.to_csv(TRANSACTIONS)
-    #print(f'Saved data to {TRANSACTIONS}')
+    transactions.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
+    transactions = append_current_holdings(transactions)
+    current_stocks, buy_stats = update_current_stocks(
+        current_stocks, current_best_stocks, transactions)
+    print('Current stocks:')
+    print(current_stocks)
+    get_next_day_distributions(current_stocks)
+    next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
+    get_stock_metrics(current_stocks)
+    stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
+    stock_metrics = append_current_holdings(stock_metrics)
+    transactions = get_transactions(
+        stock_metrics, next_day_distributions, buy_stats)
+    save_current_stocks(current_stocks)
+    transactions.to_csv(TRANSACTIONS)
+    print(f'Saved data to {TRANSACTIONS}')
     ## Extras
     append_game_data()
 

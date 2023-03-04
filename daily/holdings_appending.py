@@ -25,6 +25,11 @@ print('TOMORROW:', TOMORROW)
 
 class HoldingsAppender:
     def __init__(self, stock_metrics):
+        if 'stock' in list(stock_metrics):
+            stock_metrics.set_index('stock', inplace=True)
+        #print('Stock metrics:')
+        #print(stock_metrics.head())
+        #sys.exit()
         self.stock_metrics = stock_metrics
         self.SYMBOLS = list(set(stock_metrics.index.tolist()))
         self.binder = pd.DataFrame(index=self.SYMBOLS)
@@ -37,6 +42,9 @@ class HoldingsAppender:
         out = out.astype(float).fillna(0).round().astype(int)
         out_cols = ['et', 'tdam', 'rollover', 'roth', 'simple']
         out.columns = out_cols
+        for col in out_cols + ['fid']:
+            if col in list(self.stock_metrics):
+                self.stock_metrics.drop(columns=[col], inplace=True)
         out['fid'] = out.rollover + out.roth + out.simple
         metrics = pd.concat([self.stock_metrics, out], axis=1)
         metrics['Owned'] = metrics[out_cols].sum(axis=1)
