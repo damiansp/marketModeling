@@ -33,13 +33,6 @@ class TransactionDeterminer:
              self.buy_stats[[
                  'inEt', 'inFid', 'in_self_managed', 'currentlyActive']]],
             axis=1)
-        #drops = []
-        #or stock in self._df.index:
-        #    if stock not in stocks and self._df.loc[stock, 'Owned'] == 0:
-        #        drops.append(stock)
-        #print('Dropping the following unowned stocks:', drops)
-        #self._df.drop(drops, inplace=True)
-        
         
     def _add_status(self):
         SCALED_BOUNDS = 5
@@ -192,10 +185,12 @@ class TransactionDeterminer:
             if err <= 0:
                 # primary is sell
                 self._handle_transactions(account, primary, 'sell')
+                print()
                 self._handle_transactions(account, secondary, 'buy')
             else:
                 # primary is buy
                 self._handle_transactions(account, primary, 'buy')
+                print()
                 self._handle_transactions(account, secondary, 'sell')
 
     def _sort_by_transaction_order(self, transaction_type):
