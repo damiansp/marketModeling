@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from datetime import datetime, timedelta
 import json
 
@@ -22,13 +23,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 204_734
-ET_VALUE = 146_294
-TDAM_VALUE = 10_376
+FID_VALUE = 193099
+ET_VALUE = 138051
+TDAM_VALUE = 9783
 FRAC_IN = 0.8000
-FID_MAX = 0.06  # max weight to give my picks in fid acct
-RSI_VALUE = 107_149
-ADEL_VALUE = 105_450
+FID_MAX = 0.00  # max weight to give my picks in fid acct
+RSI_VALUE = 94960
+ADEL_VALUE = 94338
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -78,7 +79,7 @@ def main():
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
-    ## Extras
+    # Extras
     append_game_data()
 
 
@@ -187,7 +188,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
 def append_game_data():
     df = pd.read_csv(
         TRANSACTIONS, index_col=0
-    )[['direction', 'RSI', 'weighted_sharpe', 'status_scaled']]
+    )[['direction', 'inEt', 'RSI', 'weighted_sharpe', 'status_scaled']]
     rsi_file = f'{DOWNLOADS}/Holdings - Damian Satterthwaite-Phillips.csv'
     adel_file = rsi_file.replace('.', '(1).')
     df = append_file(df, rsi_file, 'rsi_mod')
@@ -225,6 +226,7 @@ def get_deltas(df, current_amt, criterion, total):
     PORTFOLIO_SIZE = 20
     df.sort_values(criterion, inplace=True, ascending=False)
     df[criterion][PORTFOLIO_SIZE:] = 0
+    df[criterion] *= df.inEt
     df[criterion] /= df[criterion].sum()
     df[f'{current_amt}_target'] = df[criterion] * total
     df[f'{current_amt}_diff'] = df[f'{current_amt}_target'] - df[current_amt]
