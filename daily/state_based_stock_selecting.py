@@ -13,6 +13,7 @@ TOMORROW = (datetime.now() + timedelta(1)).date()
 # symbols to exclude (e.g., some are state or municipality specific and cannot
 # be purchased externally
 ALWAYS_EXCLUDE = ['EP', 'NXN', 'NXP', 'SVA']
+MAX_ITER = 10
 FIGSIZE = [20, 12]
 LABEL_SIZE = 20
 
@@ -36,6 +37,7 @@ class StateBasedStockSelector:
         self.START = (
             TOMORROW - timedelta(int(round(self.YEARS_OF_DATA * 365.25))))
         print('Data start date:', self.START)
+        self.iters = 0
 
     def _get_dar_df(self):
         dar_df = pd.read_csv(self.dar_by_state_path, index_col=0)
@@ -68,6 +70,8 @@ class StateBasedStockSelector:
         self.dar_df.sort_values('weighted', ascending=False, inplace=True)
                                                  
     def _select_stocks(self, n, exclude=ALWAYS_EXCLUDE, stock_data=None):
+        self.iters += 1
+        print('Iteration:', self.iters)
         best_weighted = [s for s in self.dar_df.index if s not in exclude][:n]
         print('best weighted:', sorted(best_weighted))
         needed = self._determine_needed_stock_data(
@@ -76,11 +80,17 @@ class StateBasedStockSelector:
         exclude += self._exclude_by_overall_performance(stock_data)
         exclude += self._exclude_by_current_state_performance(stock_data)
         exclude = set(exclude)  # in case of duplicates
-        if set(list(stock_data)).intersection(exclude):
+        if (set(list(stock_data)).intersection(exclude)
+            and self.iters < MAX_ITER):
             self._select_stocks(n, list(exclude), stock_data)
         else:
+            print('stock data:', stock_data)
+            if exclude:
+                exclude = [x for x in exclude if x in list(stock_data)]
+                stock_data.drop(columns=list(exclude), inplace=True)
             self.best_stocks = sorted(
                 [x for x in list(stock_data) if x != 'state'])
+            print('best stocks:', self.best_stocks)
             self._plot_stocks(stock_data)
             return #[x for x in list(stock_data) if x != 'state']
 
