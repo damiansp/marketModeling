@@ -23,13 +23,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 194950
-ET_VALUE = 139121
-TDAM_VALUE = 9841
+FID_VALUE = 198772
+ET_VALUE = 142030
+TDAM_VALUE = 10238
 FRAC_IN = 0.8000
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 92540
-ADEL_VALUE = 94583
+RSI_VALUE = 94841
+ADEL_VALUE = 93457
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
