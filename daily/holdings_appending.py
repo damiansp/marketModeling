@@ -19,8 +19,6 @@ DOWNLOADS = '/Users/damiansp/Downloads'
 now = get_adjusted_date()
 TODAY = now.date()
 TOMORROW = (now + timedelta(1)).date()
-print('TODAY:', TODAY)
-print('TOMORROW:', TOMORROW)
 
 
 class HoldingsAppender:

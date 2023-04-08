@@ -28,6 +28,16 @@ class TransactionDeterminer:
         bs_stocks = set(self.buy_stats.index)
         print('bs only:', bs_stocks - df_stocks)
         print('df only:', df_stocks - bs_stocks)
+        ###
+        #vtsi_row = pd.DataFrame(self.buy_stats.loc['VTSI', :].iloc[0, :]).T
+        #print('vtsi_row:')
+        #print(vtsi_row)
+        #self.buy_stats.drop(['VTSI'], inplace=True)
+        #self.buy_stats = pd.concat([self.buy_stats, vtsi_row])
+        #self._df.to_csv('/tmp/udf.csv')
+        #(self.buy_stats[['inEt', 'inFid', 'in_self_managed', 'currentlyActive']]
+        # .to_csv('/tmp/buystats.csv'))
+        ###
         self._df = pd.concat(
             [self._df,
              self.buy_stats[[
@@ -103,6 +113,12 @@ class TransactionDeterminer:
 
     def get_bid_ask_prices(self, account):
         print(f'Getting bid and ask prices for {account}...')
+        ###
+        #self._df.status_scaled = self._df.status_scaled.fillna(0)
+        #self._df.et_diff = self._df.et_diff.fillna(0)
+        #(self._df[['direction', 'status_scaled', f'{account}_diff']]
+        # .to_csv('/tmp/df2.csv'))
+        ###
         bid_ask_multiplier = (
             self
             ._df[['direction', 'status_scaled', f'{account}_diff']]
