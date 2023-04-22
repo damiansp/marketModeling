@@ -23,13 +23,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 206447
-ET_VALUE = 148417
-TDAM_VALUE = 10641
-FRAC_IN = 0.5400
-FID_MAX = 0.08  # max weight to give my picks in fid acct
-RSI_VALUE = 102838
-ADEL_VALUE = 99380
+FID_VALUE = 205087
+ET_VALUE = 148579
+TDAM_VALUE = 10552
+FRAC_IN = 0.4600
+FID_MAX = 0.02  # max weight to give my picks in fid acct
+RSI_VALUE = 99012
+ADEL_VALUE = 96709
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -56,10 +56,10 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    #run_hmm_models()
-    #best_stock_by_state.main()
-    #current_best_stocks = select_state_based_stocks(20)
-    current_best_stocks = ['ADUS', 'AMBA', 'AVGO', 'AXON', 'CROX', 'CSIQ', 'EPAM', 'FRO', 'LFMD', 'MANH', 'MCVT', 'NFLX', 'NOAH', 'PCRX', 'PRTA', 'SSTK', 'SYNA', 'TSLA', 'UI', 'URI']
+    run_hmm_models()
+    best_stock_by_state.main()
+    current_best_stocks = select_state_based_stocks(20)
+    #current_best_stocks = []
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
     # save backup
