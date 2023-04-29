@@ -126,10 +126,22 @@ class TransactionDeterminer:
         self._df[f'{account}_bid_ask'] = bid_ask_multiplier * self._df.price
         
     def _get_bid_ask(self, row, account):
-        distr = self._get_status_distribution(row, account)
-        q = self._get_bid_ask_quantile_from_status_scaled(
-            row.status_scaled, account, row[f'{account}_diff'])
-        return distr.quantile(q=q)
+        try:
+            distr = self._get_status_distribution(row, account)
+            q = self._get_bid_ask_quantile_from_status_scaled(
+                row.status_scaled, account, row[f'{account}_diff'])
+            return distr.quantile(q=q)
+        except:
+            print('row:')
+            print(row)
+            print('acct:', account)
+            distr = self._get_status_distribution(row, account)
+            print('distr:')
+            print(distr)
+            print(
+                'Notice this error sometimes due to bad data from Yahoo. '
+                'Just retry.')
+            raise
 
     def _get_status_distribution(self, row, account):
         symbol = row.name
