@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import json
 
+import numpy as np
 import pandas as pd
 
 from ask_bid_determination import NextDayMultiplier
@@ -23,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 203309
-ET_VALUE = 146928
-TDAM_VALUE = 10414
+FID_VALUE = 203845
+ET_VALUE = 148244
+TDAM_VALUE = 10352
 FRAC_IN = 0.4000
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 97954
-ADEL_VALUE = 95389
+RSI_VALUE = 97915
+ADEL_VALUE = 94377
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -79,6 +80,7 @@ def main():
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
+    td_updated()
     # Extras
     append_game_data()
 
@@ -183,6 +185,53 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt)
     return determiner.df
+
+
+def td_updated():
+    print('\n\n')
+    print('=' * 40)
+    print('TDAM NEW')
+    print('=' * 40)
+    df = pd.read_csv(TRANSACTIONS, index_col=0)
+    df['td_sharpe2'] = df.sharpe * (df.sharpe > 0) * df.currentlyActive
+    df['td_norm'] = df.td_sharpe2 / df.td_sharpe2.sum()
+    df['td_target'] = TDAM_VALUE * df.td_norm
+    df['td_delt'] = df.td_target - df.tdam
+    df['scaler'] = df.status_scaled.apply(get_status_scaler)
+    df['td_amt'] = df.td_delt * df.scaler
+    df['td_shares'] = (df.td_amt / df.tdam_bid_ask).round().astype(int)
+    buys = df.td_shares[df.td_shares > 0][df.scaler > 0]
+    sells = df.td_shares[df.td_shares < 0][df.scaler < 0][df.tdam > 0]
+    for buy, idx in zip(buys, buys.index):
+        print(
+            f'BUY {buy:4d} shares of {idx:5s} at '
+            f'{df.loc[idx, "tdam_bid_ask"]:7.2f}')
+    print()
+    for sell, idx in zip(sells, sells.index):
+        print(
+            f'SELL {-sell:4d} shares of {idx:5s} at '
+            f'{df.loc[idx, "tdam_bid_ask"]:7.2f}')
+    #for action in actions[actions > 0]:
+    #    print(f'BUY: {action.index}: 
+    df.to_csv('~/Desktop/test.csv')
+
+
+def get_status_scaler(val):
+    if val <= -5:
+        return -1
+    if val <= -4:
+        return -0.5
+    if val >= 5:
+        return 1
+    if val >= 4:
+        return 0.6
+    if val >= 3:
+        return 0.4
+    if val >= 2:
+        return 0.2
+    if val >= 1:
+        return 0.1
+    return 0
 
 
 def append_game_data():
