@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 203845
-ET_VALUE = 148244
-TDAM_VALUE = 10352
+FID_VALUE = 204976
+ET_VALUE = 148980
+TDAM_VALUE = 10266
 FRAC_IN = 0.4000
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 97915
-ADEL_VALUE = 94377
+RSI_VALUE = 105957
+ADEL_VALUE = 95525
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -211,8 +211,6 @@ def td_updated():
         print(
             f'SELL {-sell:4d} shares of {idx:5s} at '
             f'{df.loc[idx, "tdam_bid_ask"]:7.2f}')
-    #for action in actions[actions > 0]:
-    #    print(f'BUY: {action.index}: 
     df.to_csv('~/Desktop/test.csv')
 
 
