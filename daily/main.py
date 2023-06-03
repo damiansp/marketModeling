@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 207834
-ET_VALUE = 148149
-TDAM_VALUE = 15407
-FRAC_IN = 0.4000
+FID_VALUE = 211305
+ET_VALUE = 150484
+TDAM_VALUE = 15647
+FRAC_IN = 0.4100
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 108085
-ADEL_VALUE = 94763
+RSI_VALUE = 111636
+ADEL_VALUE = 99235
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -244,19 +244,10 @@ def append_game_data():
         df[f'z_{field}'] = get_rescaled_zscore(df[field])
     df.z_RSI = 1 - df.z_RSI  # reverse order
     df['score'] = df.z_RSI * df.z_weighted_sharpe * df.z_status_scaled
-    df = get_deltas(df, 'adel', 'score', ADEL_VALUE)
-    df = get_deltas(df, 'rsi_mod', 'z_RSI', RSI_VALUE)
+    df = get_deltas(df, 'adel', 'z_RSI', ADEL_VALUE)
+    df = get_deltas(df, 'rsi_mod', 'score', RSI_VALUE)
     df.to_csv('~/Desktop/game.csv')
 
-
-def get_rescaled_zscore(series):
-    mu = series.mean()
-    sig = series.std()
-    series =  (series - mu) / sig
-    series -= series.min()
-    series /= series.max()
-    return series
-    
 
 def append_file(df, path, name):
     other_df = pd.read_csv(path, index_col=0)[['Value']]
@@ -267,6 +258,15 @@ def append_file(df, path, name):
     df.Value.fillna(0., inplace=True)
     df.rename(columns={'Value': name}, inplace=True)
     return df
+    
+
+def get_rescaled_zscore(series):
+    mu = series.mean()
+    sig = series.std()
+    series =  (series - mu) / sig
+    series -= series.min()
+    series /= series.max()
+    return series
     
 
 def get_deltas(df, current_amt, criterion, total):
