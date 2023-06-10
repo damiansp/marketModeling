@@ -6,7 +6,6 @@ class TransactionDeterminer:
     def __init__(self, metrics, next_day_distributions, buy_stats, frac_in):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
-        #self.buy_stats = buy_stats.set_index('stock')
         self.buy_stats = buy_stats
         self.frac_in = frac_in
 
@@ -28,16 +27,6 @@ class TransactionDeterminer:
         bs_stocks = set(self.buy_stats.index)
         print('bs only:', bs_stocks - df_stocks)
         print('df only:', df_stocks - bs_stocks)
-        ###
-        #vtsi_row = pd.DataFrame(self.buy_stats.loc['VTSI', :].iloc[0, :]).T
-        #print('vtsi_row:')
-        #print(vtsi_row)
-        #self.buy_stats.drop(['VTSI'], inplace=True)
-        #self.buy_stats = pd.concat([self.buy_stats, vtsi_row])
-        #self._df.to_csv('/tmp/udf.csv')
-        #(self.buy_stats[['inEt', 'inFid', 'in_self_managed', 'currentlyActive']]
-        # .to_csv('/tmp/buystats.csv'))
-        ###
         self._df = pd.concat(
             [self._df,
              self.buy_stats[[
@@ -113,12 +102,6 @@ class TransactionDeterminer:
 
     def get_bid_ask_prices(self, account):
         print(f'Getting bid and ask prices for {account}...')
-        ###
-        #self._df.status_scaled = self._df.status_scaled.fillna(0)
-        #self._df.et_diff = self._df.et_diff.fillna(0)
-        #(self._df[['direction', 'status_scaled', f'{account}_diff']]
-        # .to_csv('/tmp/df2.csv'))
-        ###
         bid_ask_multiplier = (
             self
             ._df[['direction', 'status_scaled', f'{account}_diff']]
@@ -157,7 +140,16 @@ class TransactionDeterminer:
     @staticmethod
     def _get_bid_ask_quantile_from_status_scaled(status, account, diff):
         # Prob of which buy/sell should happen given neutral status (0)
-        P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'tdam': 0.5}[account]
+        #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'tdam': 0.5}[account]
+        P_STATUS0_BUY = {'et': 0.01, 'fid': 0.01, 'tdam': 0.01}[account]
+        #             P(buy/sell) at state =
+        # p_stat0_buy     0      1      2      3      4     5
+        #       0.01   0.01   0.20   0.39   0.57   0.76  0.95
+        #       0.02   0.02   0.21   0.39   0.58   0.76  0.95
+        #       0.05   0.05   0.23   0.41   0.59   0.77  0.95
+        #       0.10   0.10   0.27   0.44   0.61   0.78  0.95
+        #       0.20   0.20   0.35   0.50   0.65   0.80  0.95
+        #       0.50   0.50   0.59   0.68   0.77   0.86  0.95
         P_STATUS0 = P_STATUS0_BUY if diff >= 0 else 1 - P_STATUS0_BUY
         MIN_P = 0.01  # p(buy | strong sell sig) or vice versa
         MAX_P = 0.95  # p(buy | strong buy sig)  ...
