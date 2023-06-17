@@ -3,11 +3,13 @@ import pandas as pd
 
 
 class TransactionDeterminer:
-    def __init__(self, metrics, next_day_distributions, buy_stats, frac_in):
+    def __init__(
+            self, metrics, next_day_distributions, buy_stats, frac_in, p_stats0_buy):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
         self.buy_stats = buy_stats
         self.frac_in = frac_in
+        self.p_stats0_buy = p_stats0_buy
 
     @property
     def df(self):
@@ -71,7 +73,8 @@ class TransactionDeterminer:
             * self._df.w_sharpe_adj_status
             * self._df.inEt)
         prop_sum = prop_et.sum()
-        capped_et = prop_et.apply(lambda x: min(x, 0.05*prop_sum))
+        # Originally 0.05, but led to an actual cap closer to 0.17 when renormalized
+        capped_et = prop_et.apply(lambda x: min(x, 0.01*prop_sum))  
         self._df['et_norm'] = capped_et / capped_et.sum()
         
     def _get_fid_proportions(self):
@@ -80,7 +83,7 @@ class TransactionDeterminer:
             * self._df.sharpe_adj_status
             * self._df.inFid)
         prop_sum = prop_fid.sum()
-        capped_fid = prop_fid.apply(lambda x: min(x, 0.05*prop_sum))
+        capped_fid = prop_fid.apply(lambda x: min(x, 0.01*prop_sum))
         self._df['fid_norm'] = capped_fid / capped_fid.sum()
 
     def _get_tdam_proportions(self):
@@ -90,7 +93,7 @@ class TransactionDeterminer:
             * self._df.in_self_managed
             * self._df.currentlyActive)
         prop_sum = prop_tdam.sum()
-        capped_tdam = prop_tdam.apply(lambda x: min(x, 0.05*prop_sum))
+        capped_tdam = prop_tdam.apply(lambda x: min(x, 0.01*prop_sum))
         self._df['tdam_norm'] = capped_tdam / capped_tdam.sum()
 
     def get_target_amounts(self, account, amount):
@@ -137,11 +140,10 @@ class TransactionDeterminer:
         distr = distr[distr.notnull()]
         return distr
 
-    @staticmethod
-    def _get_bid_ask_quantile_from_status_scaled(status, account, diff):
+    def _get_bid_ask_quantile_from_status_scaled(self, status, account, diff):
         # Prob of which buy/sell should happen given neutral status (0)
         #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'tdam': 0.5}[account]
-        P_STATUS0_BUY = {'et': 0.01, 'fid': 0.01, 'tdam': 0.01}[account]
+        P_STATUS0_BUY = self.p_stats0_buy[account]
         #             P(buy/sell) at state =
         # p_stat0_buy     0      1      2      3      4     5
         #       0.01   0.01   0.20   0.39   0.57   0.76  0.95
@@ -226,16 +228,18 @@ class TransactionDeterminer:
     def _handle_transactions(self, account, err, transaction_type):
         self._sort_by_transaction_order(transaction_type)
         cum = self._df.exact_amt.cumsum()
-        for i, (trans_total, symbol, shares, bid_ask) in enumerate(
+        for i, (trans_total, symbol, shares, bid_ask, status) in enumerate(
                 zip(
                     cum,
                     self._df.index,
                     self._df[f'{account}_nshares'],
-                    self._df[f'{account}_bid_ask'])):
+                    self._df[f'{account}_bid_ask'],
+                    self._df.status_scaled)):
             if shares == 0:
                 continue
             print(
                 f'{transaction_type.title()} {abs(shares)} shares of {symbol} '
-                f'at ${bid_ask:,.2f}')
+                f'at ${bid_ask:,.2f} (Total: ${abs(shares) * bid_ask:,.2f}) '
+                f'Status: {status:.3f}')
             if abs(trans_total) >= abs(err):
                 return

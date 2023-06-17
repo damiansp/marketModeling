@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 211092
-ET_VALUE = 149046
-TDAM_VALUE = 15581
-FRAC_IN = 0.4000
+FID_VALUE = 214783
+ET_VALUE = 152716
+TDAM_VALUE = 15878
+FRAC_IN = 0.4100
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 113293
-ADEL_VALUE = 100392
+RSI_VALUE = 117103
+ADEL_VALUE = 104107
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -41,9 +41,10 @@ DOWNLOADS = '/Users/damiansp/Downloads'
 # Model params
 NEXT_DAY_DISTRIB_WINDOW = 120
 PCT_TO_TRADE_DAILY = 0.05
+# increase values if trying to increase prob of on/offloading
+P_STATS0_BUY = {'et': 0.01, 'fid': 0.01, 'tdam': 0.01}  
 
 # File paths
-#BUY_STATS = f'{DATA}/buyStats_csv.csv' # to be replaced by transactions
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
 DAR_BY_STATE = f'{DATA}/dar_by_state.csv'  # daily average returns
 HMM_EXPECTED_RETURNS = f'{DATA}/hmm_exp_returns.csv'
@@ -55,9 +56,10 @@ TRANSITION_PROBS = f'{DATA}/transition_probs.csv'
 BUY_STATS = TRANSACTIONS
 
 
+
 def main():
     current_stocks = load_current_stocks()
-    #run_hmm_models()
+    run_hmm_models()
     best_stock_by_state.main()
     current_best_stocks = select_state_based_stocks(20)
     #current_best_stocks = 
@@ -168,7 +170,7 @@ def append_current_holdings(stock_metrics):
 def get_transactions(stock_metrics, next_day_distributions, buy_stats):
     print('Determining transactions...')
     determiner = TransactionDeterminer(
-        stock_metrics, next_day_distributions, buy_stats, FRAC_IN)
+        stock_metrics, next_day_distributions, buy_stats, FRAC_IN, P_STATS0_BUY)
     determiner.compile_data()
     for account, amt in zip(
             ['et', 'fid', 'tdam'], [ET_VALUE, FID_VALUE, TDAM_VALUE]):
