@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 214783
-ET_VALUE = 152716
-TDAM_VALUE = 15878
-FRAC_IN = 0.4100
+FID_VALUE = 211957
+ET_VALUE = 150603
+TDAM_VALUE = 15617
+FRAC_IN = 0.4400
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 117103
-ADEL_VALUE = 104107
+RSI_VALUE = 112746
+ADEL_VALUE = 100781
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -39,8 +39,8 @@ START = '1965-01-01'
 DATA = '../data'
 DOWNLOADS = '/Users/damiansp/Downloads'
 # Model params
-NEXT_DAY_DISTRIB_WINDOW = 120
-PCT_TO_TRADE_DAILY = 0.05
+NEXT_DAY_DISTRIB_WINDOW = 750
+PCT_TO_TRADE_DAILY = 0.2
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {'et': 0.01, 'fid': 0.01, 'tdam': 0.01}  
 
