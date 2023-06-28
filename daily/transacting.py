@@ -73,7 +73,8 @@ class TransactionDeterminer:
             * self._df.w_sharpe_adj_status
             * self._df.inEt)
         prop_sum = prop_et.sum()
-        # Originally 0.05, but led to an actual cap closer to 0.17 when renormalized
+        # Originally 0.05, but led to an actual cap closer to 0.17 when
+        # renormalized
         capped_et = prop_et.apply(lambda x: min(x, 0.01*prop_sum))  
         self._df['et_norm'] = capped_et / capped_et.sum()
         
@@ -237,9 +238,12 @@ class TransactionDeterminer:
                     self._df.status_scaled)):
             if shares == 0:
                 continue
-            print(
-                f'{transaction_type.title()} {abs(shares)} shares of {symbol} '
-                f'at ${bid_ask:,.2f} (Total: ${abs(shares) * bid_ask:,.2f}) '
-                f'Status: {status:.3f}')
+            if ((transaction_type == 'buy' and shares > 0)
+                or (transaction_type == 'sell' and shares < 0)):
+                print(
+                    f'{transaction_type.title():4s} {shares:+4d} shares of '
+                    f'{symbol:5s} at ${bid_ask:7,.2f} (Total: '
+                    f'${abs(shares) * bid_ask:9,.2f}) '
+                    f'Status: {status:.3f}')
             if abs(trans_total) >= abs(err):
                 return
