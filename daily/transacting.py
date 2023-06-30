@@ -4,12 +4,14 @@ import pandas as pd
 
 class TransactionDeterminer:
     def __init__(
-            self, metrics, next_day_distributions, buy_stats, frac_in, p_stats0_buy):
+            self, metrics, next_day_distributions, buy_stats, frac_in,
+            p_stats0_buy, transact_if):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
         self.buy_stats = buy_stats
         self.frac_in = frac_in
         self.p_stats0_buy = p_stats0_buy
+        self.transact_if = transact_if
 
     @property
     def df(self):
@@ -133,7 +135,6 @@ class TransactionDeterminer:
     def _get_status_distribution(self, row, account):
         symbol = row.name
         trend = row.direction
-        status = row.status_scaled
         high_low = 'low' if row[f'{account}_diff'] > 0 else 'high'
         distr = self.next_day_distributions.loc[
             self.next_day_distributions[f'{symbol}_trend'] == trend,
@@ -207,14 +208,14 @@ class TransactionDeterminer:
             secondary = remainder / 2
             if err <= 0:
                 # primary is sell
-                self._handle_transactions(account, primary, 'sell')
+                self._handle_transactions(account, primary, 'sell', 'curr')
                 print()
-                self._handle_transactions(account, secondary, 'buy')
+                self._handle_transactions(account, secondary, 'buy', 'opp')
             else:
                 # primary is buy
-                self._handle_transactions(account, primary, 'buy')
+                self._handle_transactions(account, primary, 'buy', 'curr')
                 print()
-                self._handle_transactions(account, secondary, 'sell')
+                self._handle_transactions(account, secondary, 'sell', 'opp')
 
     def _sort_by_transaction_order(self, transaction_type):
         if transaction_type == 'sell':
@@ -226,7 +227,7 @@ class TransactionDeterminer:
         self._df.sort_values(
             ['up_down', 'status_scaled'], ascending=ascending, inplace=True)
 
-    def _handle_transactions(self, account, err, transaction_type):
+    def _handle_transactions(self, account, err, transaction_type, curr_opp):
         self._sort_by_transaction_order(transaction_type)
         cum = self._df.exact_amt.cumsum()
         for i, (trans_total, symbol, shares, bid_ask, status) in enumerate(
@@ -238,6 +239,13 @@ class TransactionDeterminer:
                     self._df.status_scaled)):
             if shares == 0:
                 continue
+            thresh = self.transact_if[account][curr_opp]
+            if abs(status) < thresh:
+                if transaction_type == 'buy':
+                    diff = thresh - abs(status)
+                    shares = int(round(shares * (2 ** -diff)))
+            if transaction_type == 'sell' and status > -thresh:
+                shares = 0
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(
