@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 213398
-ET_VALUE = 150891
-TDAM_VALUE = 15850
-FRAC_IN = 0.4900
+FID_VALUE = 212763
+ET_VALUE = 150225
+TDAM_VALUE = 15798
+FRAC_IN = 0.5200
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 113304
-ADEL_VALUE = 101336
+RSI_VALUE = 111140
+ADEL_VALUE = 99474
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -63,7 +63,7 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    #run_hmm_models()
+    run_hmm_models()
     best_stock_by_state.main()
     current_best_stocks = select_state_based_stocks(20)
     #current_best_stocks = 

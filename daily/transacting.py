@@ -196,10 +196,10 @@ class TransactionDeterminer:
             # all buys or all sells
             if err < 0:
                 print('Just selling today\n')
-                self._handle_transactions(account, err, 'sell')
+                self._handle_transactions(account, err, 'sell', 'curr')
             else:
                 print('Just buying today\n')
-                self._handle_transactions(account, err, 'buy')
+                self._handle_transactions(account, err, 'buy', 'curr')
         else:
             print('Buying and selling today\n')
             primary = abs(err)
@@ -244,6 +244,7 @@ class TransactionDeterminer:
                 if transaction_type == 'buy':
                     diff = thresh - abs(status)
                     shares = int(round(shares * (2 ** -diff)))
+            # Comment out to see sales even if below threshold
             if transaction_type == 'sell' and status > -thresh:
                 shares = 0
             if ((transaction_type == 'buy' and shares > 0)
