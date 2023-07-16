@@ -24,13 +24,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE = 212763
-ET_VALUE = 150225
-TDAM_VALUE = 15798
-FRAC_IN = 0.5200
+FID_VALUE = 217131
+ET_VALUE = 152709
+TDAM_VALUE = 16019
+RSI_VALUE = 115992
+ADEL_VALUE = 105047
+FRAC_IN = 0.5600
 FID_MAX = 0.00  # max weight to give my picks in fid acct
-RSI_VALUE = 111140
-ADEL_VALUE = 99474
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -42,11 +42,11 @@ DOWNLOADS = '/Users/damiansp/Downloads'
 NEXT_DAY_DISTRIB_WINDOW = 750
 PCT_TO_TRADE_DAILY = 1  #0.2
 # increase values if trying to increase prob of on/offloading
-P_STATS0_BUY = {'et': 0.01, 'fid': 0.01, 'tdam': 0.01}
+P_STATS0_BUY = {'et': 0.02, 'fid': 0.03, 'tdam': 0.04}
 TRANSACT_IF = {
-    'et': {'curr': 3, 'opp': 4},
-    'fid': {'curr': 1, 'opp': 2},
-    'tdam': {'curr': 2, 'opp': 3}}
+    'et': {'curr': 3, 'opp': 3},
+    'fid': {'curr': 1, 'opp': 1},
+    'tdam': {'curr': 2, 'opp': 2}}
 
 # File paths
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
@@ -63,7 +63,7 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    run_hmm_models()
+    #run_hmm_models()
     best_stock_by_state.main()
     current_best_stocks = select_state_based_stocks(20)
     #current_best_stocks = 
