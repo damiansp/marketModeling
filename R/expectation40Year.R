@@ -271,7 +271,7 @@ fracs.in <- c()
 
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 75%/37%; 100/50% in
+# 75%/37% out; 100/50% in
 f.out <- 0
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
