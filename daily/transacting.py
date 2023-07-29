@@ -244,9 +244,11 @@ class TransactionDeterminer:
                 if transaction_type == 'buy':
                     diff = thresh - abs(status)
                     shares = int(round(shares * (2 ** -diff)))
+
             # Comment out to see sales even if below threshold
-            #if transaction_type == 'sell' and status > -thresh:
-            #    shares = 0
+            if transaction_type == 'sell' and status > -thresh:
+                shares = 0
+
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(
