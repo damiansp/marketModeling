@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def get_adjusted_date():
-    '''Treat weekend dates as preceding Friday'''
+    'Treat weekend dates as preceding Friday'
     NOW = datetime.now()
     #today = NOW.date()
     weekday = NOW.weekday()

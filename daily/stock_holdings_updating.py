@@ -5,7 +5,8 @@ DECAY = 0.8
 
 
 class StockHoldingsUpdater:
-    def __init__(self, current_stocks, current_best_stocks, buy_stats, fid_max):
+    def __init__(
+            self, current_stocks, current_best_stocks, buy_stats, fid_max):
         self.current_stocks = current_stocks
         self.current_best_stocks = current_best_stocks
         self.buy_stats = buy_stats
@@ -48,7 +49,8 @@ class StockHoldingsUpdater:
             stock, 'in_self_managed'
         ] *= DECAY
         self.buy_stats.inFid = self.buy_stats.inFid.round(2)
-        self.buy_stats.in_self_managed = self.buy_stats.in_self_managed.round(2)
+        self.buy_stats.in_self_managed = (
+            self.buy_stats.in_self_managed.round(2))
 
     def _insert_current_best_stocks(self):
         for stock in self.current_best_stocks:

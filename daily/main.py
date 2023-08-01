@@ -24,11 +24,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  217168
-ET_VALUE =   153529
-TDAM_VALUE =  15905
-RSI_VALUE =  121387
-ADEL_VALUE = 108787
+FID_VALUE =  217156
+ET_VALUE =   153825
+TDAM_VALUE =  15904
+RSI_VALUE =  128629
+ADEL_VALUE = 113439
 FRAC_IN = 0.5600
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -58,7 +58,6 @@ STOCK_METRICS = f'{DATA}/stock_metrics.csv'
 TRANSACTIONS = f'{DATA}/transactions.csv'
 TRANSITION_PROBS = f'{DATA}/transition_probs.csv'
 BUY_STATS = TRANSACTIONS
-
 
 
 def main():

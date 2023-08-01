@@ -142,7 +142,9 @@ class HMMModler:
                 ).fit(daily_returns)
                 logprob = mod.score(daily_returns)
                 if logprob > mod_meta['logprob']:
-                    print(f'New best - States: {states} (cov: {cov})')
+                    print(
+                        f'\n\n     New best - States: {states} (cov: {cov})'
+                        f'\n\n')
                     mod_meta['logprob'] = logprob
                     mod_meta['mod'] = mod
                     mod_meta['n_states'] = states
@@ -175,7 +177,8 @@ class HMMModler:
             .mean(axis=1))
         
     def _get_preds(self, symbol):
-        returns = self.data[f'{symbol}_returns'].fillna(method='ffill').dropna()
+        returns = (
+            self.data[f'{symbol}_returns'].fillna(method='ffill').dropna())
         idx = returns.index
         returns = np.reshape(returns.values, [-1, 1])
         mod = self.mods[symbol]['mod']
@@ -183,7 +186,8 @@ class HMMModler:
         means = np.squeeze(mod.means_)
         sds = np.squeeze(np.sqrt(mod.covars_))
         preds = pd.Series(
-            [means[state] for state in states], index=idx, name=f'{symbol}_exp')
+            [means[state] for state in states], index=idx, name=f'{symbol}_exp'
+        )
         ses = np.array([1.96 * sds[state] for state in states])
         return preds, ses, means, states[-1]
 
