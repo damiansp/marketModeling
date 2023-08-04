@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 
 import pandas as pd
 
@@ -15,7 +16,8 @@ def get_adjusted_date():
     return NOW
 
 
-DOWNLOADS = '/Users/damiansp/Downloads'
+HOME = os.environ['HOME']
+DOWNLOADS = f'{HOME}/Downloads'
 now = get_adjusted_date()
 TODAY = now.date()
 TOMORROW = (now + timedelta(1)).date()

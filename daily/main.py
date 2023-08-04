@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
 import json
+import os
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,8 @@ TOMORROW = TODAY + timedelta(1)
 INDICES = ['^GSPC', '^NYA', '^IXIC']#, '^W5000']
 START = '1965-01-01'
 DATA = '../data'
-DOWNLOADS = '/Users/damiansp/Downloads'
+HOME = os.environ['HOME']
+DOWNLOADS = f'{HOME}/Downloads'
 # Model params
 NEXT_DAY_DISTRIB_WINDOW = 750
 PCT_TO_TRADE_DAILY = 1  #0.2
