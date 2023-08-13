@@ -25,11 +25,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  212803
-ET_VALUE =   152230
-TDAM_VALUE =  15723
-RSI_VALUE =  124017
-ADEL_VALUE = 107670
+FID_VALUE =  212261
+ET_VALUE =   153411
+TDAM_VALUE =  15603
+RSI_VALUE =  117787
+ADEL_VALUE = 111046
 FRAC_IN = 0.5600
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
