@@ -25,11 +25,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  212283
-ET_VALUE =   155222
-TDAM_VALUE =  15788
-RSI_VALUE =  116950
-ADEL_VALUE = 109498
+FID_VALUE =  207299
+ET_VALUE =   150941
+TDAM_VALUE =  15315
+RSI_VALUE =  111110
+ADEL_VALUE = 104557
 FRAC_IN = 0.5600
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -44,7 +44,10 @@ DOWNLOADS = f'{HOME}/Downloads'
 NEXT_DAY_DISTRIB_WINDOW = 750
 PCT_TO_TRADE_DAILY = 0.2
 # increase values if trying to increase prob of on/offloading
-P_STATS0_BUY = {'et': 0.04, 'fid': 0.04, 'tdam': 0.04}
+P_STATS0_BUY = {
+    'et': {'buy': 0.01, 'sell': 0.06},
+    'fid': {'buy': 0.01, 'sell': 0.07},
+    'tdam': {'buy': 0.01, 'sell': 0.08}}
 TRANSACT_IF = {
     'et': {'curr': 3, 'opp': 3},
     'fid': {'curr': 1, 'opp': 1},
@@ -64,7 +67,7 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    run_hmm_models()
+    #run_hmm_models()
     best_stock_by_state.main()
     current_best_stocks = select_state_based_stocks(20)
     #current_best_stocks = 

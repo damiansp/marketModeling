@@ -53,8 +53,9 @@ class HoldingsAppender:
     def _upload_files(self):
         etrade = self._upload_etrade()
         fidelity = self._upload_fidelity()
-        td_ameritrade = self._upload_tdameritrade()
-        return etrade, fidelity, td_ameritrade
+        #td_ameritrade = self._upload_tdameritrade()
+        schwab = self._upload_schwab()
+        return etrade, fidelity, schwab #td_ameritrade
         
     def _upload_etrade(self):
         print('Uploading E*Trade data...')
@@ -150,6 +151,37 @@ class HoldingsAppender:
                     is_header = False
         return pd.DataFrame({'TD': data}, index=inds)
             
+    def _upload_schwab(self):
+        print('Uploading Schwab data...')
+        path_start = f'PCRA_Custodial-Positions-{str(TODAY)}'
+        filename = [
+            f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
+        ][0]
+        path = f'{DOWNLOADS}/{filename}'
+        schwab = self._parse_schwab(path)
+        if not self._symbols_are_valid(schwab):
+            raise ValueError('Unexpected symbol in TD Ameritrade file')
+        return schwab
+
+    @staticmethod
+    def _parse_schwab(path):
+        data = []
+        inds = []
+        is_header = True
+        with open(path, 'r') as f:
+            for line in f:
+                if line.startswith('"Cash') or line.startswith('"Account'):
+                    continue
+                if not is_header:
+                    cols = line.split(',')
+                    symbol = cols[0].strip('""')
+                    amt = float(cols[6].strip('"$'))
+                    inds.append(symbol)
+                    data.append(amt)
+                if line.startswith('"Symbol"'):
+                    is_header = False
+        return pd.DataFrame({'TD': data}, index=inds)
+        
     @staticmethod
     def _convert_value(s):
         return round(float(s.replace('$', '').replace(',', '')))

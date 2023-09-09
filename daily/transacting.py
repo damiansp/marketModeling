@@ -154,7 +154,8 @@ class TransactionDeterminer:
         #       0.10   0.10   0.27   0.44   0.61   0.78  0.95
         #       0.20   0.20   0.35   0.50   0.65   0.80  0.95
         #       0.50   0.50   0.59   0.68   0.77   0.86  0.95
-        P_STATUS0 = P_STATUS0_BUY if diff >= 0 else 1 - P_STATUS0_BUY
+        P_STATUS0 = (
+            P_STATUS0_BUY['buy'] if diff >= 0 else 1 - P_STATUS0_BUY['sell'])
         MIN_P = 0.01  # p(buy | strong sell sig) or vice versa
         MAX_P = 0.95  # p(buy | strong buy sig)  ...
         # Piecewise linear interpolation: y = mx + b: b = P_STATUS_0
