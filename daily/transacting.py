@@ -77,7 +77,7 @@ class TransactionDeterminer:
         prop_sum = prop_et.sum()
         # Originally 0.05, but led to an actual cap closer to 0.17 when
         # renormalized
-        capped_et = prop_et.apply(lambda x: min(x, 0.01*prop_sum))  
+        capped_et = prop_et.apply(lambda x: min(x, 0.001*prop_sum))  
         self._df['et_norm'] = capped_et / capped_et.sum()
         
     def _get_fid_proportions(self):
