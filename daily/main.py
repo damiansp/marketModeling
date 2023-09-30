@@ -25,11 +25,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  199775
-ET_VALUE =   142234
-TDAM_VALUE =  14652
-RSI_VALUE =  104221
-ADEL_VALUE =  93853
+FID_VALUE =  201568
+ET_VALUE =   146226
+TDAM_VALUE =  14821
+RSI_VALUE =  106020
+ADEL_VALUE =  95857
 FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -45,9 +45,9 @@ NEXT_DAY_DISTRIB_WINDOW = 750
 PCT_TO_TRADE_DAILY = 0.2
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.16},
-    'fid':  {'buy': 0.01, 'sell': 0.01},
-    'tdam': {'buy': 0.01, 'sell': 0.18}}
+    'et':   {'buy': 0.01, 'sell': 0.21},
+    'fid':  {'buy': 0.01, 'sell': 0.22},
+    'tdam': {'buy': 0.01, 'sell': 0.23}}
 TRANSACT_IF = {
     'et': {'curr': 3, 'opp': 3},
     'fid': {'curr': 1, 'opp': 1},
