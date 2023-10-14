@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
 import json
+from math import ceil
 import os
 
 import numpy as np
@@ -25,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  201376
-ET_VALUE =   146047
-SCHWAB_VALUE =  14758
-RSI_VALUE =  105526
-ADEL_VALUE =  93290
+FID_VALUE =   198939
+ET_VALUE =    144895
+SCHWAB_VALUE = 14406
+RSI_VALUE =   103966
+ADEL_VALUE =   91328
 FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -46,13 +47,14 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.26},
-    'fid':  {'buy': 0.01, 'sell': 0.27},
-    'schwab': {'buy': 0.01, 'sell': 0.28}}
+    'et':   {'buy': 0.02, 'sell': 0.01},    # incr by 1
+    'fid':  {'buy': 0.02, 'sell': 0.01},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.34}}  #         3
 TRANSACT_IF = {
-    'et': {'curr': 3, 'opp': 3},
-    'fid': {'curr': 1, 'opp': 1},
-    'schwab': {'curr': 2, 'opp': 2}}
+    'et': {'curr': 5, 'opp': 5},
+    'fid': {'curr': 4, 'opp': 4},
+    'schwab': {'curr': 3, 'opp': 3}}
+
 
 # File paths
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
@@ -68,10 +70,9 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    #run_hmm_models()
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)
+    ##run_hmm_models()  ##
+    ##best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
-    #current_best_stocks = 
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
     # save backup
@@ -88,8 +89,10 @@ def main():
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     ##########
     stock_metrics = append_current_holdings(stock_metrics)
+    print_buy_sell_statuses()
     transactions = get_transactions(
         stock_metrics, next_day_distributions, buy_stats)
+    print_buy_sell_statuses()
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
@@ -199,6 +202,32 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt)
     return determiner.df
+
+
+def get_threshold(max_init, current):
+    diff = int(100 * (1 - 0.01))
+    probs = np.linspace(0.01, 1, diff + 1)
+    thresh = np.linspace(max_init, -5, diff + 1)
+    for i in range(diff + 1):
+        if probs[i] == current:
+            return thresh[i]
+    raise RuntimeError('Should be unreachable')
+
+
+def print_buy_sell_statuses():
+    for portfolio, data in P_STATS0_BUY.items():
+        print()
+        print('-' * 25)
+        print(portfolio)
+        print('-' * 25)
+        for action, prob in data.items():
+            thresh = get_threshold(TRANSACT_IF[portfolio]['curr'], prob)
+            direction = 'above'
+            if action == 'sell':
+                thresh *= -1
+                direction = 'below'
+            print(f'  {action}: {thresh} and {direction}')
+    print()
 
 
 def td_updated():

@@ -80,6 +80,7 @@ class HoldingsAppender:
         print('Uploading Fidelity data...')
         today = datetime.strftime(TODAY, '%b-%d-%Y')
         filename = f'Portfolio_Positions_{today}.csv'
+        print('Looking for Fidelity file:', filename)
         try:
             fidelity = pd.read_csv(f'{DOWNLOADS}/{filename}')
         except FileNotFoundError:
@@ -117,6 +118,7 @@ class HoldingsAppender:
     def _upload_schwab(self):
         print('Uploading Schwab data...')
         path_start = f'PCRA_Custodial-Positions-{str(TODAY)}'
+        print(f'Looking for Fidelity file: {path_start}...')
         filename = [
             f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
         ][0]
