@@ -26,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   198939
-ET_VALUE =    144895
-SCHWAB_VALUE = 14406
-RSI_VALUE =   103966
-ADEL_VALUE =   91328
+FID_VALUE =   195907
+ET_VALUE =    142127
+SCHWAB_VALUE = 14319
+RSI_VALUE =   103027
+ADEL_VALUE =   90885
 FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,9 +47,9 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.02, 'sell': 0.01},    # incr by 1
-    'fid':  {'buy': 0.02, 'sell': 0.01},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.34}}  #         3
+    'et':   {'buy': 0.07, 'sell': 0.01},    # incr by 1
+    'fid':  {'buy': 0.12, 'sell': 0.01},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.48}}  #         3
 TRANSACT_IF = {
     'et': {'curr': 5, 'opp': 5},
     'fid': {'curr': 4, 'opp': 4},
@@ -70,8 +70,8 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    ##run_hmm_models()  ##
-    ##best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -98,7 +98,8 @@ def main():
     print(f'Saved data to {TRANSACTIONS}')
     td_updated()
     # Extras
-    append_game_data()
+    #append_game_data()
+    print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
 
 
 def load_current_stocks():
@@ -208,8 +209,9 @@ def get_threshold(max_init, current):
     diff = int(100 * (1 - 0.01))
     probs = np.linspace(0.01, 1, diff + 1)
     thresh = np.linspace(max_init, -5, diff + 1)
+    ERR = 0.00001
     for i in range(diff + 1):
-        if probs[i] == current:
+        if abs(probs[i] - current) < ERR:
             return thresh[i]
     raise RuntimeError('Should be unreachable')
 
