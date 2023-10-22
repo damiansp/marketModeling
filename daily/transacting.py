@@ -24,7 +24,7 @@ class TransactionDeterminer:
         self._get_status_weights()
         self._get_et_proportions()
         self._get_fid_proportions()
-        self._get_tdam_proportions()
+        self._get_schwab_proportions()
         
     def _add_account_indicators(self):
         df_stocks = set(self._df.index)
@@ -89,15 +89,15 @@ class TransactionDeterminer:
         capped_fid = prop_fid.apply(lambda x: min(x, 0.01*prop_sum))
         self._df['fid_norm'] = capped_fid / capped_fid.sum()
 
-    def _get_tdam_proportions(self):
-        prop_tdam = (
+    def _get_schwab_proportions(self):
+        prop_schwab = (
             (self._df.weighted_sharpe_scaled**4)
             * self._df.mean_sharpe_adj_status
             * self._df.in_self_managed
             * self._df.currentlyActive)
-        prop_sum = prop_tdam.sum()
-        capped_tdam = prop_tdam.apply(lambda x: min(x, 0.01*prop_sum))
-        self._df['tdam_norm'] = capped_tdam / capped_tdam.sum()
+        prop_sum = prop_schwab.sum()
+        capped_schwab = prop_schwab.apply(lambda x: min(x, 0.01*prop_sum))
+        self._df['schwab_norm'] = capped_schwab / capped_schwab.sum()
 
     def get_target_amounts(self, account, amount):
         print(f'Getting target amounts for {account}...')
@@ -144,7 +144,7 @@ class TransactionDeterminer:
 
     def _get_bid_ask_quantile_from_status_scaled(self, status, account, diff):
         # Prob of which buy/sell should happen given neutral status (0)
-        #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'tdam': 0.5}[account]
+        #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'schwab': 0.5}[account]
         P_STATUS0_BUY = self.p_stats0_buy[account]
         #             P(buy/sell) at state =
         # p_stat0_buy     0      1      2      3      4     5

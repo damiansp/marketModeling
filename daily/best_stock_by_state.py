@@ -9,14 +9,16 @@ import pandas as pd
 import yfinance as yf
 
 
-DATA = '../data'
+DATA = '../data_new'
 TRIM = 0.02
 RUN = {
     0: 'all',
     1: 0,  # specific batch
     2: 'random_batch'
 }[0]
-#MIN_OVERALL_SHARPE = 0.45
+#MIN_OVERALL_SHARPE = 1.00
+ABS_MIN_DAR = 1.0001
+KEEP_N = 100
 MIN_STOCK_PRICE = 1.00
 
 TOMORROW = (datetime.now() + timedelta(1)).date()
@@ -26,7 +28,7 @@ START = TOMORROW - timedelta(YEARS_OF_DATA * 365)
 N_JOBS = 8
 
 
-def main():
+def main(outpath):
     symbols, states_df = load_data()
     STATES = sorted(states_df.state.unique())
     CURRENT_STATE = states_df.state.to_numpy()[-1]
@@ -53,7 +55,11 @@ def main():
         df = pd.concat(dfs)
     else:
         df = dfs[0]
-    outpath = f'{DATA}/dar_by_state.csv'
+    # Filter out worst performers
+    df = df[df.dar >= ABS_MIN_DAR]
+    if len(df) > KEEP_N:
+        df.sort_values('dar', ascending=False, inplace=True)
+        df = df.iloc[:KEEP_N, :]
     df.to_csv(outpath, index=True)
     print(f'Complete. Data written to {outpath}')
         

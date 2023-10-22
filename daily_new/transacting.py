@@ -5,13 +5,13 @@ import pandas as pd
 class TransactionDeterminer:
     def __init__(
             self, metrics, next_day_distributions, buy_stats, frac_in,
-            p_stats0_buy, transact_if):
+            p_stats0_buy, params):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
         self.buy_stats = buy_stats
         self.frac_in = frac_in
         self.p_stats0_buy = p_stats0_buy
-        self.transact_if = transact_if
+        self.params = params
 
     @property
     def df(self):
@@ -38,27 +38,20 @@ class TransactionDeterminer:
             axis=1)
         
     def _add_status(self):
-        SCALED_BOUNDS = 5
-        self._df['status'] = self._get_harmonic_mean(
-            'RSI', 'fair_value_mult', 'geomean')
-        self._df['status_scaled'] = (
-            (0.6 * np.tan(3 * (1 - self._df['status']) - 1.5))
-            .clip(-SCALED_BOUNDS, SCALED_BOUNDS))
+        for portfolio, params in self.params.items():
+            weights = params['status_weights']
+            self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
+                weights, 'RSI', 'fair_value_mult', 'geomean')
+            self._df[f'{portfolio}_status_scaled'] = (
+                (0.6 * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5))
+            )
 
-    def _get_harmonic_mean(self, *cols):
-        n_cols = len(cols)
-        recip_sum = 0
-        for col in cols:
-            recip_sum += 1 / self._df[col]
-        return n_cols / recip_sum
-
-    def _get_status_weights(self):
-        self._df['sharpe_adj_status'] = (
-            self._df.sharpe_scaled ** self._df.status_scaled)
-        self._df['w_sharpe_adj_status'] = (
-            self._df.weighted_sharpe_scaled ** self._df.status_scaled)
-        self._df['mean_sharpe_adj_status'] = (
-            (self._df.sharpe_adj_status + self._df.w_sharpe_adj_status) / 2)
+    def _get_weighted_harmonic_mean(self, weights, *cols):
+        s_w = sum(weights)
+        denom = 0
+        for w, col in zip(weights, cols):
+            denom += (w / self._df[col])
+        return s_w / denom
 
     def _add_scaled_sharpes(self):
         for col in ['sharpe', 'weighted_sharpe']:
@@ -69,10 +62,31 @@ class TransactionDeterminer:
             self._df[f'{col}_scaled'] = (
                 self._df[f'{col}_capped'] - min_capped + 1)
         
+    def _get_status_weights(self):
+        for portfolio in self.params:
+            self._df[f'{portfolio}_sharpe_adj_status'] = (
+                self._df.sharpe_scaled
+                ** self._df[f'{portfolio}_status_scaled'])
+            self._df[f'{portfolio}_w_sharpe_adj_status'] = (
+                self._df.weighted_sharpe_scaled
+                ** self._df[f'{portfolio}_status_scaled'])
+            self._df[f'{portfolio}_mean_sharpe_adj_status'] = (
+                (self._df[f'{portfolio}_sharpe_adj_status']
+                 + self._df[f'{portfolio}_w_sharpe_adj_status'])
+                / 2)
+
     def _get_et_proportions(self):
+        params = self.params['et']
+        use_weighted_sharpe = params['weighted_sharpe']
+        sharpe_col = (
+            'weighted_sharpe_scaled' if use_weighted_sharpe
+            else 'sharpe_scaled')
+        EXP = params['sharpe_scaled_exp']
+        sharpe_adj_status_type = params['sharpe_adj_status_type']
+        
         prop_et = (
-            (self._df.sharpe_scaled**4)
-            * self._df.w_sharpe_adj_status
+            (self._df[sharpe_col]**EXP)
+            * self._df[f'et_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.inEt)
         prop_sum = prop_et.sum()
         # Originally 0.05, but led to an actual cap closer to 0.17 when
@@ -81,18 +95,34 @@ class TransactionDeterminer:
         self._df['et_norm'] = capped_et / capped_et.sum()
         
     def _get_fid_proportions(self):
+        params = self.params['fid']
+        use_weighted_sharpe = params['weighted_sharpe']
+        sharpe_col = (
+            'weighted_sharpe_scaled' if use_weighted_sharpe
+            else 'sharpe_scaled')
+        EXP = params['sharpe_scaled_exp']
+        sharpe_adj_status_type = params['sharpe_adj_status_type']
+
         prop_fid = (
-            (self._df.weighted_sharpe_scaled**4)
-            * self._df.sharpe_adj_status
+            (self._df[sharpe_col]**EXP)
+            * self._df[f'fid_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.inFid)
         prop_sum = prop_fid.sum()
         capped_fid = prop_fid.apply(lambda x: min(x, 0.01*prop_sum))
         self._df['fid_norm'] = capped_fid / capped_fid.sum()
 
     def _get_schwab_proportions(self):
+        params = self.params['schwab']
+        use_weighted_sharpe = params['weighted_sharpe']
+        sharpe_col = (
+            'weighted_sharpe_scaled' if use_weighted_sharpe
+            else 'sharpe_scaled')
+        EXP = params['sharpe_scaled_exp']
+        sharpe_adj_status_type = params['sharpe_adj_status_type']
+
         prop_schwab = (
-            (self._df.weighted_sharpe_scaled**4)
-            * self._df.mean_sharpe_adj_status
+            (self._df[sharpe_col]**EXP)
+            * self._df[f'schwab_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.in_self_managed
             * self._df.currentlyActive)
         prop_sum = prop_schwab.sum()
@@ -110,7 +140,7 @@ class TransactionDeterminer:
         print(f'Getting bid and ask prices for {account}...')
         bid_ask_multiplier = (
             self
-            ._df[['direction', 'status_scaled', f'{account}_diff']]
+            ._df[['direction', f'{account}_status_scaled', f'{account}_diff']]
             .apply(lambda row: self._get_bid_ask(row, account), axis=1))
         self._df[f'{account}_bid_ask'] = bid_ask_multiplier * self._df.price
         
@@ -118,7 +148,9 @@ class TransactionDeterminer:
         try:
             distr = self._get_status_distribution(row, account)
             q = self._get_bid_ask_quantile_from_status_scaled(
-                row.status_scaled, account, row[f'{account}_diff'])
+                row[f'{account}_status_scaled'],
+                account,
+                row[f'{account}_diff'])
             return distr.quantile(q=q)
         except:
             print('row:')
@@ -162,9 +194,9 @@ class TransactionDeterminer:
         # rise = P_STATUS0 - MIN if negative status (sell signal)
         # rise = MAX - P_STATUS0 if + status (buy signal)
         rise = P_STATUS0 - MIN_P if status <= 0 else MAX_P - P_STATUS0
-        m = rise / 5
+        m = rise / 5  # 5: status as which prob reaches 1
         q = m*status + P_STATUS0
-        return q
+        return min(q, 0.99)
 
     def get_n_shares_to_buy_or_sell(self, account):
         print('Determining ideal number of shares to buy/sell...')
@@ -218,7 +250,7 @@ class TransactionDeterminer:
                 print()
                 self._handle_transactions(account, secondary, 'sell', 'opp')
 
-    def _sort_by_transaction_order(self, transaction_type):
+    def _sort_by_transaction_order(self, transaction_type, account):
         if transaction_type == 'sell':
             ascending = [True, True]
         elif transaction_type == 'buy':
@@ -226,10 +258,12 @@ class TransactionDeterminer:
         else:
             raise ValueError('transaction_type must be "buy" or "sell"')
         self._df.sort_values(
-            ['up_down', 'status_scaled'], ascending=ascending, inplace=True)
+            ['up_down', f'{account}_status_scaled'],
+            ascending=ascending,
+            inplace=True)
 
     def _handle_transactions(self, account, err, transaction_type, curr_opp):
-        self._sort_by_transaction_order(transaction_type)
+        self._sort_by_transaction_order(transaction_type, account)
         cum = self._df.exact_amt.cumsum()
         for i, (trans_total, symbol, shares, bid_ask, status) in enumerate(
                 zip(
@@ -237,19 +271,9 @@ class TransactionDeterminer:
                     self._df.index,
                     self._df[f'{account}_nshares'],
                     self._df[f'{account}_bid_ask'],
-                    self._df.status_scaled)):
+                    self._df[f'{account}_status_scaled'])):
             if shares == 0:
                 continue
-            thresh = self.transact_if[account][curr_opp]
-            if abs(status) < thresh:
-                if transaction_type == 'buy':
-                    diff = thresh - abs(status)
-                    shares = int(round(shares * (2 ** -diff)))
-
-            # Comment out to see sales even if below threshold
-            #if transaction_type == 'sell' and status > -thresh:
-            #    shares = 0
-
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(

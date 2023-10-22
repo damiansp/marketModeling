@@ -70,36 +70,28 @@ class StockHoldingsUpdater:
     def _move_lingerer_to_best(self, stock):
         self.current_stocks['lingerers'].remove(stock)
         self.best.append(stock)
-        #self.buy_stats.loc[self.buy_stats.stock == stock, 'inFid'] = (
-        self.buy_stats.loc[stock, 'inFid'] = (
-            self.fid_max)
-        self.buy_stats.loc[
-            #self.buy_stats.stock == stock, 'in_self_managed'
-            stock, 'in_self_managed'
-        ] = 1.
+        self.buy_stats.loc[stock, 'inFid'] = self.fid_max
+        self.buy_stats.loc[stock, 'in_self_managed'] = 1.
 
     def _append_new_stock(self, symbol, acct):
         print(f'Adding {symbol} to buy_stats')
-        #row = pd.DataFrame(
-        #    {col: 0 for col in self.buy_stats.columns}, index=[0])
-        #row['stock'] = symbol
-        #row.stock = row.stock.astype(str)
         row = pd.DataFrame(
             {col: 0 for col in self.buy_stats.columns}, index=[symbol])
         self.buy_stats.to_csv('/tmp/test.csv')
-        #self.buy_stats = pd.concat([self.buy_stats, row], ignore_index=True)
         self.buy_stats = pd.concat([self.buy_stats, row], axis=0)
         if acct == 'et':
-            #self.buy_stats.loc[self.buy_stats.stock == symbol, 'inEt'] = 1
             self.buy_stats.loc[symbol, 'inEt'] = 1
         else:
-            #self.buy_stats.loc[self.buy_stats.stock == symbol, 'inFid'] = (
-            self.buy_stats.loc[symbol, 'inFid'] = (
-                self.fid_max)
-            self.buy_stats.loc[
-                #self.buy_stats.stock == symbol, 'in_self_managed'
-                symbol, 'in_self_managed'
-            ] = 1
+            self.buy_stats.loc[symbol, 'inFid'] = self.fid_max
+            self.buy_stats.loc[symbol, 'in_self_managed'] = 1
+            ###
+            self.buy_stats.loc[symbol, 'currentlyActive'] = 1
+            ###
+        ###
+        total_in = self.buy_stats[['inEt', 'inFid', 'in_self_managed']].sum(axis=1)
+        self.buy_stats.loc[total_in == 0, 'currentlyActive'] = 0
+        ###
+                               
         
     def _handle_old_best(self):
         for stock in self.old_best:
@@ -118,11 +110,9 @@ class StockHoldingsUpdater:
         all_current_stocks = []
         for stocks in self.current_stocks.values():
             all_current_stocks += stocks
-        #for symbol in self.buy_stats.stock:
         for symbol in self.buy_stats.index:
             if symbol not in all_current_stocks:
                 if (self.buy_stats
-                    #.loc[self.buy_stats.stock == symbol, 'Owned']
                     .loc[symbol, 'Owned']
                     .any()):
                     print(
@@ -132,6 +122,4 @@ class StockHoldingsUpdater:
                     print(
                         f'Stock {symbol} not owned and not in current stocks. '
                         f'Removing from buy_stats')
-                    #self.buy_stats = (
-                        #self.buy_stats[self.buy_stats.stock != symbol])
                     self.buy_stats.drop(symbol, inplace=True)

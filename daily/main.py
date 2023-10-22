@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
 import json
+from math import ceil
 import os
 
 import numpy as np
@@ -25,33 +26,35 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =  201376
-ET_VALUE =   146047
-TDAM_VALUE =  14758
-RSI_VALUE =  105526
-ADEL_VALUE =  93290
+FID_VALUE =   195907
+ET_VALUE =    142127
+SCHWAB_VALUE = 14319
+RSI_VALUE =   103027
+ADEL_VALUE =   90885
 FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
-INDICES = ['^GSPC', '^NYA', '^IXIC']#, '^W5000']
+INDICES = ['^GSPC', '^NYA', '^IXIC']
 START = '1965-01-01'
-DATA = '../data'
+DATA = '../data_new'
 HOME = os.environ['HOME']
 DOWNLOADS = f'{HOME}/Downloads'
 # Model params
 NEXT_DAY_DISTRIB_WINDOW = 750
 PCT_TO_TRADE_DAILY = 0.2
+N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.26},
-    'fid':  {'buy': 0.01, 'sell': 0.27},
-    'tdam': {'buy': 0.01, 'sell': 0.28}}
+    'et':   {'buy': 0.07, 'sell': 0.01},    # incr by 1
+    'fid':  {'buy': 0.12, 'sell': 0.01},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.48}}  #         3
 TRANSACT_IF = {
-    'et': {'curr': 3, 'opp': 3},
-    'fid': {'curr': 1, 'opp': 1},
-    'tdam': {'curr': 2, 'opp': 2}}
+    'et': {'curr': 5, 'opp': 5},
+    'fid': {'curr': 4, 'opp': 4},
+    'schwab': {'curr': 3, 'opp': 3}}
+
 
 # File paths
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
@@ -67,15 +70,15 @@ BUY_STATS = TRANSACTIONS
 
 def main():
     current_stocks = load_current_stocks()
-    run_hmm_models()
-    best_stock_by_state.main()
-    current_best_stocks = select_state_based_stocks(20)
-    #current_best_stocks = 
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
     # save backup
     transactions.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
     transactions = append_current_holdings(transactions)
+    transactions.to_csv('/tmp/transactions.csv')
     current_stocks, buy_stats = update_current_stocks(
         current_stocks, current_best_stocks, transactions)
     print('Current stocks:')
@@ -84,15 +87,19 @@ def main():
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
     get_stock_metrics(current_stocks)
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
+    ##########
     stock_metrics = append_current_holdings(stock_metrics)
+    print_buy_sell_statuses()
     transactions = get_transactions(
         stock_metrics, next_day_distributions, buy_stats)
+    print_buy_sell_statuses()
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
     td_updated()
     # Extras
-    append_game_data()
+    #append_game_data()
+    print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
 
 
 def load_current_stocks():
@@ -117,13 +124,13 @@ def run_hmm_models():
     modeler.plot_models(last_n_days=500)
 
 
-def select_state_based_stocks(n):
+def select_state_based_stocks():
     print('Selecting best stocks for current state...')
     selector = StateBasedStockSelector(
         states_path=HMM_EXPECTED_RETURNS,
         dar_by_state_path=DAR_BY_STATE,
         trans_path=TRANSITION_PROBS)
-    current_best_stocks = selector.get_best_stocks(n)
+    current_best_stocks = selector.get_best_stocks(N_STATE_BASED_STOCKS)
     print('Current best stocks:', current_best_stocks)
     return current_best_stocks
 
@@ -182,7 +189,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         P_STATS0_BUY, TRANSACT_IF)
     determiner.compile_data()
     for account, amt in zip(
-            ['et', 'fid', 'tdam'], [ET_VALUE, FID_VALUE, TDAM_VALUE]):
+            ['et', 'fid', 'schwab'], [ET_VALUE, FID_VALUE, SCHWAB_VALUE]):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -198,30 +205,57 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
     return determiner.df
 
 
+def get_threshold(max_init, current):
+    diff = int(100 * (1 - 0.01))
+    probs = np.linspace(0.01, 1, diff + 1)
+    thresh = np.linspace(max_init, -5, diff + 1)
+    ERR = 0.00001
+    for i in range(diff + 1):
+        if abs(probs[i] - current) < ERR:
+            return thresh[i]
+    raise RuntimeError('Should be unreachable')
+
+
+def print_buy_sell_statuses():
+    for portfolio, data in P_STATS0_BUY.items():
+        print()
+        print('-' * 25)
+        print(portfolio)
+        print('-' * 25)
+        for action, prob in data.items():
+            thresh = get_threshold(TRANSACT_IF[portfolio]['curr'], prob)
+            direction = 'above'
+            if action == 'sell':
+                thresh *= -1
+                direction = 'below'
+            print(f'  {action}: {thresh} and {direction}')
+    print()
+
+
 def td_updated():
     print('\n\n')
     print('=' * 40)
-    print('TDAM NEW')
+    print('SCHWAB NEW')
     print('=' * 40)
     df = pd.read_csv(TRANSACTIONS, index_col=0)
-    df['td_sharpe2'] = df.sharpe * (df.sharpe > 0) * df.currentlyActive
-    df['td_norm'] = df.td_sharpe2 / df.td_sharpe2.sum()
-    df['td_target'] = TDAM_VALUE * df.td_norm
-    df['td_delt'] = df.td_target - df.tdam
+    df['schw_sharpe2'] = df.sharpe * (df.sharpe > 0) * df.currentlyActive
+    df['schw_norm'] = df.schw_sharpe2 / df.schw_sharpe2.sum()
+    df['schw_target'] = SCHWAB_VALUE * df.schw_norm
+    df['schw_delt'] = df.schw_target - df.schwab
     df['scaler'] = df.status_scaled.apply(get_status_scaler)
-    df['td_amt'] = df.td_delt * df.scaler
-    df['td_shares'] = (df.td_amt / df.tdam_bid_ask).round().astype(int)
-    buys = df.td_shares[df.td_shares > 0][df.scaler > 0]
-    sells = df.td_shares[df.td_shares < 0][df.scaler < 0][df.tdam > 0]
+    df['schw_amt'] = df.schw_delt * df.scaler
+    df['schw_shares'] = (df.schw_amt / df.schwab_bid_ask).round().astype(int)
+    buys = df.schw_shares[df.schw_shares > 0][df.scaler > 0]
+    sells = df.schw_shares[df.schw_shares < 0][df.scaler < 0][df.schwab > 0]
     for buy, idx in zip(buys, buys.index):
         print(
             f'BUY {buy:4d} shares of {idx:5s} at '
-            f'{df.loc[idx, "tdam_bid_ask"]:7.2f}')
+            f'{df.loc[idx, "schwab_bid_ask"]:7.2f}')
     print()
     for sell, idx in zip(sells, sells.index):
         print(
             f'SELL {-sell:4d} shares of {idx:5s} at '
-            f'{df.loc[idx, "tdam_bid_ask"]:7.2f}')
+            f'{df.loc[idx, "schwab_bid_ask"]:7.2f}')
     df.to_csv('~/Desktop/test.csv')
 
 

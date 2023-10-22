@@ -1,3 +1,4 @@
+# NOTE: TDAmeritrade -> Now Schwab
 from datetime import datetime, timedelta
 import os
 
@@ -35,12 +36,12 @@ class HoldingsAppender:
         self.binder = pd.DataFrame(index=self.SYMBOLS)
 
     def append_holdings(self):
-        etrade, fidelity, td_ameritrade = self._upload_files()
-        out = pd.concat([self.binder, etrade, td_ameritrade], axis=1)
+        etrade, fidelity, schwab = self._upload_files()
+        out = pd.concat([self.binder, etrade, schwab], axis=1)
         for v in fidelity.values():
             out = pd.concat([out, v], axis=1)
         out = out.astype(float).fillna(0).round().astype(int)
-        out_cols = ['et', 'tdam', 'rollover', 'roth', 'simple']
+        out_cols = ['et', 'schwab', 'rollover', 'roth', 'simple']
         out.columns = out_cols
         for col in out_cols + ['fid']:
             if col in list(self.stock_metrics):
@@ -53,9 +54,8 @@ class HoldingsAppender:
     def _upload_files(self):
         etrade = self._upload_etrade()
         fidelity = self._upload_fidelity()
-        #td_ameritrade = self._upload_tdameritrade()
         schwab = self._upload_schwab()
-        return etrade, fidelity, schwab #td_ameritrade
+        return etrade, fidelity, schwab
         
     def _upload_etrade(self):
         print('Uploading E*Trade data...')
@@ -80,6 +80,7 @@ class HoldingsAppender:
         print('Uploading Fidelity data...')
         today = datetime.strftime(TODAY, '%b-%d-%Y')
         filename = f'Portfolio_Positions_{today}.csv'
+        print('Looking for Fidelity file:', filename)
         try:
             fidelity = pd.read_csv(f'{DOWNLOADS}/{filename}')
         except FileNotFoundError:
@@ -114,53 +115,17 @@ class HoldingsAppender:
                 raise ValueError(f'Fidelity {k} data has unexpected symbol')
         return accounts
 
-    def _upload_tdameritrade(self):
-        print('Uploading TD Ameritrade data...')
-        filename = (
-            f'Positions_damiansp_Stocks_{str(TODAY).replace("-", "_")}.xls')
-        try:
-            tdam = self._parse_tdam_file(filename)
-        except FileNotFoundError:
-            filename = (
-                f'Positions_damiansp_Stocks_{str(TOMORROW).replace("-", "_")}'
-                f'.xls')
-            tdam = self._parse_tdam_file(filename)
-        if not self._symbols_are_valid(tdam):
-            raise ValueError('Unexpected symbol in TD Ameritrade file')
-        return tdam
-
-    @staticmethod
-    def _parse_tdam_file(filename):
-        inds = []
-        data = []
-        is_header = True
-        print('reading from', filename)
-        with open(f'{DOWNLOADS}/{filename}', 'r') as f:
-            for line in f:
-                if not is_header:
-                    if line.startswith('"'):
-                        try:
-                            columns = line.split('\t')
-                            symbol = columns[0][1:-1]
-                            value = float(columns[5][1:-1].replace(',', ''))
-                            inds.append(symbol)
-                            data.append(value)
-                        except IndexError:
-                            print('Cannot parse:', line)
-                if line.startswith('Symbol'):
-                    is_header = False
-        return pd.DataFrame({'TD': data}, index=inds)
-            
     def _upload_schwab(self):
         print('Uploading Schwab data...')
         path_start = f'PCRA_Custodial-Positions-{str(TODAY)}'
+        print(f'Looking for Fidelity file: {path_start}...')
         filename = [
             f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
         ][0]
         path = f'{DOWNLOADS}/{filename}'
         schwab = self._parse_schwab(path)
         if not self._symbols_are_valid(schwab):
-            raise ValueError('Unexpected symbol in TD Ameritrade file')
+            raise ValueError('Unexpected symbol in Schwab file')
         return schwab
 
     @staticmethod
@@ -180,7 +145,7 @@ class HoldingsAppender:
                     data.append(amt)
                 if line.startswith('"Symbol"'):
                     is_header = False
-        return pd.DataFrame({'TD': data}, index=inds)
+        return pd.DataFrame({'Schwab': data}, index=inds)
         
     @staticmethod
     def _convert_value(s):

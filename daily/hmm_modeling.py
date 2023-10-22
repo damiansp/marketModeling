@@ -23,7 +23,7 @@ class HMMModler:
             allow_fresh_start: bool=False) -> None:
         '''Model a series of stock prices as a hidden markov model (HMM).
         Args:
-        - symbols: stock tickers and time ranges to model over, foramtted as:
+        - symbols: stock tickers and time ranges to model over, formatted as:
 
           {'symbol': ['start_date', 'end_date']}
 

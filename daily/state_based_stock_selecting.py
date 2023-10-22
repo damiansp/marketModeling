@@ -76,7 +76,8 @@ class StateBasedStockSelector:
         print('best weighted:', sorted(best_weighted))
         needed = self._determine_needed_stock_data(
             stock_data, exclude, best_weighted)
-        stock_data = self._update_stock_downloads(stock_data, needed)
+        if needed:
+            stock_data = self._update_stock_downloads(stock_data, needed)
         exclude += self._exclude_by_overall_performance(stock_data)
         exclude += self._exclude_by_current_state_performance(stock_data)
         exclude = set(exclude)  # in case of duplicates
