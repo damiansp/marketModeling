@@ -26,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   195907
-ET_VALUE =    142127
-SCHWAB_VALUE = 14319
-RSI_VALUE =   103027
-ADEL_VALUE =   90885
+FID_VALUE =   190513
+ET_VALUE =    136691
+SCHWAB_VALUE = 13935
+RSI_VALUE =    96679
+ADEL_VALUE =   79281
 FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,25 +47,28 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.07, 'sell': 0.01},    # incr by 1
-    'fid':  {'buy': 0.12, 'sell': 0.01},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.48}}  #         3
+    'et':   {'buy': 0.01, 'sell': 0.02},    # incr by 1
+    'fid':  {'buy': 0.01, 'sell': 0.06},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.60}}  #         3
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
         'weighted_sharpe': False,
         'sharpe_scaled_exp': 3.9,
-        'sharpe_adj_status_type': 'w_'},    # '' | 'w_' | 'mean_'
+        'sharpe_adj_status_type': 'w_',  # '' | 'w_' | 'mean_'
+        'max_prop_per_stock': 0.05},
     'fid': {
         'status_weights': [1, 1.1, 1],
         'weighted_sharpe': True,
         'sharpe_scaled_exp': 4,
-        'sharpe_adj_status_type': ''},
+        'sharpe_adj_status_type': '',
+        'max_prop_per_stock': 0.03},
     'schwab': {
         'status_weights': [1, 1, 1.1],
         'weighted_sharpe': True,
         'sharpe_scaled_exp': 4.1,
-        'sharpe_adj_status_type': 'mean_'}}
+        'sharpe_adj_status_type': 'mean_',
+        'max_prop_per_stock': 0.01}}
 
 
 # File paths
@@ -210,7 +213,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         # ideal amount ($) to buy/sell today
         daily_transaction_amt = PCT_TO_TRADE_DAILY * amt
         determiner.list_transactions(
-            account, invested_amt, daily_transaction_amt)
+            account, invested_amt, daily_transaction_amt, amt)
     return determiner.df
 
 
@@ -226,7 +229,7 @@ def get_threshold(max_init, current):
 
 
 def print_buy_sell_statuses():
-    levels = {'et': 5, 'fid': 4, 'schwab': 3}
+    levels = {'et': 5, 'fid': 5, 'schwab': 5}
     for portfolio, data in P_STATS0_BUY.items():
         print()
         print('-' * 25)

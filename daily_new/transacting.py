@@ -83,17 +83,13 @@ class TransactionDeterminer:
             else 'sharpe_scaled')
         EXP = params['sharpe_scaled_exp']
         sharpe_adj_status_type = params['sharpe_adj_status_type']
-        
         prop_et = (
             (self._df[sharpe_col]**EXP)
             * self._df[f'et_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.inEt)
-        prop_sum = prop_et.sum()
-        # Originally 0.05, but led to an actual cap closer to 0.17 when
-        # renormalized
-        capped_et = prop_et.apply(lambda x: min(x, 0.001*prop_sum))  
-        self._df['et_norm'] = capped_et / capped_et.sum()
-        
+        max_prop = params['max_prop_per_stock']
+        self._df['et_norm'] = self._rescale_props(prop_et, max_prop)
+    
     def _get_fid_proportions(self):
         params = self.params['fid']
         use_weighted_sharpe = params['weighted_sharpe']
@@ -102,14 +98,12 @@ class TransactionDeterminer:
             else 'sharpe_scaled')
         EXP = params['sharpe_scaled_exp']
         sharpe_adj_status_type = params['sharpe_adj_status_type']
-
         prop_fid = (
             (self._df[sharpe_col]**EXP)
             * self._df[f'fid_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.inFid)
-        prop_sum = prop_fid.sum()
-        capped_fid = prop_fid.apply(lambda x: min(x, 0.01*prop_sum))
-        self._df['fid_norm'] = capped_fid / capped_fid.sum()
+        max_prop = params['max_prop_per_stock']
+        self._df['fid_norm'] = self._rescale_props(prop_fid, max_prop)
 
     def _get_schwab_proportions(self):
         params = self.params['schwab']
@@ -119,15 +113,28 @@ class TransactionDeterminer:
             else 'sharpe_scaled')
         EXP = params['sharpe_scaled_exp']
         sharpe_adj_status_type = params['sharpe_adj_status_type']
-
         prop_schwab = (
             (self._df[sharpe_col]**EXP)
             * self._df[f'schwab_{sharpe_adj_status_type}sharpe_adj_status']
             * self._df.in_self_managed
             * self._df.currentlyActive)
-        prop_sum = prop_schwab.sum()
-        capped_schwab = prop_schwab.apply(lambda x: min(x, 0.01*prop_sum))
-        self._df['schwab_norm'] = capped_schwab / capped_schwab.sum()
+        max_prop = params['max_prop_per_stock']
+        self._df['schwab_norm'] = self._rescale_props(prop_schwab, max_prop)
+
+    @staticmethod
+    def _rescale_props(prop, max_prop=0.05):
+        prop_sum = prop.sum()
+        prop  = prop / prop_sum
+        i = 1
+        print('Rescaling proportions to limit to max')
+        while prop.max() > max_prop:
+            prop = prop.clip(upper=0.99*max_prop)
+            prop = prop / prop.sum()
+            i += 1
+            if (i > 100):
+                break
+        print(f'Actual max prop before clipping: {prop.max():.4f}')
+        return prop.clip(upper=max_prop)
 
     def get_target_amounts(self, account, amount):
         print(f'Getting target amounts for {account}...')
@@ -207,16 +214,19 @@ class TransactionDeterminer:
         self._df[f'{account}_nshares'] = (
             self._df[f'{account}_nshares'].round().astype(int))
 
-    def list_transactions(self, account, invested_amt, daily_transaction_amt):
-        ''' Determine the specific stocks and no. shares to buy/sell each day
+    def list_transactions(
+            self, account, invested_amt, daily_transaction_amt, total_amt):
+        '''Determine the specific stocks and no. shares to buy/sell each day
         Args:
         - account (str): account name
         - invested_amt (float): total $ that should be invested as of today for
           <account>
         - daily_transaction_amt (float): ideal amt to buy/sell each day (may be
           more if % funds invested changes).
+        - total_amt (float): total funds in <account>
         '''
         print('Getting transactions...')
+        print(f'Total amount: {total_amt:,}')
         self._df['up_down'] = 1 * (self._df[f'{account}_diff'] > 0)
         self._df['exact_amt'] = (
             self._df[f'{account}_nshares'] * self._df[f'{account}_bid_ask'])
