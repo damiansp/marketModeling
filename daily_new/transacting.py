@@ -158,6 +158,11 @@ class TransactionDeterminer:
                 row[f'{account}_status_scaled'],
                 account,
                 row[f'{account}_diff'])
+            # make sure q on [0.01, 0.99]
+            if q < 0.01:
+                q = 0.01
+            elif q > 0.00:
+                q = 0.99
             return distr.quantile(q=q)
         except:
             print('row:')
