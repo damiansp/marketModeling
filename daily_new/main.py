@@ -26,12 +26,12 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   200698
-ET_VALUE =    146535
-SCHWAB_VALUE = 14266
-RSI_VALUE =   104938
-ADEL_VALUE =   89873
-FRAC_IN = 0.665
+FID_VALUE =   208364
+ET_VALUE =    156498
+SCHWAB_VALUE = 14823
+RSI_VALUE =   112497
+ADEL_VALUE =  104689
+FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -47,9 +47,9 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.13},    # incr by 1
-    'fid':  {'buy': 0.01, 'sell': 0.26},    #         2
-    'schwab': {'buy': 0.12, 'sell': 0.01}}  #         3
+    'et':   {'buy': 0.01, 'sell': 0.18},    # incr by 1
+    'fid':  {'buy': 0.01, 'sell': 0.36},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.12}}  #         3
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -84,6 +84,7 @@ BUY_STATS = TRANSACTIONS
 
 
 def main():
+    make_sure_files_downloaded()
     current_stocks = load_current_stocks()
     run_hmm_models()  ##
     best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
@@ -113,6 +114,20 @@ def main():
     print(f'Saved data to {TRANSACTIONS}')
     print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
 
+
+def make_sure_files_downloaded():
+    downloads = [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')]
+    n_found = 0
+    expected = ['PCRA', 'Portfolio', 'Positions']
+    for file_start in expected:
+        found = False
+        for f in downloads:
+            if f.startswith(file_start):
+                n_found += 1
+                continue
+    if n_found != len(expected):
+        raise RuntimeError('One of more download missing.')
+    
 
 def load_current_stocks():
     print('Loading current stock lists...')
