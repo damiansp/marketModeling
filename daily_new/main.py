@@ -26,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   211133  # [209409, 211133]
-ET_VALUE =    159021  # [156809, 159021]
-SCHWAB_VALUE = 15022  # [ 14898,  15022]
-RSI_VALUE =   113982
-ADEL_VALUE =  110240
+FID_VALUE =   214999  # [209409, 214999]
+ET_VALUE =    165513  # [156809, 165513]
+SCHWAB_VALUE = 15232  # [ 14898,  15232]
+RSI_VALUE =   118529
+ADEL_VALUE =  113556
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,9 +47,9 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.22},    # incr by 1
-    'fid':  {'buy': 0.01, 'sell': 0.44},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.24}}  #         3
+    'et':   {'buy': 0.01, 'sell': 0.27},    # incr by 1
+    'fid':  {'buy': 0.01, 'sell': 0.54},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.39}}  #         3
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -86,8 +86,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    #run_hmm_models()  ##
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -236,10 +236,12 @@ def get_threshold(max_init, current):
     diff = int(100 * (1 - 0.01))
     probs = np.linspace(0.01, 1, diff + 1)
     thresh = np.linspace(max_init, -5, diff + 1)
+    buy_frac = np.linspace(1, 1.25, diff + 1)
+    sell_frac = np.linspace(1, 0.75, diff + 1)
     ERR = 0.00001
     for i in range(diff + 1):
         if abs(probs[i] - current) < ERR:
-            return thresh[i]
+            return thresh[i], buy_frac[i], sell_frac[i]
     raise RuntimeError('Should be unreachable')
 
 
@@ -251,12 +253,15 @@ def print_buy_sell_statuses():
         print(portfolio)
         print('-' * 25)
         for action, prob in data.items():
-            thresh = get_threshold(levels[portfolio], prob)
+            thresh, buy_frac, sell_frac = get_threshold(
+                levels[portfolio], prob)
             direction = 'above'
             if action == 'sell':
                 thresh *= -1
                 direction = 'below'
-            print(f'  {action}: {thresh} and {direction}')
+            print(
+                f'  {action}: {thresh:.4f} and {direction} '
+                f'({buy_frac if action == "buy" else sell_frac:.4f})')
     print()
 
 
