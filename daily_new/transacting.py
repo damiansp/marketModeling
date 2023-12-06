@@ -161,9 +161,10 @@ class TransactionDeterminer:
             # make sure q on [0.01, 0.99]
             if q < 0.01:
                 q = 0.01
-            elif q > 0.00:
+            elif q > 0.99:
                 q = 0.99
-            return distr.quantile(q=q)
+            multiplier = distr.quantile(q=q)
+            return multiplier
         except:
             print('row:')
             print(row)
@@ -200,15 +201,16 @@ class TransactionDeterminer:
         #       0.50   0.50   0.59   0.68   0.77   0.86  0.95
         P_STATUS0 = (
             P_STATUS0_BUY['buy'] if diff >= 0 else 1 - P_STATUS0_BUY['sell'])
-        MIN_P = 0.01  # p(buy | strong sell sig) or vice versa
-        MAX_P = 0.95  # p(buy | strong buy sig)  ...
+        MIN_P = 0.03  # p(buy | strong sell sig) or vice versa
+        MAX_P = 0.97  # p(buy | strong buy sig)  ...
         # Piecewise linear interpolation: y = mx + b: b = P_STATUS_0
         # rise = P_STATUS0 - MIN if negative status (sell signal)
         # rise = MAX - P_STATUS0 if + status (buy signal)
         rise = P_STATUS0 - MIN_P if status <= 0 else MAX_P - P_STATUS0
         m = rise / 5  # 5: status as which prob reaches 1
         q = m*status + P_STATUS0
-        return min(q, 0.99)
+        q = min(max(q, MIN_P), MAX_P)
+        return q        
 
     def get_n_shares_to_buy_or_sell(self, account):
         print('Determining ideal number of shares to buy/sell...')
@@ -265,18 +267,6 @@ class TransactionDeterminer:
                 print()
                 self._handle_transactions(account, secondary, 'sell', 'opp')
 
-    def _sort_by_transaction_order(self, transaction_type, account):
-        if transaction_type == 'sell':
-            ascending = [True, True]
-        elif transaction_type == 'buy':
-            ascending = [False, False]
-        else:
-            raise ValueError('transaction_type must be "buy" or "sell"')
-        self._df.sort_values(
-            ['up_down', f'{account}_status_scaled'],
-            ascending=ascending,
-            inplace=True)
-
     def _handle_transactions(self, account, err, transaction_type, curr_opp):
         self._sort_by_transaction_order(transaction_type, account)
         cum = self._df.exact_amt.cumsum()
@@ -298,3 +288,16 @@ class TransactionDeterminer:
                     f'Status: {status:.3f}')
             if abs(trans_total) >= abs(err):
                 return
+
+    def _sort_by_transaction_order(self, transaction_type, account):
+        if transaction_type == 'sell':
+            ascending = [True, True]
+        elif transaction_type == 'buy':
+            ascending = [False, False]
+        else:
+            raise ValueError('transaction_type must be "buy" or "sell"')
+        self._df.sort_values(
+            ['up_down', f'{account}_status_scaled'],
+            ascending=ascending,
+            inplace=True)
+

@@ -26,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   214999  # [209409, 214999]
-ET_VALUE =    165513  # [156809, 165513]
-SCHWAB_VALUE = 15232  # [ 14898,  15232]
-RSI_VALUE =   118529
-ADEL_VALUE =  113556
+FID_VALUE =   214238  # [209409, 215614]
+ET_VALUE =    165986  # [156809, 167397]
+SCHWAB_VALUE = 15160  # [ 14898,  15334]
+RSI_VALUE =   118056
+ADEL_VALUE =  112827
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,9 +47,9 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.27},    # incr by 1
-    'fid':  {'buy': 0.01, 'sell': 0.54},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.39}}  #         3
+    'et':   {'buy': 0.01, 'sell': 0.29},    # incr by 1
+    'fid':  {'buy': 0.02, 'sell': 0.01},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.01}}  #         3
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -86,8 +86,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    run_hmm_models()  ##
-    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    #run_hmm_models()  ##
+    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -96,7 +96,7 @@ def main():
     transactions = append_current_holdings(transactions)
     transactions.to_csv('/tmp/transactions.csv')
     current_stocks, buy_stats = update_current_stocks(
-        current_stocks, current_best_stocks, transactions)
+        current_stocks, current_best_stocks, transactions) 
     print('Current stocks:')
     print(current_stocks)
     get_next_day_distributions(current_stocks)
