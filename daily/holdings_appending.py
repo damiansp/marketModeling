@@ -1,4 +1,3 @@
-# NOTE: TDAmeritrade -> Now Schwab
 from datetime import datetime, timedelta
 import os
 
@@ -8,7 +7,6 @@ import pandas as pd
 def get_adjusted_date():
     'Treat weekend dates as preceding Friday'
     NOW = datetime.now()
-    #today = NOW.date()
     weekday = NOW.weekday()
     if weekday == 5:    # Sat
         return NOW - timedelta(1)
@@ -28,9 +26,6 @@ class HoldingsAppender:
     def __init__(self, stock_metrics):
         if 'stock' in list(stock_metrics):
             stock_metrics.set_index('stock', inplace=True)
-        #print('Stock metrics:')
-        #print(stock_metrics.head())
-        #sys.exit()
         self.stock_metrics = stock_metrics
         self.SYMBOLS = list(set(stock_metrics.index.tolist()))
         self.binder = pd.DataFrame(index=self.SYMBOLS)
@@ -58,13 +53,13 @@ class HoldingsAppender:
         return etrade, fidelity, schwab
         
     def _upload_etrade(self):
-        print('Uploading E*Trade data...')
         filename = 'Positions.csv'
+        path = f'{DOWNLOADS}/{filename}'
+        self._preclean(path)
+        print('Uploading E*Trade data...')
         etrade = (
             pd
-            .read_csv(
-                f'{DOWNLOADS}/{filename}', index_col=0, skiprows=1
-            )[['Market Value']]
+            .read_csv(path, index_col=0, skiprows=1)[['Market Value']]
             .rename(columns={'Market Value': 'ET'}))
         etrade.index = map(lambda x: x.split()[0], etrade.index)
         drops = [d for d in ['FNRG', 'Portfolio', 'Cash'] if d in etrade.index]
@@ -75,6 +70,19 @@ class HoldingsAppender:
         if not self._symbols_are_valid(etrade):
             raise ValueError('E*Trade file has unexpected symbol')
         return etrade
+
+    @staticmethod
+    def _preclean(path):
+        print(f'Pre-cleaning {path}...')
+        with open(path, 'r') as fi:
+            data_in = fi.readlines()
+            with open(path, 'w') as fo:
+                for line in data_in:
+                    fields = line.split(',')
+                    if len(fields) > 2 and fields[2] == '"--"':
+                        continue
+                    else:
+                        fo.write(line)
 
     def _upload_fidelity(self):
         print('Uploading Fidelity data...')
@@ -118,7 +126,7 @@ class HoldingsAppender:
     def _upload_schwab(self):
         print('Uploading Schwab data...')
         path_start = f'PCRA_Custodial-Positions-{str(TODAY)}'
-        print(f'Looking for Fidelity file: {path_start}...')
+        print(f'Looking for Schwab file: {path_start}...')
         filename = [
             f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
         ][0]
@@ -157,3 +165,13 @@ class HoldingsAppender:
                 print(f'{symbol} not in SYMBOLS')
                 return False
         return True
+
+
+if __name__ == '__main__':
+    pass
+    # Test uploads
+    #DATA = '../data_new'
+    #STOCK_METRICS = f'{DATA}/stock_metrics.csv'
+    #stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
+    #appender = HoldingsAppender(stock_metrics)
+    #appender._upload_etrade()

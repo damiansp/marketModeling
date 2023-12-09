@@ -9,7 +9,7 @@ import pandas as pd
 import yfinance as yf
 
 
-DATA = '../data_new'
+DATA = '../data'
 TRIM = 0.02
 RUN = {
     0: 'all',

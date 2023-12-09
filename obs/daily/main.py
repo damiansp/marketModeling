@@ -26,12 +26,12 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   214238  # [209409, 215614]
-ET_VALUE =    165986  # [156809, 167397]
-SCHWAB_VALUE = 15160  # [ 14898,  15334]
-RSI_VALUE =   118056
-ADEL_VALUE =  112827
-FRAC_IN = 0.63
+FID_VALUE =   195907
+ET_VALUE =    142127
+SCHWAB_VALUE = 14319
+RSI_VALUE =   103027
+ADEL_VALUE =   90885
+FRAC_IN = 0.70
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -47,28 +47,13 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.01, 'sell': 0.29},    # incr by 1
-    'fid':  {'buy': 0.02, 'sell': 0.01},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.01}}  #         3
-PARAMS = {
-    'et': {
-        'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
-        'weighted_sharpe': False,
-        'sharpe_scaled_exp': 3.9,
-        'sharpe_adj_status_type': 'w_',  # '' | 'w_' | 'mean_'
-        'max_prop_per_stock': 0.05},
-    'fid': {
-        'status_weights': [1, 1.1, 1],
-        'weighted_sharpe': True,
-        'sharpe_scaled_exp': 4,
-        'sharpe_adj_status_type': '',
-        'max_prop_per_stock': 0.03},
-    'schwab': {
-        'status_weights': [1, 1, 1.1],
-        'weighted_sharpe': True,
-        'sharpe_scaled_exp': 4.1,
-        'sharpe_adj_status_type': 'mean_',
-        'max_prop_per_stock': 0.01}}
+    'et':   {'buy': 0.07, 'sell': 0.01},    # incr by 1
+    'fid':  {'buy': 0.12, 'sell': 0.01},    #         2
+    'schwab': {'buy': 0.01, 'sell': 0.48}}  #         3
+TRANSACT_IF = {
+    'et': {'curr': 5, 'opp': 5},
+    'fid': {'curr': 4, 'opp': 4},
+    'schwab': {'curr': 3, 'opp': 3}}
 
 
 # File paths
@@ -84,10 +69,9 @@ BUY_STATS = TRANSACTIONS
 
 
 def main():
-    make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    #run_hmm_models()  ##
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -96,38 +80,27 @@ def main():
     transactions = append_current_holdings(transactions)
     transactions.to_csv('/tmp/transactions.csv')
     current_stocks, buy_stats = update_current_stocks(
-        current_stocks, current_best_stocks, transactions) 
+        current_stocks, current_best_stocks, transactions)
     print('Current stocks:')
     print(current_stocks)
     get_next_day_distributions(current_stocks)
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
     get_stock_metrics(current_stocks)
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
+    ##########
     stock_metrics = append_current_holdings(stock_metrics)
     print_buy_sell_statuses()
-    ##########
     transactions = get_transactions(
         stock_metrics, next_day_distributions, buy_stats)
     print_buy_sell_statuses()
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
+    td_updated()
+    # Extras
+    #append_game_data()
     print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
 
-
-def make_sure_files_downloaded():
-    downloads = [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')]
-    n_found = 0
-    expected = ['PCRA', 'Portfolio', 'Positions']
-    for file_start in expected:
-        found = False
-        for f in downloads:
-            if f.startswith(file_start):
-                n_found += 1
-                continue
-    if n_found != len(expected):
-        raise RuntimeError('One of more download missing.')
-    
 
 def load_current_stocks():
     print('Loading current stock lists...')
@@ -213,7 +186,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
     print('Determining transactions...')
     determiner = TransactionDeterminer(
         stock_metrics, next_day_distributions, buy_stats, FRAC_IN,
-        P_STATS0_BUY, PARAMS)
+        P_STATS0_BUY, TRANSACT_IF)
     determiner.compile_data()
     for account, amt in zip(
             ['et', 'fid', 'schwab'], [ET_VALUE, FID_VALUE, SCHWAB_VALUE]):
@@ -228,7 +201,7 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         # ideal amount ($) to buy/sell today
         daily_transaction_amt = PCT_TO_TRADE_DAILY * amt
         determiner.list_transactions(
-            account, invested_amt, daily_transaction_amt, amt)
+            account, invested_amt, daily_transaction_amt)
     return determiner.df
 
 
@@ -236,33 +209,121 @@ def get_threshold(max_init, current):
     diff = int(100 * (1 - 0.01))
     probs = np.linspace(0.01, 1, diff + 1)
     thresh = np.linspace(max_init, -5, diff + 1)
-    buy_frac = np.linspace(1, 1.25, diff + 1)
-    sell_frac = np.linspace(1, 0.75, diff + 1)
     ERR = 0.00001
     for i in range(diff + 1):
         if abs(probs[i] - current) < ERR:
-            return thresh[i], buy_frac[i], sell_frac[i]
+            return thresh[i]
     raise RuntimeError('Should be unreachable')
 
 
 def print_buy_sell_statuses():
-    levels = {'et': 5, 'fid': 5, 'schwab': 5}
     for portfolio, data in P_STATS0_BUY.items():
         print()
         print('-' * 25)
         print(portfolio)
         print('-' * 25)
         for action, prob in data.items():
-            thresh, buy_frac, sell_frac = get_threshold(
-                levels[portfolio], prob)
+            thresh = get_threshold(TRANSACT_IF[portfolio]['curr'], prob)
             direction = 'above'
             if action == 'sell':
                 thresh *= -1
                 direction = 'below'
-            print(
-                f'  {action}: {thresh:.4f} and {direction} '
-                f'({buy_frac if action == "buy" else sell_frac:.4f})')
+            print(f'  {action}: {thresh} and {direction}')
     print()
+
+
+def td_updated():
+    print('\n\n')
+    print('=' * 40)
+    print('SCHWAB NEW')
+    print('=' * 40)
+    df = pd.read_csv(TRANSACTIONS, index_col=0)
+    df['schw_sharpe2'] = df.sharpe * (df.sharpe > 0) * df.currentlyActive
+    df['schw_norm'] = df.schw_sharpe2 / df.schw_sharpe2.sum()
+    df['schw_target'] = SCHWAB_VALUE * df.schw_norm
+    df['schw_delt'] = df.schw_target - df.schwab
+    df['scaler'] = df.status_scaled.apply(get_status_scaler)
+    df['schw_amt'] = df.schw_delt * df.scaler
+    df['schw_shares'] = (df.schw_amt / df.schwab_bid_ask).round().astype(int)
+    buys = df.schw_shares[df.schw_shares > 0][df.scaler > 0]
+    sells = df.schw_shares[df.schw_shares < 0][df.scaler < 0][df.schwab > 0]
+    for buy, idx in zip(buys, buys.index):
+        print(
+            f'BUY {buy:4d} shares of {idx:5s} at '
+            f'{df.loc[idx, "schwab_bid_ask"]:7.2f}')
+    print()
+    for sell, idx in zip(sells, sells.index):
+        print(
+            f'SELL {-sell:4d} shares of {idx:5s} at '
+            f'{df.loc[idx, "schwab_bid_ask"]:7.2f}')
+    df.to_csv('~/Desktop/test.csv')
+
+
+def get_status_scaler(val):
+    if val <= -5:
+        return -1
+    if val <= -4:
+        return -0.5
+    if val >= 5:
+        return 1
+    if val >= 4:
+        return 0.6
+    if val >= 3:
+        return 0.4
+    if val >= 2:
+        return 0.2
+    if val >= 1:
+        return 0.1
+    return 0
+
+
+def append_game_data():
+    df = pd.read_csv(
+        TRANSACTIONS, index_col=0
+    )[['direction', 'inEt', 'RSI', 'weighted_sharpe', 'status_scaled']]
+    rsi_file = f'{DOWNLOADS}/Holdings - Damian Satterthwaite-Phillips.csv'
+    adel_file = rsi_file.replace('.', '(1).')
+    df = append_file(df, rsi_file, 'rsi_mod')
+    df = append_file(df, adel_file, 'adel')
+    for field in ['RSI', 'weighted_sharpe', 'status_scaled']:
+        df[f'z_{field}'] = get_rescaled_zscore(df[field])
+    df.z_RSI = 1 - df.z_RSI  # reverse order
+    df['score'] = df.z_RSI * df.z_weighted_sharpe * df.z_status_scaled
+    df = get_deltas(df, 'adel', 'z_RSI', ADEL_VALUE)
+    df = get_deltas(df, 'rsi_mod', 'score', RSI_VALUE)
+    df.to_csv('~/Desktop/game.csv')
+
+
+def append_file(df, path, name):
+    other_df = pd.read_csv(path, index_col=0)[['Value']]
+    other_df.Value = other_df.Value.apply(
+        lambda x: float(x.strip('$').replace(',', '')))
+    other_df.Value.fillna(0., inplace=True)
+    df = pd.concat([df, other_df], axis=1)
+    df.Value.fillna(0., inplace=True)
+    df.rename(columns={'Value': name}, inplace=True)
+    return df
+    
+
+def get_rescaled_zscore(series):
+    mu = series.mean()
+    sig = series.std()
+    series =  (series - mu) / sig
+    series -= series.min()
+    series /= series.max()
+    return series
+    
+
+def get_deltas(df, current_amt, criterion, total):
+    PORTFOLIO_SIZE = 20
+    df.sort_values(criterion, inplace=True, ascending=False)
+    df[criterion][PORTFOLIO_SIZE:] = 0
+    df[criterion] *= df.inEt
+    df[criterion] /= df[criterion].sum()
+    df[f'{current_amt}_target'] = df[criterion] * total
+    df[f'{current_amt}_diff'] = df[f'{current_amt}_target'] - df[current_amt]
+    return df
+    
 
 
 if __name__ == '__main__':

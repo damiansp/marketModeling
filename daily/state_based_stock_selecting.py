@@ -190,4 +190,5 @@ class StateBasedStockSelector:
             plt.yscale('log')
             if i == 0:
                 plt.title(method)
+        plt.tight_layout()
         plt.show()
