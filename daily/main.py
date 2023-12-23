@@ -26,11 +26,11 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   225173  # [209409, 225193]
-ET_VALUE =    178541  # [156809, 178591]
-SCHWAB_VALUE = 16027  # [ 14898,  16059]
-RSI_VALUE =   127291
-ADEL_VALUE =  133681
+FID_VALUE =   228578  # [209409, 228614]
+ET_VALUE =    181650  # [156809, 181650]
+SCHWAB_VALUE = 16304  # [ 14898,  16304]
+RSI_VALUE =   128965
+ADEL_VALUE =  134897
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,9 +47,9 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.06, 'sell': 0.01},    # incr by 1
-    'fid':  {'buy': 0.01, 'sell': 0.12},    #         2
-    'schwab': {'buy': 0.01, 'sell': 0.09}}  #         3
+    'et':   {'buy': 0.11, 'sell': 0.01},    # incr by 1
+    'fid':  {'buy': 0.01, 'sell': 0.04},    #         2
+    'schwab': {'buy': 0.03, 'sell': 0.01}}  #         3
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean

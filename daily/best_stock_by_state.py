@@ -152,8 +152,6 @@ def adjust_min_date(min_date, dates):
 
 def filter_by_min_date(data, min_date):
     for col in data.columns:
-        #if np.isnan(data.at[pd.to_datetime(min_date), col]):
-        #    data.drop(columns=[col], inplace=True)
         if (
                 data[col][data[col].notnull()].index[0] 
                 > pd.to_datetime(min_date)):
@@ -190,10 +188,18 @@ def get_daily_annualized_return_by_state(data, states,trim=0.02):
         returns = get_daily_returns(data[stock])
         annualized_daily_return = get_annualized_daily_return(returns)
         stock_data.append(annualized_daily_return)
+        # use sharpe ratio instead
+        #sharpes = get_sharpe(returns)
+        #stock_data.append(sharpes)
+        ###
         for state in states:
             daily_annualized_return_state = get_annualized_daily_return(
                 returns[data.state == state], trim=trim)
             stock_data.append(daily_annualized_return_state)
+        # use sharpe instead
+        #state_sharpes = get_sharpes_by_state(data, states)
+        #stock_data.append(state_sharpes)
+        ###
         output.append(stock_data)
     df_out = pd.DataFrame(
         output,
