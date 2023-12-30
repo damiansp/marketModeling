@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
 import json
-from math import ceil
 import os
+from pprint import pprint
 
 import numpy as np
 import pandas as pd
@@ -29,8 +29,9 @@ from transacting import TransactionDeterminer
 FID_VALUE =   228645  # [209409, 230484]
 ET_VALUE =    184168  # [156809, 186201]
 SCHWAB_VALUE = 16301  # [ 14898,  16445]
-RSI_VALUE =   131440
-ADEL_VALUE =  139976
+SIM1_VALUE =  100000
+SIM2_VALUE =  100000
+SIM3_VALUE =  100000
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -47,9 +48,13 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':   {'buy': 0.16, 'sell': 0.01},    # incr by 1
-    'fid':  {'buy': 0.01, 'sell': 0.12},    #         2
-    'schwab': {'buy': 0.15, 'sell': 0.01}}  #         3
+    'et':     {'buy': 0.16, 'sell': 0.01},  # incr by 1
+    'fid':    {'buy': 0.01, 'sell': 0.12},  #         2
+    'schwab': {'buy': 0.15, 'sell': 0.01},  #         3
+    'sim1':   {'buy': 0.01, 'sell': 0.01},  #         1 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.01}}  #         3 simsims
+BEST_SIM = 1
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -68,7 +73,25 @@ PARAMS = {
         'weighted_sharpe': True,
         'sharpe_scaled_exp': 4.1,
         'sharpe_adj_status_type': 'mean_',
-        'max_prop_per_stock': 0.01}}
+        'max_prop_per_stock': 0.01},
+    'sim1': {                           # adelaide 2024
+        'status_weights': [1.1, 1, 1],  # RSI, fair_val_mutl, geomean
+        'weighted_sharpe': False,
+        'sharpe_scaled_exp': 3.9,
+        'sharpe_adj_status_type': 'w_',
+        'max_prop_per_stock': 0.05},
+    'sim2': {                           # aei
+        'status_weights': [1, 1.272, 1.36],
+        'weighted_sharpe': True,
+        'sharpe_scaled_exp': 3.5851,
+        'sharpe_adj_status_type': 'mean_',
+        'max_prop_per_stock': 0.051},
+    'sim3': {                           # simsims
+        'status_weights': [1.252, 1.433, 1.],
+        'weighted_sharpe': True,
+        'sharpe_scaled_exp': 3.8492,
+        'sharpe_adj_status_type': 'w_',
+        'max_prop_per_stock': 0.048}}
 
 
 # File paths
@@ -86,8 +109,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    #run_hmm_models()  ##
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -104,6 +127,9 @@ def main():
     get_stock_metrics(current_stocks)
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = append_current_holdings(stock_metrics)
+    ###
+    stock_metrics.to_csv('~/Desktop/stock_metrics.csv')
+    ###
     print_buy_sell_statuses()
     ##########
     transactions = get_transactions(
@@ -112,6 +138,7 @@ def main():
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
+    update_sim_vals()
     print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
 
 
@@ -120,7 +147,6 @@ def make_sure_files_downloaded():
     n_found = 0
     expected = ['PCRA', 'Portfolio', 'Positions']
     for file_start in expected:
-        found = False
         for f in downloads:
             if f.startswith(file_start):
                 n_found += 1
@@ -215,8 +241,20 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         stock_metrics, next_day_distributions, buy_stats, FRAC_IN,
         P_STATS0_BUY, PARAMS)
     determiner.compile_data()
+    ########################################################################
+
+
+
+
+
+
+
+
+    
     for account, amt in zip(
-            ['et', 'fid', 'schwab'], [ET_VALUE, FID_VALUE, SCHWAB_VALUE]):
+            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3'],
+            [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE, SIM3_VALUE]
+    ):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -246,7 +284,7 @@ def get_threshold(max_init, current):
 
 
 def print_buy_sell_statuses():
-    levels = {'et': 5, 'fid': 5, 'schwab': 5}
+    levels = {'et': 5, 'fid': 5, 'schwab': 5, 'sim1': 5, 'sim2': 5, 'sim3': 5}
     for portfolio, data in P_STATS0_BUY.items():
         print()
         print('-' * 25)
@@ -263,6 +301,63 @@ def print_buy_sell_statuses():
                 f'  {action}: {thresh:.4f} and {direction} '
                 f'({buy_frac if action == "buy" else sell_frac:.4f})')
     print()
+
+
+def update_sim_vals():
+    n_sims = len([k for k in PARAMS.keys() if k.startswith('sim')])
+    sim1 = PARAMS[f'sim{BEST_SIM}']
+    out = {'sim1': sim1}
+    for i in range(1, n_sims):
+        sim = {
+            'status_weights': update_status_weights(sim1['status_weights']),
+            'weighted_sharpe': (
+                sim1['weighted_sharpe'] if np.random.random() <= 0.6
+                else not sim1['weighted_sharpe']),
+            'sharpe_scaled_exp': update_sharpe_scaled_exp(
+                sim1['sharpe_scaled_exp']),
+            'sharpe_adj_status_type': update_sharpe_adj_status_type(
+                sim1['sharpe_adj_status_type']),
+            'max_prop_per_stock': update_max_prop_per_stock(
+                sim1['max_prop_per_stock'])}
+        out[f'sim{i + 1}'] = sim
+    pprint(out)
+
+
+def update_status_weights(current):
+    SD = 1
+    MIN = 1
+    a = np.array(current)
+    a += np.random.normal(scale=SD, size=len(current))
+    a = np.clip(a, MIN, a.max())
+    a /= a.min()
+    return a.round(3)
+
+
+def update_sharpe_scaled_exp(current):
+    SD = 0.2
+    MIN = 1
+    a = current + np.random.normal(scale=SD)
+    a = max(round(a, 4), MIN)
+    return a
+
+
+def update_sharpe_adj_status_type(current):
+    options = ['', 'w_', 'mean_']
+    alts = [opt for opt in options if opt != current]
+    n = np.random.rand()
+    if n <= 0.5:
+        return current
+    if n <= 0.75:
+        return alts[0]
+    return alts[1]
+
+
+def update_max_prop_per_stock(current):
+    MIN = 0.005
+    MAX = 0.1
+    SD = 0.005
+    prop = current + np.random.normal(scale=SD)
+    return max(min(round(prop, 4), MAX), MIN)
 
 
 if __name__ == '__main__':

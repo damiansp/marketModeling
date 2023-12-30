@@ -35,8 +35,14 @@ class HoldingsAppender:
         out = pd.concat([self.binder, etrade, schwab], axis=1)
         for v in fidelity.values():
             out = pd.concat([out, v], axis=1)
+        ###
+        sims = self._upload_sims()
+        simcols = list(sims.columns)
+        print('simcols:', simcols)
+        out = pd.concat([out, sims], axis=1)
+        ###
         out = out.astype(float).fillna(0).round().astype(int)
-        out_cols = ['et', 'schwab', 'rollover', 'roth', 'simple']
+        out_cols = ['et', 'schwab', 'rollover', 'roth', 'simple'] + simcols
         out.columns = out_cols
         for col in out_cols + ['fid']:
             if col in list(self.stock_metrics):
@@ -154,6 +160,26 @@ class HoldingsAppender:
                 if line.startswith('"Symbol"'):
                     is_header = False
         return pd.DataFrame({'Schwab': data}, index=inds)
+
+    def _upload_sims(self):
+        print('Uploading simulation data...')
+        #files = [f for f in os.listdir(DOWNLOADS) if f.startswith('Holdings')]
+        files = [
+            f'Holdings - Damian Satterthwaite-Phillips{x}.csv' for
+            x in ['', '(1)', '(2)']]
+        print(f'Found {len(files)} sim files.')
+        dfs = []
+        for f in files:
+            df = pd.read_csv(
+                f'{DOWNLOADS}/{f}', index_col=0, usecols=['Symbol', 'Value'])
+            df.Value = df.Value.str.replace(',', '').str[1:].astype(float)
+            drop = [sym for sym in df.index if sym not in self.SYMBOLS]
+            df.drop(drop, inplace=True)
+            dfs.append(df)
+        out = pd.concat(dfs, axis=1)
+        out.columns = [f'sim{i}' for i in range(1, len(files) + 1)]
+        return out
+            
         
     @staticmethod
     def _convert_value(s):

@@ -25,6 +25,7 @@ class TransactionDeterminer:
         self._get_et_proportions()
         self._get_fid_proportions()
         self._get_schwab_proportions()
+        self._get_sim_proportions()
         
     def _add_account_indicators(self):
         df_stocks = set(self._df.index)
@@ -121,6 +122,23 @@ class TransactionDeterminer:
         max_prop = params['max_prop_per_stock']
         self._df['schwab_norm'] = self._rescale_props(prop_schwab, max_prop)
 
+    def _get_sim_proportions(self):
+        sims = [k for k in self.params.keys() if k.startswith('sim')]
+        for sim in sims:
+            params = self.params[sim]
+            use_weighted_sharpe = params['weighted_sharpe']
+            sharpe_col = (
+                'weighted_sharpe_scaled' if use_weighted_sharpe
+                else 'sharpe_scaled')
+            EXP = params['sharpe_scaled_exp']
+            sharpe_adj_status_type = params['sharpe_adj_status_type']
+            prop_sim = (
+                (self._df[sharpe_col]**EXP)
+                * self._df[f'{sim}_{sharpe_adj_status_type}sharpe_adj_status']
+                * self._df.currentlyActive)
+            max_prop = params['max_prop_per_stock']
+            self._df[f'{sim}_norm'] = self._rescale_props(prop_sim, max_prop)
+
     @staticmethod
     def _rescale_props(prop, max_prop=0.05):
         prop_sum = prop.sum()
@@ -137,6 +155,9 @@ class TransactionDeterminer:
         return prop.clip(upper=max_prop)
 
     def get_target_amounts(self, account, amount):
+        ###
+        self._df.to_csv('~/Desktop/df1.csv')
+        ###
         print(f'Getting target amounts for {account}...')
         self._df[f'{account}_target'] = (
             amount * self.frac_in * self._df[f'{account}_norm'])
