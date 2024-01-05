@@ -26,12 +26,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   228645  # [209409, 230484]
-ET_VALUE =    184168  # [156809, 186201]
-SCHWAB_VALUE = 16301  # [ 14898,  16445]
-SIM1_VALUE =  100000
-SIM2_VALUE =  100000
-SIM3_VALUE =  100000
+FID_VALUE =   222370  # [222123, 226255]
+ET_VALUE =    178839  # [178447, 182169]
+SCHWAB_VALUE = 15861  # [ 15852,  16169]
+SIM1_VALUE =   99987
+SIM2_VALUE =   99916
+SIM3_VALUE =   99882
+BEST_SIM = 1
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -48,13 +49,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.16, 'sell': 0.01},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.12},  #         2
-    'schwab': {'buy': 0.15, 'sell': 0.01},  #         3
-    'sim1':   {'buy': 0.01, 'sell': 0.01},  #         1 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.01}}  #         3 simsims
-BEST_SIM = 1
+    'et':     {'buy': 0.20, 'sell': 0.01},  # incr by 1
+    'fid':    {'buy': 0.08, 'sell': 0.01},  #         2
+    'schwab': {'buy': 0.27, 'sell': 0.01},  #         3
+    'sim1':   {'buy': 0.04, 'sell': 0.01},  #         1 adelaide 2024
+    'sim2':   {'buy': 0.08, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.12, 'sell': 0.01}}  #         3 simsims
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -74,24 +74,24 @@ PARAMS = {
         'sharpe_scaled_exp': 4.1,
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
-    'sim1': {                           # adelaide 2024
-        'status_weights': [1.1, 1, 1],  # RSI, fair_val_mutl, geomean
-        'weighted_sharpe': False,
+    'sim1': {
+        'max_prop_per_stock': 0.05,
+        'sharpe_adj_status_type': 'w_',
         'sharpe_scaled_exp': 3.9,
+        'status_weights': [1.1, 1, 1],
+        'weighted_sharpe': False},
+    'sim2': {
+        'max_prop_per_stock': 0.0489,
         'sharpe_adj_status_type': 'w_',
-        'max_prop_per_stock': 0.05},
-    'sim2': {                           # aei
-        'status_weights': [1, 1.272, 1.36],
-        'weighted_sharpe': True,
-        'sharpe_scaled_exp': 3.5851,
-        'sharpe_adj_status_type': 'mean_',
-        'max_prop_per_stock': 0.051},
-    'sim3': {                           # simsims
-        'status_weights': [1.252, 1.433, 1.],
-        'weighted_sharpe': True,
-        'sharpe_scaled_exp': 3.8492,
+        'sharpe_scaled_exp': 3.694,
+        'status_weights': array([1.219, 1.469, 1.   ]),
+        'weighted_sharpe': False},
+    'sim3': {
+        'max_prop_per_stock': 0.0504,
         'sharpe_adj_status_type': 'w_',
-        'max_prop_per_stock': 0.048}}
+        'sharpe_scaled_exp': 3.8158,
+        'status_weights': array([2.481, 1.   , 1.   ]),
+        'weighted_sharpe': False}}
 
 
 # File paths
@@ -127,9 +127,6 @@ def main():
     get_stock_metrics(current_stocks)
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = append_current_holdings(stock_metrics)
-    ###
-    stock_metrics.to_csv('~/Desktop/stock_metrics.csv')
-    ###
     print_buy_sell_statuses()
     ##########
     transactions = get_transactions(
@@ -138,8 +135,8 @@ def main():
     save_current_stocks(current_stocks)
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
-    update_sim_vals()
     print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
+    update_sim_vals()
 
 
 def make_sure_files_downloaded():
@@ -153,7 +150,9 @@ def make_sure_files_downloaded():
                 continue
     if n_found != len(expected):
         raise RuntimeError('One of more download missing.')
-    
+    sims = [x for x in downloads if x.startswith('Holdings')]
+    if len(sims) != 3:
+        raise RuntimeError('One of more download missing.')
 
 def load_current_stocks():
     print('Loading current stock lists...')
@@ -241,20 +240,10 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         stock_metrics, next_day_distributions, buy_stats, FRAC_IN,
         P_STATS0_BUY, PARAMS)
     determiner.compile_data()
-    ########################################################################
-
-
-
-
-
-
-
-
-    
     for account, amt in zip(
             ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3'],
-            [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE, SIM3_VALUE]
-    ):
+            [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE,
+             SIM3_VALUE]):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -362,3 +351,4 @@ def update_max_prop_per_stock(current):
 
 if __name__ == '__main__':
     main()
+    

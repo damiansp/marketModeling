@@ -12,35 +12,43 @@ prev.last <- dim(df)[1]
 
 
 sp.actual <- c(
-  df$sp.actual,    )
+  df$sp.actual,    4743, 4705, 4689, 4697)
 
 fid.in <- c(
-  df$fid.in,     )#167137) #
+  df$fid.in, 167137, 167137, 167137, 167137) #
 fid.val <- c(
-  df$fid.val,    ) #
+  df$fid.val, 226255,222123,222288,222370) #
 
 f1k.in <- c(
-  df$f1k.in,      )#36528) # (1133.49)
+  df$f1k.in, 36528, 36528, 36528, 36528) # (1133.49)
 f1k.val <- c(
-  df$f1k.val,     ) #
+  df$f1k.val, 48986, 48283, 47658, 47523) #
 
 self.mng.in <- c(
-  df$self.mng.in,  )#13857)  #
+  df$self.mng.in, 13857, 13857, 13857, 13857)  #
 self.mng.val <- c(
-  df$self.mng.val, )  #
+  df$self.mng.val, 16169, 15852, 15887, 15861)  #
 
 et.in <- c(
-  df$et.in,       )#86278) #
+  df$et.in, 86278, 86278, 86278, 86278) #
 et.val <-c(
-  df$et.val,     ) #
+  df$et.val, 182169,178447,178828,178839) #
 
-rsi <- (c(
-          100000)
+sim1 <- (c(
+          100000,100023, 99980, 99994, 99987)
   / 100000)
+sim1.name <- 'adelaide'
 
-adl <- (c(
-          100000)
+sim2 <- (c(
+          100000,100005, 99939, 99944, 99916)
   / 100000)
+sim2.name <- 'aei'
+
+sim3 <- (c(
+          100000, 99994, 99910, 99915, 99882)
+  / 100000)
+sim3.name <- 'simsims'
+
 
 normalize.to.index <- function(x, index) {
 	x / x[index]
@@ -108,10 +116,11 @@ mine.sh     <- get.sharpe.from.daily.values(mine[this.year])
 f1k.sh      <- get.sharpe.from.daily.values(f1k[this.year]) 
 fid.sh      <- get.sharpe.from.daily.values(fid[this.year]) 
 et.sh       <- get.sharpe.from.daily.values(et[this.year])
-adl.sh      <- get.sharpe.from.daily.values(adl)
-rsi.sh      <- get.sharpe.from.daily.values(rsi)
+sim1.sh      <- get.sharpe.from.daily.values(sim1)
+sim2.sh      <- get.sharpe.from.daily.values(sim2)
+sim3.sh      <- get.sharpe.from.daily.values(sim3)
 
-# PLOT 1: This year's returns -----------------------------------------------------
+# PLOT 1: This year's returns ---------------------------------------------------
 plot(
   days, 
   sp / sp[year.start], 
@@ -119,7 +128,7 @@ plot(
   col='orange',
   lwd=3, 
   xlim=range(days[days >= 0]), 
-  ylim=c(0.8, 1.5),
+  ylim=c(0.9, 1.1),
   log='y')
 abline(h=seq(0, 8, 0.1), lty=2, col=rgb(0, 0, 0, 0.2))
 abline(h=seq(0, 8, 0.5), lty=4, col=rgb(0, 0, 0, 0.8))
@@ -130,16 +139,17 @@ lines(days, fid / fid[year.start], col='darkgreen', lwd=3)
 lines(days, et / et[year.start], col='purple', lwd=3)
 lines(days, self.mng, col='sienna', lwd=3)
 lines(days, f1k / f1k[year.start], lwd=3, col='maroon')
-lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start + 1], col=2)
-lines(0:(length(adl) - 1), adl, lwd=3, col='limegreen')
-lines(0:(length(rsi) - 1), rsi, lwd=3, col='hotpink')
+lines(0:(length(sim1) - 1), sim1, lwd=3, col='hotpink')
+lines(0:(length(sim2) - 1), sim2, lwd=3, col='limegreen')
+lines(0:(length(sim3) - 1), sim3, lwd=3, col='cyan')
+lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start], col=2)
 legend(
   'topleft',
   lty=1,
-  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 1),
+  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1),
   col=c(
     'orange', 'darkgreen', 'purple', 'sienna', 'maroon', 'cadetblue', 'black', 
-    'limegreen', 'hotpink', 'red'),
+    'hotpink', 'limegreen', 'cyan', 'red'),
   legend=c(
     paste(sp.sh, 'S&P'),
     paste(fid.sh, 'Fid'),
@@ -148,11 +158,12 @@ legend(
     paste(f1k.sh, '401(k) All'),
     paste(mine.sh, 'Mine'),
     paste(tot.sh, 'Total'),
-    paste(adl.sh, 'Adelaide'),
-    paste(rsi.sh, 'RSI'),
+    paste(sim1.sh, sim1.name),
+    paste(sim2.sh, sim2.name),
+    paste(sim3.sh, sim3.name),
     paste('Diff(SP)')),
   bg=rgb(1, 1, 1, alpha=0.8))
-#---------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
 
 
 exp.mod <- function(funds, x) {
@@ -213,7 +224,7 @@ legend(
 
 x <- 1:length(tot.val)
 savings.exp.mod <- lm(log(tot.val) ~ x)
-x <- prev.last + seq(250, 3750, by=250)[1:13]
+x <- prev.last + seq(250, 3750, by=250)[1:12]
 log.y <- coef(savings.exp.mod)[1] + x*coef(savings.exp.mod)[2]
 y <- round(exp(log.y))
 for (p in y) { cat(p, '\n') }
@@ -222,9 +233,16 @@ for (p in y) { cat(p, '\n') }
 (et.amt <- et.val[length(et.val)])                   # [130010 154288]
 (f1k.total <- f1k.val[length(f1k.val)])              # [ 18063  41548] 
 (self.mng.amt <- self.mng.val[length(self.mng.val)]) # [  9514  16089]
-(rsi[length(rsi)] * 100000)
-(adl[length(adl)] * 100000)
+(sim1[length(sim1)] * 100000)
+(sim2[length(sim2)] * 100000)
+(sim3[length(sim3)] * 100000)
 (pct.invested)
+
+n <- length(sim1)
+NDAYS.LOOKBACK <- 5
+sim1[n] / sim1[n - NDAYS.LOOKBACK]
+sim2[n] / sim2[n - NDAYS.LOOKBACK]
+sim3[n] / sim3[n - NDAYS.LOOKBACK]
 
 
 #--------------------------------------------------------
