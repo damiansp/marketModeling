@@ -35,21 +35,19 @@ class HoldingsAppender:
         out = pd.concat([self.binder, etrade, schwab], axis=1)
         for v in fidelity.values():
             out = pd.concat([out, v], axis=1)
-        ###
         sims = self._upload_sims()
         simcols = list(sims.columns)
-        print('simcols:', simcols)
+        actual_cols = ['et', 'schwab', 'rollover', 'roth', 'simple']
         out = pd.concat([out, sims], axis=1)
-        ###
         out = out.astype(float).fillna(0).round().astype(int)
-        out_cols = ['et', 'schwab', 'rollover', 'roth', 'simple'] + simcols
+        out_cols = actual_cols + simcols
         out.columns = out_cols
         for col in out_cols + ['fid']:
             if col in list(self.stock_metrics):
                 self.stock_metrics.drop(columns=[col], inplace=True)
         out['fid'] = out.rollover + out.roth + out.simple
         metrics = pd.concat([self.stock_metrics, out], axis=1)
-        metrics['Owned'] = metrics[out_cols].sum(axis=1)
+        metrics['Owned'] = metrics[actual_cols].sum(axis=1)
         return metrics
 
     def _upload_files(self):

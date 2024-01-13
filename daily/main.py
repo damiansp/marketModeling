@@ -26,13 +26,13 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   222370  # [222123, 226255]
-ET_VALUE =    178839  # [178447, 182169]
-SCHWAB_VALUE = 15861  # [ 15852,  16169]
-SIM1_VALUE =   99987
-SIM2_VALUE =   99916
-SIM3_VALUE =   99882
-BEST_SIM = 1
+FID_VALUE =   226111  # [222123, 226918]
+ET_VALUE =    181803  # [178447, 182169]
+SCHWAB_VALUE = 15949  # [ 15852,  16169]
+SIM1_VALUE =  100410
+SIM2_VALUE =  100456
+SIM3_VALUE =  100453
+BEST_SIM = 3  # update weekly (on Fri)
 FRAC_IN = 0.63
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
@@ -49,12 +49,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.20, 'sell': 0.01},  # incr by 1
-    'fid':    {'buy': 0.08, 'sell': 0.01},  #         2
-    'schwab': {'buy': 0.27, 'sell': 0.01},  #         3
-    'sim1':   {'buy': 0.04, 'sell': 0.01},  #         1 adelaide 2024
-    'sim2':   {'buy': 0.08, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.12, 'sell': 0.01}}  #         3 simsims
+    'et':     {'buy': 0.25, 'sell': 0.01},  # incr by 1
+    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
+    'schwab': {'buy': 0.01, 'sell': 0.06},  #         3
+    'sim1':   {'buy': 0.09, 'sell': 0.01},  #         3 adelaide 2024
+    'sim2':   {'buy': 0.18, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.30, 'sell': 0.01}}  #         6 simsims
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -75,22 +75,22 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.05,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.9,
-        'status_weights': [1.1, 1, 1],
-        'weighted_sharpe': False},
-    'sim2': {
-        'max_prop_per_stock': 0.0489,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.694,
-        'status_weights': array([1.219, 1.469, 1.   ]),
-        'weighted_sharpe': False},
-    'sim3': {
         'max_prop_per_stock': 0.0504,
         'sharpe_adj_status_type': 'w_',
         'sharpe_scaled_exp': 3.8158,
-        'status_weights': array([2.481, 1.   , 1.   ]),
+        'status_weights': [2.481, 1.0, 1.0],
+        'weighted_sharpe': False},
+    'sim2': {
+        'max_prop_per_stock': 0.0521,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.8887,
+        'status_weights': [2.429, 1.0, 2.229],
+        'weighted_sharpe': True},
+    'sim3': {
+        'max_prop_per_stock': 0.055,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 4.1905,
+        'status_weights': [3.156, 2.407, 1.0],
         'weighted_sharpe': False}}
 
 
@@ -128,7 +128,6 @@ def main():
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = append_current_holdings(stock_metrics)
     print_buy_sell_statuses()
-    ##########
     transactions = get_transactions(
         stock_metrics, next_day_distributions, buy_stats)
     print_buy_sell_statuses()
@@ -319,7 +318,7 @@ def update_status_weights(current):
     a += np.random.normal(scale=SD, size=len(current))
     a = np.clip(a, MIN, a.max())
     a /= a.min()
-    return a.round(3)
+    return list(a.round(3))
 
 
 def update_sharpe_scaled_exp(current):
