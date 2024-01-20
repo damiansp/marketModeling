@@ -123,7 +123,9 @@ class TransactionDeterminer:
         self._df['schwab_norm'] = self._rescale_props(prop_schwab, max_prop)
 
     def _get_sim_proportions(self):
-        sims = [k for k in self.params.keys() if k.startswith('sim')]
+        sims = [
+            k for k in self.params.keys()
+            if k.startswith('sim') or k.startswith('dm')]
         for sim in sims:
             params = self.params[sim]
             use_weighted_sharpe = params['weighted_sharpe']

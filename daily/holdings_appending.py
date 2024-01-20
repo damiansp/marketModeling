@@ -37,10 +37,11 @@ class HoldingsAppender:
             out = pd.concat([out, v], axis=1)
         sims = self._upload_sims()
         simcols = list(sims.columns)
+        dm = self._upload_dm()
         actual_cols = ['et', 'schwab', 'rollover', 'roth', 'simple']
-        out = pd.concat([out, sims], axis=1)
+        out = pd.concat([out, sims, dm], axis=1)
         out = out.astype(float).fillna(0).round().astype(int)
-        out_cols = actual_cols + simcols
+        out_cols = actual_cols + simcols + ['dm']
         out.columns = out_cols
         for col in out_cols + ['fid']:
             if col in list(self.stock_metrics):
@@ -177,7 +178,18 @@ class HoldingsAppender:
         out = pd.concat(dfs, axis=1)
         out.columns = [f'sim{i}' for i in range(1, len(files) + 1)]
         return out
-            
+
+    def _upload_dm(self):
+        if 'Dongmei.csv' not in os.listdir(DOWNLOADS):
+            return pd.DataFrame(
+                {'dm': [0] * len(self.SYMBOLS)}, index=self.SYMBOLS)
+        dm = pd.read_csv(
+            f'{DOWNLOADS}/Dongmei.csv',
+            index_col=0,
+            usecols=['Position', 'Market Value']
+        ).rename(columns={'Market Value': 'dm'})
+        dm.index = [x.replace(' shares', '') for x in dm.index]
+        return dm
         
     @staticmethod
     def _convert_value(s):

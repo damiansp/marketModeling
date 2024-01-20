@@ -26,14 +26,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   226111  # [222123, 226918]
-ET_VALUE =    181803  # [178447, 182169]
-SCHWAB_VALUE = 15949  # [ 15852,  16169]
-SIM1_VALUE =  100410
-SIM2_VALUE =  100456
-SIM3_VALUE =  100453
-BEST_SIM = 3  # update weekly (on Fri)
+FID_VALUE =   226784  # [222123, 226918]
+ET_VALUE =    181513  # [178132, 182169]
+SCHWAB_VALUE = 15827  # [ 15640,  16169]
+SIM1_VALUE =  100650
+SIM2_VALUE =  100598
+SIM3_VALUE =  100497
+DM_VALUE   =  16927 + 3271
 FRAC_IN = 0.63
+BEST_SIM = 1  # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -49,12 +50,13 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.25, 'sell': 0.01},  # incr by 1
-    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
+    'et':     {'buy': 0.01, 'sell': 0.03},  # incr by 1
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
     'schwab': {'buy': 0.01, 'sell': 0.06},  #         3
-    'sim1':   {'buy': 0.09, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.18, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.30, 'sell': 0.01}}  #         6 simsims
+    'sim1':   {'buy': 0.18, 'sell': 0.01},  #         3 adelaide 2024
+    'sim2':   {'buy': 0.24, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.48, 'sell': 0.01},  #         6 simsims
+    'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
         'status_weights': [1.1, 1, 1], # RSI, fair_value_mult, geomean
@@ -81,17 +83,18 @@ PARAMS = {
         'status_weights': [2.481, 1.0, 1.0],
         'weighted_sharpe': False},
     'sim2': {
-        'max_prop_per_stock': 0.0521,
-        'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 3.8887,
-        'status_weights': [2.429, 1.0, 2.229],
-        'weighted_sharpe': True},
+        'max_prop_per_stock': 0.058,
+        'sharpe_adj_status_type': 'mean_',
+        'sharpe_scaled_exp': 3.6022,
+        'status_weights': [3.13, 1.0, 3.006],
+        'weighted_sharpe': False},
     'sim3': {
-        'max_prop_per_stock': 0.055,
-        'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 4.1905,
-        'status_weights': [3.156, 2.407, 1.0],
-        'weighted_sharpe': False}}
+        'max_prop_per_stock': 0.0493,
+        'sharpe_adj_status_type': 'w_',
+        'sharpe_scaled_exp': 3.6265,
+        'status_weights': [1.218, 1.0, 1.427],
+        'weighted_sharpe': True}}
+PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 
 
 # File paths
@@ -135,6 +138,7 @@ def main():
     transactions.to_csv(TRANSACTIONS)
     print(f'Saved data to {TRANSACTIONS}')
     print('\n\n\nDON\'T FORGET TO UPDATE BUY/SELL STATS\n\n')
+    print('DO NOT BUY: GGE, POWW, PTON, RDFN, XPEV (dm lingerers)')
     update_sim_vals()
 
 
@@ -240,9 +244,9 @@ def get_transactions(stock_metrics, next_day_distributions, buy_stats):
         P_STATS0_BUY, PARAMS)
     determiner.compile_data()
     for account, amt in zip(
-            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3'],
+            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3', 'dm'],
             [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE,
-             SIM3_VALUE]):
+             SIM3_VALUE, DM_VALUE]):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -272,7 +276,14 @@ def get_threshold(max_init, current):
 
 
 def print_buy_sell_statuses():
-    levels = {'et': 5, 'fid': 5, 'schwab': 5, 'sim1': 5, 'sim2': 5, 'sim3': 5}
+    levels = {
+        'et': 5,
+        'fid': 5,
+        'schwab': 5,
+        'sim1': 5,
+        'sim2': 5,
+        'sim3': 5,
+        'dm': 5}
     for portfolio, data in P_STATS0_BUY.items():
         print()
         print('-' * 25)
