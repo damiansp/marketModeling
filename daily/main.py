@@ -26,15 +26,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   226784  # [222123, 226918]
-ET_VALUE =    181513  # [178132, 182169]
-SCHWAB_VALUE = 15827  # [ 15640,  16169]
-SIM1_VALUE =  100650
-SIM2_VALUE =  100598
-SIM3_VALUE =  100497
+FID_VALUE =   228542  # [222123, 228542]
+ET_VALUE =    181724  # [178132, 183106]
+SCHWAB_VALUE = 15851  # [ 15640,  16169]
+SIM1_VALUE =  100565 + 100000
+SIM2_VALUE =  100503 + 100000
+SIM3_VALUE =  100488 + 100000
 DM_VALUE   =  16927 + 3271
 FRAC_IN = 0.63
-BEST_SIM = 1  # update weekly (on Fri)
+BEST_SIM = 3  # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -50,12 +50,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.03},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
-    'schwab': {'buy': 0.01, 'sell': 0.06},  #         3
-    'sim1':   {'buy': 0.18, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.24, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.48, 'sell': 0.01},  #         6 simsims
+    'et':     {'buy': 0.01, 'sell': 0.02},  # incr by 1
+    'fid':    {'buy': 0.01, 'sell': 0.14},  #         2
+    'schwab': {'buy': 0.03, 'sell': 0.01},  #         3
+    'sim1':   {'buy': 0.33, 'sell': 0.01},  #         3 adelaide 2024
+    'sim2':   {'buy': 0.32, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.78, 'sell': 0.01},  #         6 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -77,22 +77,22 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.0504,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.8158,
-        'status_weights': [2.481, 1.0, 1.0],
-        'weighted_sharpe': False},
-    'sim2': {
-        'max_prop_per_stock': 0.058,
-        'sharpe_adj_status_type': 'mean_',
-        'sharpe_scaled_exp': 3.6022,
-        'status_weights': [3.13, 1.0, 3.006],
-        'weighted_sharpe': False},
-    'sim3': {
         'max_prop_per_stock': 0.0493,
         'sharpe_adj_status_type': 'w_',
         'sharpe_scaled_exp': 3.6265,
         'status_weights': [1.218, 1.0, 1.427],
+        'weighted_sharpe': True},
+    'sim2': {
+        'max_prop_per_stock': 0.0541,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.5043,
+        'status_weights': [1.0, 2.924, 2.092],
+        'weighted_sharpe': True},
+    'sim3': {
+        'max_prop_per_stock': 0.0477,
+        'sharpe_adj_status_type': 'w_',
+        'sharpe_scaled_exp': 3.5375,
+        'status_weights': [1.579, 1.0, 1.18],
         'weighted_sharpe': True}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 

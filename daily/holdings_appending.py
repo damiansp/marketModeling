@@ -151,7 +151,7 @@ class HoldingsAppender:
                 if line.startswith('"Cash') or line.startswith('"Account'):
                     continue
                 if not is_header:
-                    cols = line.split(',')
+                    cols = line.split(',"')
                     symbol = cols[0].strip('""')
                     amt = float(cols[6].strip('"$'))
                     inds.append(symbol)
