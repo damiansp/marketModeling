@@ -289,7 +289,7 @@ sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
 # 50%25% out; 75/38% in; 
 f.out <- 0
-f.in <- 0 # active top (3x)
+f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
