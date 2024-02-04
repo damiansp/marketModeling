@@ -26,12 +26,12 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   228977  # [222123, 228977]
-ET_VALUE =    179782 # [178132, 183106]
-SCHWAB_VALUE = 15823  # [ 15640,  16169]
-SIM1_VALUE =  100333
-SIM2_VALUE =  100550 + 100000
-SIM3_VALUE =  100323 + 100000
+FID_VALUE =   229117  # [222123, 228977]
+ET_VALUE =    180339  # [178132, 183106]
+SCHWAB_VALUE = 15793  # [ 15640,  16169]
+SIM1_VALUE =  100273
+SIM2_VALUE =  100560 + 100000
+SIM3_VALUE =  100221 + 100000
 DM_VALUE   =   16927 + 3271
 FRAC_IN = 0.63
 BEST_SIM = 2  # update weekly (on Fri)
@@ -50,8 +50,8 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.02, 'sell': 0.01},  # incr by 1
-    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
+    'et':     {'buy': 0.01, 'sell': 0.02},  # incr by 1
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
     'schwab': {'buy': 0.03, 'sell': 0.01},  #         3
     'sim1':   {'buy': 0.42, 'sell': 0.01},  #         3 adelaide 2024
     'sim2':   {'buy': 0.38, 'sell': 0.01},  #         2 aei
@@ -77,22 +77,22 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.0493,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.6265,
-        'status_weights': [1.218, 1.0, 1.427],
-        'weighted_sharpe': True},
-    'sim2': {
         'max_prop_per_stock': 0.0541,
         'sharpe_adj_status_type': '',
         'sharpe_scaled_exp': 3.5043,
         'status_weights': [1.0, 2.924, 2.092],
         'weighted_sharpe': True},
+    'sim2': {
+        'max_prop_per_stock': 0.0543,
+        'sharpe_adj_status_type': 'mean_',
+        'sharpe_scaled_exp': 3.1521,
+        'status_weights': [1.0, 1.255, 2.628],
+        'weighted_sharpe': False},
     'sim3': {
-        'max_prop_per_stock': 0.0477,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.5375,
-        'status_weights': [1.579, 1.0, 1.18],
+        'max_prop_per_stock': 0.0578,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.6335,
+        'status_weights': [1.0, 2.542, 1.455],
         'weighted_sharpe': True}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 
@@ -112,8 +112,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    run_hmm_models()  ##
-    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    #run_hmm_models()  ##
+    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
