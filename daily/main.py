@@ -26,15 +26,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   229117  # [222123, 228977]
-ET_VALUE =    180339  # [178132, 183106]
-SCHWAB_VALUE = 15793  # [ 15640,  16169]
-SIM1_VALUE =  100273
-SIM2_VALUE =  100560 + 100000
-SIM3_VALUE =  100221 + 100000
+FID_VALUE =   230179  # [222123, 230179]
+ET_VALUE =    180807  # [178132, 183106]
+SCHWAB_VALUE = 15939  # [ 15640,  16169]
+SIM1_VALUE =  101074
+SIM2_VALUE =  101389 + 100000
+SIM3_VALUE =  101861 + 100000
 DM_VALUE   =   16927 + 3271
 FRAC_IN = 0.63
-BEST_SIM = 2  # update weekly (on Fri)
+BEST_SIM = 3  # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -51,11 +51,11 @@ N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
     'et':     {'buy': 0.01, 'sell': 0.02},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
+    'fid':    {'buy': 0.01, 'sell': 0.02},  #         2
     'schwab': {'buy': 0.03, 'sell': 0.01},  #         3
-    'sim1':   {'buy': 0.42, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.38, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.96, 'sell': 0.01},  #         6 simsims
+    'sim1':   {'buy': 0.48, 'sell': 0.01},  #         3 adelaide 2024
+    'sim2':   {'buy': 0.42, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 1.00, 'sell': 0.01},  #         6 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -112,8 +112,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    #run_hmm_models()  ##
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
