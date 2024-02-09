@@ -26,12 +26,12 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   230179  # [222123, 230179]
-ET_VALUE =    180807  # [178132, 183106]
-SCHWAB_VALUE = 15939  # [ 15640,  16169]
-SIM1_VALUE =  101074
-SIM2_VALUE =  101389 + 100000
-SIM3_VALUE =  101861 + 100000
+FID_VALUE =   230329  # [222123, 230329]
+ET_VALUE =    180861  # [178132, 183106]
+SCHWAB_VALUE = 15910  # [ 15640,  16169]
+SIM1_VALUE =  100928
+SIM2_VALUE =  101192+ 100000
+SIM3_VALUE =  102350 + 100000
 DM_VALUE   =   16927 + 3271
 FRAC_IN = 0.63
 BEST_SIM = 3  # update weekly (on Fri)
@@ -50,11 +50,11 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.02},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.02},  #         2
-    'schwab': {'buy': 0.03, 'sell': 0.01},  #         3
-    'sim1':   {'buy': 0.48, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.42, 'sell': 0.01},  #         2 aei
+    'et':     {'buy': 0.01, 'sell': 0.03},  # incr by 1
+    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
+    'schwab': {'buy': 0.06, 'sell': 0.01},  #         3
+    'sim1':   {'buy': 0.51, 'sell': 0.01},  #         3 adelaide 2024
+    'sim2':   {'buy': 0.44, 'sell': 0.01},  #         2 aei
     'sim3':   {'buy': 1.00, 'sell': 0.01},  #         6 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
