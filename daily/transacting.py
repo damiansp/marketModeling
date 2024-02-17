@@ -157,9 +157,6 @@ class TransactionDeterminer:
         return prop.clip(upper=max_prop)
 
     def get_target_amounts(self, account, amount):
-        ###
-        self._df.to_csv('~/Desktop/df1.csv')
-        ###
         print(f'Getting target amounts for {account}...')
         self._df[f'{account}_target'] = (
             amount * self.frac_in * self._df[f'{account}_norm'])

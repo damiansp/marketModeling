@@ -26,12 +26,12 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   232353  # [222123, 232352]
-ET_VALUE =    182226  # [178132, 183106]
-SCHWAB_VALUE = 16011  # [ 15640,  16169]
-SIM1_VALUE =  101547
-SIM2_VALUE =  102098+ 100000
-SIM3_VALUE =  104026 + 100000
+FID_VALUE =   232492  # [222123, 233479]
+ET_VALUE =    182353  # [178132, 184216]
+SCHWAB_VALUE = 16157  # [ 15640,  16214]
+SIM1_VALUE =  102332
+SIM2_VALUE =  102491 + 100000
+SIM3_VALUE =  105469 + 100000
 DM_VALUE   =   16927 + 3271
 FRAC_IN = 0.63
 BEST_SIM = 3  # update weekly (on Fri)
@@ -50,12 +50,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.04},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.02},  #         2
-    'schwab': {'buy': 0.01, 'sell': 0.03},  #         3
-    'sim1':   {'buy': 0.54, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.46, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.06},  #         6 simsims
+    'et':     {'buy': 0.01, 'sell': 0.03},  # incr by 1
+    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
+    'schwab': {'buy': 0.01, 'sell': 0.06},  #         3
+    'sim1':   {'buy': 0.12, 'sell': 0.01},  #         12 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.06},  #         6 aei
+    'sim3':   {'buy': 0.24, 'sell': 0.01},  #         24 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -77,23 +77,23 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.0578,
-        'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 3.6335,
-        'status_weights': [1.0, 2.542, 1.455],
-        'weighted_sharpe': True},
-    'sim2': {
-        'max_prop_per_stock': 0.0474,
-        'sharpe_adj_status_type': 'mean_',
-        'sharpe_scaled_exp': 3.6688,
-        'status_weights': [1.0, 2.077, 2.206],
-        'weighted_sharpe': True},
-    'sim3': {
         'max_prop_per_stock': 0.0594,
         'sharpe_adj_status_type': '',
         'sharpe_scaled_exp': 3.8676,
         'status_weights': [1.07, 1.167, 1.0],
-        'weighted_sharpe': True}}
+        'weighted_sharpe': True},
+    'sim2': {
+        'max_prop_per_stock': 0.0594,
+        'sharpe_adj_status_type': 'mean_',
+        'sharpe_scaled_exp': 3.5596,
+        'status_weights': [1.0, 3.087, 2.805],
+        'weighted_sharpe': True},
+    'sim3': {
+        'max_prop_per_stock': 0.0516,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.7191,
+        'status_weights': [3.224, 2.712, 1.0],
+        'weighted_sharpe': False}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 
 
@@ -323,11 +323,16 @@ def update_sim_vals():
 
 
 def update_status_weights(current):
-    SD = 1
-    MIN = 1
+    #SD = 1
+    #MIN = 1
     a = np.array(current)
-    a += np.random.normal(scale=SD, size=len(current))
-    a = np.clip(a, MIN, a.max())
+    #a += np.random.normal(scale=SD, size=len(current))
+    #a = np.clip(a, MIN, a.max())
+    #a /= a.min()
+    #return list(a.round(3))
+    factors = np.random.normal(scale=0.2, loc=1, size=len(current))
+    factors = np.clip(factors, 0.01, 2)
+    a *= factors
     a /= a.min()
     return list(a.round(3))
 
@@ -353,12 +358,12 @@ def update_sharpe_adj_status_type(current):
 
 def update_max_prop_per_stock(current):
     MIN = 0.005
-    MAX = 0.1
-    SD = 0.005
+    MAX = 0.2
+    SD = 0.01
     prop = current + np.random.normal(scale=SD)
     return max(min(round(prop, 4), MAX), MIN)
 
 
 if __name__ == '__main__':
-    main()
+    main()        
     
