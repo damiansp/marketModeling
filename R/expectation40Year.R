@@ -271,7 +271,7 @@ fracs.in <- c()
 
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 75%/37% out; 100/50% in
+# 75%/37% out; 100/50% in  (top/bottom)
 f.out <- 0
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
@@ -321,7 +321,7 @@ fracs.in <- c(fracs.in, f.in)
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; 
-f.out <- 0.1  # active top
+f.out <- 0
 f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)

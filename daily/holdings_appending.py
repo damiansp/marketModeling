@@ -28,6 +28,7 @@ class HoldingsAppender:
             stock_metrics.set_index('stock', inplace=True)
         self.stock_metrics = stock_metrics
         self.SYMBOLS = list(set(stock_metrics.index.tolist()))
+        print('\n\nTECH in HoldingsAppender.SYMBOLS:', 'TECH' in self.SYMBOLS)
         self.binder = pd.DataFrame(index=self.SYMBOLS)
 
     def append_holdings(self):
