@@ -280,8 +280,8 @@ fracs.in <- c(fracs.in, f.in)
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
 # 60%/30% out; 95/48% in; Extreme
-# 30%/15% out; ?????% in; Near-Extreme
-f.out <- 0.15
+# 30%/15% out; ?????% in; Near-Extreme 
+f.out <- 0.15  # active bottom
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)

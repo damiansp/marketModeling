@@ -96,11 +96,11 @@ PARAMS = {
         'weighted_sharpe': True}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 param_tracker = {
-    'max_prop': [0.0641],
-    'exp': [3.7602],
-    'w0': [1.186],
-    'w1': [1.485],
-    'w2': [1.000]}
+    'max_prop': [0.0641, 0.0587],
+    'exp': [3.7602, 3.629],
+    'w0': [1.186, 4.160],
+    'w1': [1.485, 1.000],
+    'w2': [1.000, 6.988]}
 
 
 # File paths
