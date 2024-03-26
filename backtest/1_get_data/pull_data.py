@@ -49,10 +49,12 @@ class StockGetter:
 
     def get_stocks(self, run_batches: list[int] | None = None):
         # In order to prevent getting rate-limited, we get data in batches of
-        # 100 stocks sequentially (rather than multiprocessing or
+        # <BATCH_SIZE> stocks sequentially (rather than multiprocessing or
         # multithreading). Each batch is enumerated so that just specific
         # batches can be rerun in the event of failure.
-        # The data are pulled and immediately written to disk
+        # After pulling from the API, subesequent processing is multiprocessed
+        # in _download_batch().
+        # The data are pulled, processed, and immediately written to disk
         for i, batch in enumerate(self.batches):
             #try:
             self._download_batch(i, batch)
@@ -63,7 +65,7 @@ class StockGetter:
             break
         print('Downloads complete.')
 
-    # TODO: fill gap NAs, refactor, multiprocess this method
+    # TODO: refactor, multiprocess this method
     def _download_batch(self, i, batch):
         new_cols = []
         df = (
@@ -74,6 +76,7 @@ class StockGetter:
         df.drop(columns=empties, inplace=True)
         df.columns = df.columns.map(
             lambda t: f'{t[1]}_{t[0]}'.lower().replace('_adj close', ''))
+        df = self._fill_nas(df)
         for symbol in batch:
             symbol = symbol.lower()
             try:
@@ -102,6 +105,24 @@ class StockGetter:
         print('Wrote batch to', path)    
         return df
 
+    def _fill_nas(self, df: pd.DataFrame) -> pd.DataFrame:
+        '''Fill NAs, but only in the middle of a sequence with legitimate
+        values before and after (e.g., leave initial or final NAs as-is)
+        '''
+        for col in df.columns:
+            df[col] = self._fill_internal_nas(df[col])
+        return df
+
+    @staticmethod
+    def _fill_internal_nas(s: pd.Series) -> pd.Series:
+        not_null = s.notnull()
+        not_null_idxs = not_null[not_null].index
+        start = not_null_idxs[0]
+        end = not_null_idxs[-1]
+        # s[start:end] = s[start:end].fillna(method='ffill')
+        s[start:end].fillna(method='ffill', inplace=True)
+        return s        
+        
     @staticmethod
     def _get_pct_change(symbol: str, stock: pd.Series) -> pd.Series:
         return pd.Series(
