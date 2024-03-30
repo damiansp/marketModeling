@@ -4,6 +4,7 @@ import json
 import os
 from pprint import pprint
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -26,15 +27,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   233398  # [222123, 234813]
-ET_VALUE =    180843  # [177915, 184216]
-SCHWAB_VALUE = 15896  # [ 15640,  16214]
-SIM1_VALUE =  102540
-SIM2_VALUE =  102045 + 100000
-SIM3_VALUE =  105736 + 100000
+FID_VALUE =   235694  # [222123, 235694]
+ET_VALUE =    182768  # [177915, 184216]
+SCHWAB_VALUE = 16109  # [ 15640,  16214]
+SIM1_VALUE =  103286
+SIM2_VALUE =  103715 + 100000
+SIM3_VALUE =  107811 + 100000
 DM_VALUE   =   16927 + 3271
-FRAC_IN = 0.595
-BEST_SIM = 1    # update weekly (on Fri)
+FRAC_IN = 0.0300
+BEST_SIM = 3    # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -50,12 +51,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.09},  # incr by 1
-    'fid':    {'buy': 0.02, 'sell': 0.01},  #         2
-    'schwab': {'buy': 0.01, 'sell': 0.09},  #         3
-    'sim1':   {'buy': 0.18, 'sell': 0.01},  #         6 adelaide 2024
-    'sim2':   {'buy': 0.09, 'sell': 0.01},  #         3 aei
-    'sim3':   {'buy': 0.24, 'sell': 0.01},  #         12 simsims
+    'et':     {'buy': 0.01, 'sell': 0.13},  # incr by 1
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
+    'schwab': {'buy': 0.01, 'sell': 0.21},  #         3
+    'sim1':   {'buy': 0.01, 'sell': 0.18},  #         12 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.09},  #          6 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.36},  #         24 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -77,31 +78,44 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.0587,
-        'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 3.629,
-        'status_weights': [4.16, 1.0, 6.988],
-        'weighted_sharpe': False},
-    'sim2': {
-        'max_prop_per_stock': 0.1109,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.5508,
-        'status_weights': [7.583, 1.0, 4.89],
-        'weighted_sharpe': False},
-    'sim3': {
         'max_prop_per_stock': 0.1155,
         'sharpe_adj_status_type': 'w_',
         'sharpe_scaled_exp': 3.5379,
         'status_weights': [5.215, 1.0, 3.819],
-        'weighted_sharpe': True}}
+        'weighted_sharpe': True},
+    'sim2': {
+        'max_prop_per_stock': 0.1104,
+        'sharpe_adj_status_type': 'w_',
+        'sharpe_scaled_exp': 4.4541,
+        'status_weights': [12.602, 1.0, 15.234],
+        'weighted_sharpe': True},
+    'sim3': {
+        'max_prop_per_stock': 0.0791,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.4459,
+        'status_weights': [7.808, 1.0, 3.99],
+        'weighted_sharpe': False}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 param_tracker = {
-    'max_prop': [0.0641, 0.0587],
-    'exp': [3.7602, 3.629],
-    'w0': [1.186, 4.160],
-    'w1': [1.485, 1.000],
-    'w2': [1.000, 6.988]}
+    'max_prop': [0.0641, 0.0587, 0.1155],
+    'exp': [3.7602, 3.629, 3.5379],
+    'w0': [1.186, 4.160, 5.215],
+    'w1': [1.485, 1.000, 1.000],
+    'w2': [1.000, 6.988, 3.819]}
 
+
+'''
+for param, ts in param_tracker.items():
+    if param == 'max_prop':
+        ts = [t * 100 for t in ts]
+    if param == 'exp':
+        ts = [t * 3 for t in ts]
+        param = '3(exp)'
+    plt.plot(ts, label=param)
+plt.legend()
+plt.show()
+exit()
+'''
 
 # File paths
 CURRENT_STOCKS = f'{DATA}/current_stocks.json'
@@ -118,8 +132,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    run_hmm_models()  ##
-    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    #run_hmm_models()  ##
+    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -366,6 +380,6 @@ def update_max_prop_per_stock(current):
 
 
 if __name__ == '__main__':
-    #main()
-    update_sim_vals()
+    main()
+    #update_sim_vals()
     
