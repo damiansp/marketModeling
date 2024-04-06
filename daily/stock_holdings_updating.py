@@ -21,6 +21,8 @@ class StockHoldingsUpdater:
         self.current_stocks['best_weighted'] = self.best
         self._clean_current_stocks()
         self._clean_buy_stats()
+        self.buy_stats = (
+            self.buy_stats[~self.buy_stats.index.duplicated(keep='last')])
         return self.current_stocks, self.buy_stats
 
     def _update_lingerers(self):

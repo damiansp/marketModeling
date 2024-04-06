@@ -27,15 +27,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   235694  # [222123, 235694]
-ET_VALUE =    182768  # [177915, 184216]
-SCHWAB_VALUE = 16109  # [ 15640,  16214]
-SIM1_VALUE =  103286
-SIM2_VALUE =  103715 + 100000
-SIM3_VALUE =  107811 + 100000
-DM_VALUE   =   16927 + 3271
-FRAC_IN = 0.0300
-BEST_SIM = 3    # update weekly (on Fri)
+FID_VALUE =   230974  # [222123, 235694]
+ET_VALUE =    178034  # [176744, 184216]
+SCHWAB_VALUE = 15738  # [ 15640,  16214]
+SIM1_VALUE =   99612
+SIM2_VALUE =   98564 + 100000
+SIM3_VALUE =  102593 + 100000
+DM_VALUE   =   20134
+FRAC_IN = 0.9997
+BEST_SIM = 1    # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -51,12 +51,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.13},  # incr by 1
-    'fid':    {'buy': 0.01, 'sell': 0.04},  #         2
-    'schwab': {'buy': 0.01, 'sell': 0.21},  #         3
-    'sim1':   {'buy': 0.01, 'sell': 0.18},  #         12 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.09},  #          6 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.36},  #         24 simsims
+    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 2
+    'fid':    {'buy': 0.12, 'sell': 0.01},  #         3
+    'schwab': {'buy': 0.20, 'sell': 0.01},  #         4
+    'sim1':   {'buy': 0.60, 'sell': 0.01},  #         12 adelaide 2024
+    'sim2':   {'buy': 0.30, 'sell': 0.01},  #          6 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.24},  #         24 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -84,24 +84,24 @@ PARAMS = {
         'status_weights': [5.215, 1.0, 3.819],
         'weighted_sharpe': True},
     'sim2': {
-        'max_prop_per_stock': 0.1104,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 4.4541,
-        'status_weights': [12.602, 1.0, 15.234],
+        'max_prop_per_stock': 0.0962,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.9815,
+        'status_weights': [2.661, 1.03, 1.0],
         'weighted_sharpe': True},
     'sim3': {
-        'max_prop_per_stock': 0.0791,
-        'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 3.4459,
-        'status_weights': [7.808, 1.0, 3.99],
-        'weighted_sharpe': False}}
+        'max_prop_per_stock': 0.1031,
+        'sharpe_adj_status_type': 'w_',
+        'sharpe_scaled_exp': 3.6206,
+        'status_weights': [8.282, 1.0, 6.388],
+        'weighted_sharpe': True}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 param_tracker = {
-    'max_prop': [0.0641, 0.0587, 0.1155],
-    'exp': [3.7602, 3.629, 3.5379],
-    'w0': [1.186, 4.160, 5.215],
-    'w1': [1.485, 1.000, 1.000],
-    'w2': [1.000, 6.988, 3.819]}
+    'max_prop': [0.0641, 0.0587, 0.1155, 0.1155],
+    'exp': [3.7602, 3.629, 3.5379, 3.5379],
+    'w0': [1.186, 4.160, 5.215, 5.215],
+    'w1': [1.485, 1.000, 1.000, 1.000],
+    'w2': [1.000, 6.988, 3.819, 3.819]}
 
 
 '''
@@ -142,7 +142,7 @@ def main():
     transactions = append_current_holdings(transactions)
     transactions.to_csv('/tmp/transactions.csv')
     current_stocks, buy_stats = update_current_stocks(
-        current_stocks, current_best_stocks, transactions) 
+        current_stocks, current_best_stocks, transactions)
     print('Current stocks:')
     print(current_stocks)
     get_next_day_distributions(current_stocks)
@@ -179,8 +179,12 @@ def make_sure_files_downloaded():
 
 def load_current_stocks():
     print('Loading current stock lists...')
+    DONGMEI_ONLY = ['TECH', 'ULTA', 'UNH']
     with open(CURRENT_STOCKS, 'r') as f:
         current_stocks = json.load(f)
+    for stock in DONGMEI_ONLY:
+        if stock not in current_stocks['lingerers']:
+            current_stocks['lingerers'] = current_stocks['lingerers'] + stock
     return current_stocks
 
 

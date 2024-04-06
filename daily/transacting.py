@@ -174,6 +174,8 @@ class TransactionDeterminer:
     def _get_bid_ask(self, row, account):
         try:
             distr = self._get_status_distribution(row, account)
+            if distr is None:
+                return np.nan
             q = self._get_bid_ask_quantile_from_status_scaled(
                 row[f'{account}_status_scaled'],
                 account,
@@ -201,10 +203,16 @@ class TransactionDeterminer:
         symbol = row.name
         trend = row.direction
         high_low = 'low' if row[f'{account}_diff'] > 0 else 'high'
-        distr = self.next_day_distributions.loc[
-            self.next_day_distributions[f'{symbol}_trend'] == trend,
-            f'{symbol}_{high_low}_mult']
-        distr = distr[distr.notnull()]
+        try:
+            distr = self.next_day_distributions.loc[
+                self.next_day_distributions[f'{symbol}_trend'] == trend,
+                f'{symbol}_{high_low}_mult']
+            distr = distr[distr.notnull()]
+        except KeyError:
+            print(
+                f'\n\nWarning: {symbol} not found in next_day_distribution '
+                f'data\n\n')
+            distr = None
         return distr
 
     def _get_bid_ask_quantile_from_status_scaled(self, status, account, diff):
