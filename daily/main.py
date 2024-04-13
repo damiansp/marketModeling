@@ -27,15 +27,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   230974  # [222123, 235694]
-ET_VALUE =    178034  # [176744, 184216]
-SCHWAB_VALUE = 15738  # [ 15640,  16214]
-SIM1_VALUE =   99612
-SIM2_VALUE =   98564 + 100000
-SIM3_VALUE =  102593 + 100000
+FID_VALUE =   229986  # [222123, 235694]
+ET_VALUE =    175708  # [176744, 184216]
+SCHWAB_VALUE = 15497  # [ 15640,  16214]
+SIM1_VALUE =   98589
+SIM2_VALUE =   97546 + 100000
+SIM3_VALUE =  100094 + 100000
 DM_VALUE   =   20134
-FRAC_IN = 0.9997
-BEST_SIM = 1    # update weekly (on Fri)
+FRAC_IN = 1.
+BEST_SIM = 2    # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -51,12 +51,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 2
-    'fid':    {'buy': 0.12, 'sell': 0.01},  #         3
-    'schwab': {'buy': 0.20, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.60, 'sell': 0.01},  #         12 adelaide 2024
-    'sim2':   {'buy': 0.30, 'sell': 0.01},  #          6 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.24},  #         24 simsims
+    'et':     {'buy': 0.18, 'sell': 0.01},  # incr by 3
+    'fid':    {'buy': 0.27, 'sell': 0.01},  #         4
+    'schwab': {'buy': 0.40, 'sell': 0.01},  #         5
+    'sim1':   {'buy': 0.99, 'sell': 0.01},  #         6 adelaide 2024
+    'sim2':   {'buy': 0.60, 'sell': 0.01},  #         3 aei
+    'sim3':   {'buy': 0.99, 'sell': 0.01},  #         12 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
     'et': {
@@ -78,31 +78,30 @@ PARAMS = {
         'sharpe_adj_status_type': 'mean_',
         'max_prop_per_stock': 0.01},
     'sim1': {
-        'max_prop_per_stock': 0.1155,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.5379,
-        'status_weights': [5.215, 1.0, 3.819],
-        'weighted_sharpe': True},
-    'sim2': {
         'max_prop_per_stock': 0.0962,
         'sharpe_adj_status_type': '',
         'sharpe_scaled_exp': 3.9815,
         'status_weights': [2.661, 1.03, 1.0],
         'weighted_sharpe': True},
+    'sim2': {
+        'max_prop_per_stock': 0.0985,
+        'sharpe_adj_status_type': 'mean_',
+        'sharpe_scaled_exp': 3.2915,
+        'status_weights': [1.694, 1.0, 1.352],
+        'weighted_sharpe': True},
     'sim3': {
-        'max_prop_per_stock': 0.1031,
-        'sharpe_adj_status_type': 'w_',
-        'sharpe_scaled_exp': 3.6206,
-        'status_weights': [8.282, 1.0, 6.388],
-        'weighted_sharpe': True}}
+        'max_prop_per_stock': 0.098,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 2.8264,
+        'status_weights': [12.391, 1.802, 1.0],
+        'weighted_sharpe': False}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 param_tracker = {
-    'max_prop': [0.0641, 0.0587, 0.1155, 0.1155],
-    'exp': [3.7602, 3.629, 3.5379, 3.5379],
-    'w0': [1.186, 4.160, 5.215, 5.215],
-    'w1': [1.485, 1.000, 1.000, 1.000],
-    'w2': [1.000, 6.988, 3.819, 3.819]}
-
+    'max_prop': [0.0641, 0.0587, 0.1155, 0.1155, 0.0962],
+    'exp': [3.7602, 3.629, 3.5379, 3.5379, 3.9815],
+    'w0': [1.186, 4.160, 5.215, 5.215, 2.661],
+    'w1': [1.485, 1.000, 1.000, 1.000, 1.030],
+    'w2': [1.000, 6.988, 3.819, 3.819, 1.000]}
 
 '''
 for param, ts in param_tracker.items():
@@ -132,8 +131,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    #run_hmm_models()  ##
-    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    run_hmm_models()  ##
+    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
@@ -184,7 +183,7 @@ def load_current_stocks():
         current_stocks = json.load(f)
     for stock in DONGMEI_ONLY:
         if stock not in current_stocks['lingerers']:
-            current_stocks['lingerers'] = current_stocks['lingerers'] + stock
+            current_stocks['lingerers'] = current_stocks['lingerers'] + [stock]
     return current_stocks
 
 
