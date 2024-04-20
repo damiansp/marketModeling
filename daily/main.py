@@ -27,15 +27,15 @@ from transacting import TransactionDeterminer
 
 
 # Daily inputs:
-FID_VALUE =   229986  # [222123, 235694]
-ET_VALUE =    175708  # [176744, 184216]
-SCHWAB_VALUE = 15497  # [ 15640,  16214]
-SIM1_VALUE =   98589
-SIM2_VALUE =   97546 + 100000
-SIM3_VALUE =  100094 + 100000
+FID_VALUE =   217831  # [217831, 235694]
+ET_VALUE =    168219  # [167274, 184216]
+SCHWAB_VALUE = 14775  # [ 14775,  16214]
+SIM1_VALUE =   97608
+SIM2_VALUE =   94464 #+ 100000
+SIM3_VALUE =   96471 #+ 100000
 DM_VALUE   =   20134
 FRAC_IN = 1.
-BEST_SIM = 2    # update weekly (on Fri)
+BEST_SIM = 1    # update weekly (on Fri)
 FID_MAX = 0.00  # max weight to give my picks in fid acct
 
 TODAY = datetime.now().date()
@@ -51,11 +51,11 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.18, 'sell': 0.01},  # incr by 3
-    'fid':    {'buy': 0.27, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.40, 'sell': 0.01},  #         5
+    'et':     {'buy': 0.27, 'sell': 0.01},  # incr by 5
+    'fid':    {'buy': 0.36, 'sell': 0.01},  #         5
+    'schwab': {'buy': 0.55, 'sell': 0.01},  #         6
     'sim1':   {'buy': 0.99, 'sell': 0.01},  #         6 adelaide 2024
-    'sim2':   {'buy': 0.60, 'sell': 0.01},  #         3 aei
+    'sim2':   {'buy': 0.69, 'sell': 0.01},  #         3 aei
     'sim3':   {'buy': 0.99, 'sell': 0.01},  #         12 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 PARAMS = {
@@ -84,24 +84,24 @@ PARAMS = {
         'status_weights': [2.661, 1.03, 1.0],
         'weighted_sharpe': True},
     'sim2': {
-        'max_prop_per_stock': 0.0985,
-        'sharpe_adj_status_type': 'mean_',
-        'sharpe_scaled_exp': 3.2915,
-        'status_weights': [1.694, 1.0, 1.352],
+        'max_prop_per_stock': 0.1095,
+        'sharpe_adj_status_type': '',
+        'sharpe_scaled_exp': 3.1903,
+        'status_weights': [3.266, 2.139, 1.0],
         'weighted_sharpe': True},
     'sim3': {
-        'max_prop_per_stock': 0.098,
+        'max_prop_per_stock': 0.0806,
         'sharpe_adj_status_type': '',
-        'sharpe_scaled_exp': 2.8264,
-        'status_weights': [12.391, 1.802, 1.0],
-        'weighted_sharpe': False}}
+        'sharpe_scaled_exp': 4.0868,
+        'status_weights': [4.538, 1.67, 1.0],
+        'weighted_sharpe': True}}
 PARAMS['dm'] = PARAMS[f'sim{BEST_SIM}']
 param_tracker = {
-    'max_prop': [0.0641, 0.0587, 0.1155, 0.1155, 0.0962],
-    'exp': [3.7602, 3.629, 3.5379, 3.5379, 3.9815],
-    'w0': [1.186, 4.160, 5.215, 5.215, 2.661],
-    'w1': [1.485, 1.000, 1.000, 1.000, 1.030],
-    'w2': [1.000, 6.988, 3.819, 3.819, 1.000]}
+    'max_prop': [0.0641, 0.0587, 0.1155, 0.1155, 0.0962, 0.0962],
+    'exp': [3.7602, 3.629, 3.5379, 3.5379, 3.9815, 3.9815],
+    'w0': [1.186, 4.160, 5.215, 5.215, 2.661, 2.661],
+    'w1': [1.485, 1.000, 1.000, 1.000, 1.030, 1.030],
+    'w2': [1.000, 6.988, 3.819, 3.819, 1.000, 1.000]}
 
 '''
 for param, ts in param_tracker.items():
@@ -131,8 +131,8 @@ BUY_STATS = TRANSACTIONS
 def main():
     make_sure_files_downloaded()
     current_stocks = load_current_stocks()
-    run_hmm_models()  ##
-    best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
+    #run_hmm_models()  ##
+    #best_stock_by_state.main(outpath=DAR_BY_STATE)  ##
     current_best_stocks = select_state_based_stocks()
     transactions = (
         pd.read_csv(TRANSACTIONS).rename(columns={'Unnamed: 0': 'stock'}))
