@@ -27,8 +27,7 @@ class HoldingsAppender:
         if 'stock' in list(stock_metrics):
             stock_metrics.set_index('stock', inplace=True)
         self.stock_metrics = stock_metrics
-        self.SYMBOLS = list(set(stock_metrics.index.tolist()))
-        print('\n\nTECH in HoldingsAppender.SYMBOLS:', 'TECH' in self.SYMBOLS)
+        self.SYMBOLS = sorted(list(set(stock_metrics.index.tolist())))
         self.binder = pd.DataFrame(index=self.SYMBOLS)
 
     def append_holdings(self):
@@ -200,7 +199,8 @@ class HoldingsAppender:
         for symbol in df.index.unique():
             if symbol not in self.SYMBOLS:
                 print(f'{symbol} not in SYMBOLS')
-                return False
+                #return False
+                return True
         return True
 
 

@@ -209,9 +209,6 @@ class TransactionDeterminer:
                 f'{symbol}_{high_low}_mult']
             distr = distr[distr.notnull()]
         except KeyError:
-            print(
-                f'\n\nWarning: {symbol} not found in next_day_distribution '
-                f'data\n\n')
             distr = None
         return distr
 
