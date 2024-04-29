@@ -67,18 +67,28 @@ class Loader:
                 print(f'{s}...', end=' ')
             if (df.Open[s] == 0).any():
                 df = self._fill_missing_open(df, s)
-            df['LogValue', s] = np.log(df.Value[s])
-            df['IntradayChange', s] = df.Close[s] / df.Open[s]
-            df['DayToDayChange', s] = np.nan
-            df['OvernightChange', s] = np.nan
-            first_value = df.Value[s][df.Value[s].notna()].index[0]
-            for day in range(first_value + 1, n):
-                df.loc[(day), ('DayToDayChange', s)] = (
-                    df.loc[(day), ('Value', s)]
-                    / df.loc[(day - 1), ('Value', s)])
-                df.loc[(day), ('OvernightChange', s)] = (
-                    df.loc[(day), ('Open', s)]
-                    / df.loc[(day - 1), ('Close', s)])
+            n = len(df)
+            log_val = pd.Series(np.log(df.Value[s]), name=('LogValue', s))
+            intra_ch = pd.Series(
+                df.Close[s] / df.Open[s], name=('IntradayChange', s))
+            day_day_ch = pd.Series(
+                [np.nan] * n, name=('DayToDayChange', s), index=df.index)
+            overnight_ch = pd.Series(
+                [np.nan] * n, name=('OvernightChange', s), index=df.index)
+            df = pd.concat(
+                [df, log_val, intra_ch, day_day_ch, overnight_ch], axis=1)
+            try:
+                first_value = df.Value[s][df.Value[s].notna()].index[0]
+                for day in range(first_value + 1, n):
+                    df.loc[(day), ('DayToDayChange', s)] = (
+                        df.loc[(day), ('Value', s)]
+                        / df.loc[(day - 1), ('Value', s)])
+                    df.loc[(day), ('OvernightChange', s)] = (
+                        df.loc[(day), ('Open', s)]
+                        / df.loc[(day - 1), ('Close', s)])
+            except IndexError:
+                print(f'\nCould not downlad: {s}')
+                pass
         if self.verbose:
             print()
         return df
