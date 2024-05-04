@@ -22,7 +22,6 @@ class StockHoldingsUpdater:
     def update_current_stocks(self):
         self._update_lingerers()
         self._insert_current_best_stocks()
-        self.buy_stats.to_csv('~/Desktop/st_test.csv')
         self._handle_old_best()
         self.current_stocks['best_weighted'] = self.best
         self._clean_current_stocks()
@@ -58,7 +57,8 @@ class StockHoldingsUpdater:
         for stock in self.current_best_stocks:
             if stock in self.current_stocks['blast_off']:
                 if stock not in self.buy_stats.index:
-                    self._append_new_stock(stock, ['inEt', 'inFid', 'in_self_managed'])
+                    self._append_new_stock(
+                        stock, ['inEt', 'inFid', 'in_self_managed'])
             elif stock in self.current_stocks['stock_watcher']:
                 if stock not in self.buy_stats.index:
                     self._append_new_stock(stock, ['inFid', 'in_self_managed'])
@@ -77,7 +77,8 @@ class StockHoldingsUpdater:
             {col: 0 for col in self.buy_stats.columns}, index=[symbol])
         self.buy_stats = pd.concat([self.buy_stats, row], axis=0)
         self.buy_stats.loc[symbol, in_accts + ['currentlyActive']] = 1
-        total_in = self.buy_stats[['inEt', 'inFid', 'in_self_managed']].sum(axis=1)
+        total_in = (
+            self.buy_stats[['inEt', 'inFid', 'in_self_managed']].sum(axis=1))
         self.buy_stats.loc[total_in == 0, 'currentlyActive'] = 0
 
     def _move_lingerer_to_best(self, stock):

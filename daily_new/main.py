@@ -15,16 +15,18 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+
 # Daily inputs:
-FID_VALUE =   222858  # [217831, 235694]
-ET_VALUE =    173538  # [167274, 184216]
-SCHWAB_VALUE = 15259  # [ 14775,  16214]
-SIM1_VALUE =   97828 + 7572
-SIM2_VALUE =   95867 + 34305
-SIM3_VALUE =   96340 + 40808
+FID_VALUE =   227389  # [217831, 235694]
+ET_VALUE =    178244  # [167274, 184216]
+SCHWAB_VALUE = 15673  # [ 14775,  16214]
+SIM1_VALUE =   79407 + 20337
+SIM2_VALUE =  196891 + 24525
+SIM3_VALUE =  174991 + 1701
 DM_VALUE   =   20134
-FRAC_IN = 0.9894
-BEST_SIM = 1    # update weekly (on Fri)
+FRAC_IN = 0.9942
+BEST_SIM = 2  # update weekly (on Fri)
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -38,12 +40,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.01, 'sell': 0.12},  #         4
-    'schwab': {'buy': 0.05, 'sell': 0.01},  #         5
-    'sim1':   {'buy': 0.99, 'sell': 0.01},  #         3 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.04},  #         2 aei
-    'sim3':   {'buy': 0.06, 'sell': 0.01},  #         6 simsims
+    'et':     {'buy': 0.16, 'sell': 0.01},  # incr by 3
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         3
+    'schwab': {'buy': 0.01, 'sell': 0.05},  #         4
+    'sim1':   {'buy': 0.99, 'sell': 0.01},  #         2 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.10},  #         1 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.18},  #         4 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -67,39 +69,39 @@ PARAMS = {
         'scaler': 0.6,
         'level': 5},
     'sim1': {
+        'level': 5,
         'max_prop_per_stock': 0.1095,
+        'scaler': 0.6,
         'sharpe_scaled_exp': 3.1903,
-        'status_weights': [3.266, 2.139, 1.0],
-        'scaler': 0.6,
-        'level': 5},
+        'status_weights': [3.266, 2.139, 1.0]},
     'sim2': {
-        'max_prop_per_stock': 0.0934,
-        'sharpe_scaled_exp': 3.0468,
-        'status_weights': [2.838, 2.952, 1.0],
-        'scaler': 0.6,
-        'level': 5},
+        'level': 5.5174,
+        'max_prop_per_stock': 0.0872,
+        'scaler': 0.539,
+        'sharpe_scaled_exp': 3.0007,
+        'status_weights': [1.283, 2.056, 1.0]},
     'sim3': {
-        'max_prop_per_stock': 0.1068,
-        'sharpe_scaled_exp': 3.0592,
-        'status_weights': [3.649, 1.0, 1.49],
-        'scaler': 0.6,
-        'level': 5}}
+        'level': 6.3208,
+        'max_prop_per_stock': 0.1185,
+        'scaler': 0.6085,
+        'sharpe_scaled_exp': 3.0232,
+        'status_weights': [3.291, 3.853, 1.0]}}
 PARAMS['dm'] = PARAMS['fid']
 param_tracker = {
     'max_prop': [
-        0.0641, 0.0587, 0.1155, 0.1155, 0.0962, 0.0962, 0.1095],
+        0.0641, 0.0587, 0.1155, 0.1155, 0.0962, 0.0962, 0.1095, 0.1095],
     'exp': [
-        3.7602, 3.629, 3.5379, 3.5379, 3.9815, 3.9815, 3.1903],
+        3.7602, 3.629, 3.5379, 3.5379, 3.9815, 3.9815, 3.1903, 3.1903],
     'w_rsi': [
-        1.186, 4.160, 5.215, 5.215, 2.661, 2.661, 3.266],
+        1.186, 4.160, 5.215, 5.215, 2.661, 2.661, 3.266, 3.266],
     'w_fairval': [
-        1.485, 1.000, 1.000, 1.000, 1.030, 1.030, 2.139],
+        1.485, 1.000, 1.000, 1.000, 1.030, 1.030, 2.139, 2.139],
     'w_geomean': [
-        1.000, 6.988, 3.819, 3.819, 1.000, 1.000, 1.000],
+        1.000, 6.988, 3.819, 3.819, 1.000, 1.000, 1.000, 1.000],
     'scaler': [
-        0.6,   0.6,   0.6,   0.6,   0.6,   0.6,   0.6],
+        0.6,   0.6,   0.6,   0.6,   0.6,   0.6,   0.6,   0.6],
     'level': [
-        5,     5,     5,     5,     5,     5,     5]}
+        5,     5,     5,     5,     5,     5,     5,     5]}
 
 '''
 for param, ts in param_tracker.items():
@@ -157,6 +159,11 @@ def main(start='beginning'):
     print('\n\nMETRICS COMPLETE\n\n')
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = join_metrics_and_transactions(stock_metrics, transactions)
+    ###
+    for col in holdings.columns:
+        stock_metrics[col] = holdings[col]
+        stock_metrics[col].fillna(0, inplace=True)
+    ###
     print_buy_sell_statuses()
     transactions = get_transactions(stock_metrics, next_day_distributions)
     transactions.sort_index().to_csv(TRANSACTIONS)
@@ -356,7 +363,4 @@ def update_level(level):
 
 
 if __name__ == '__main__':
-    main('beginning')
-    #main('transactions')
-    #main('metrics')
-    #main('transactions2')
+    main(MAIN_START)
