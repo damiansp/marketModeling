@@ -26,16 +26,12 @@ class NextDayMultiplier:
             .rename(columns={'Adj Close': 'AdjClose'}))
         distr_dfs = []
         for stock in self.stocks:
-            df = self._get_next_day_distribution(stock)
-            if df is not None:
-                distr_dfs.append(df)
+            distr_dfs.append(self._get_next_day_distribution(stock))
         distr_df = pd.concat(distr_dfs, axis=1)
         return distr_df
 
     def _get_next_day_distribution(self, stock_name):
         stock = self._get_stock_data(stock_name)
-        if stock is None:
-            return None
         macd = get_macd(stock, up_down=True)
         next_high = stock.High.shift(-1)
         next_low = stock.Low.shift(-1)
@@ -47,14 +43,12 @@ class NextDayMultiplier:
             f'{stock_name}_low_mult': low_mult})
 
     def _get_stock_data(self, stock):
-        try:
-            sub = self.data.loc[
-                :, [x for x in list(self.data) if x[1] == stock]]
-            first_val = sub.Value[stock][sub.Value[stock].notnull()].index[0]
-            sub = sub.loc[first_val:, :]
-            sub.columns = sub.columns.to_series().apply(lambda x: x[0])
-            sub.fillna(method='ffill', inplace=True)
-            return sub
-        except:
-            print(f'Error getting stock data for {stock}')
-            return None
+        sub = self.data.loc[:, [x for x in list(self.data) if x[1] == stock]]
+        first_val = sub.Value[stock][sub.Value[stock].notnull()].index[0]
+        sub = sub.loc[first_val:, :]
+        sub.columns = sub.columns.to_series().apply(lambda x: x[0])
+        sub.fillna(method='ffill', inplace=True)
+        return sub
+
+        
+                         

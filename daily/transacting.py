@@ -1,14 +1,12 @@
 import numpy as np
-import pandas as pd
 
 
 class TransactionDeterminer:
     def __init__(
-            self, metrics, next_day_distributions, buy_stats, frac_in,
-            p_stats0_buy, params):
+            self, metrics, next_day_distributions, frac_in, p_stats0_buy,
+            params):
         self._df = metrics
         self.next_day_distributions = next_day_distributions
-        self.buy_stats = buy_stats
         self.frac_in = frac_in
         self.p_stats0_buy = p_stats0_buy
         self.params = params
@@ -18,34 +16,22 @@ class TransactionDeterminer:
         return self._df
 
     def compile_data(self):
-        self._add_account_indicators()
         self._add_status()
         self._add_scaled_sharpes()
         self._get_status_weights()
-        self._get_et_proportions()
-        self._get_fid_proportions()
-        self._get_schwab_proportions()
-        self._get_sim_proportions()
-        
-    def _add_account_indicators(self):
-        df_stocks = set(self._df.index)
-        bs_stocks = set(self.buy_stats.index)
-        print('bs only:', bs_stocks - df_stocks)
-        print('df only:', df_stocks - bs_stocks)
-        self._df = pd.concat(
-            [self._df,
-             self.buy_stats[[
-                 'inEt', 'inFid', 'in_self_managed', 'currentlyActive']]],
-            axis=1)
-        
+        sims = [k for k in self.params.keys() if k.startswith('sim')]
+        for portfolio in ['et', 'fid', 'schwab', 'dm'] + sims:
+            self._get_proportions(portfolio)
+
     def _add_status(self):
         for portfolio, params in self.params.items():
             weights = params['status_weights']
             self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
                 weights, 'RSI', 'fair_value_mult', 'geomean')
+            scaler_scalar = params['scaler']
             self._df[f'{portfolio}_status_scaled'] = (
-                (0.6 * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5))
-            )
+                (scaler_scalar
+                 * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5)))
 
     def _get_weighted_harmonic_mean(self, weights, *cols):
         s_w = sum(weights)
@@ -55,92 +41,36 @@ class TransactionDeterminer:
         return s_w / denom
 
     def _add_scaled_sharpes(self):
-        for col in ['sharpe', 'weighted_sharpe']:
-            lower = self._df[col].quantile(q=0.02)
-            upper = self._df[col].quantile(q=0.98)
-            self._df[f'{col}_capped'] = self._df[col].clip(lower, upper)
-            min_capped = self._df[f'{col}_capped'].min()
-            self._df[f'{col}_scaled'] = (
-                self._df[f'{col}_capped'] - min_capped + 1)
-        
+        lower = self._df.sharpe.quantile(q=0.02)
+        upper = self._df.sharpe.quantile(q=0.98)
+        self._df['sharpe_capped'] = self._df.sharpe.clip(lower, upper)
+        min_capped = self._df.sharpe_capped.min()
+        self._df['sharpe_scaled'] = (self._df.sharpe_capped - min_capped + 1)
+
     def _get_status_weights(self):
         for portfolio in self.params:
             self._df[f'{portfolio}_sharpe_adj_status'] = (
                 self._df.sharpe_scaled
                 ** self._df[f'{portfolio}_status_scaled'])
-            self._df[f'{portfolio}_w_sharpe_adj_status'] = (
-                self._df.weighted_sharpe_scaled
-                ** self._df[f'{portfolio}_status_scaled'])
-            self._df[f'{portfolio}_mean_sharpe_adj_status'] = (
-                (self._df[f'{portfolio}_sharpe_adj_status']
-                 + self._df[f'{portfolio}_w_sharpe_adj_status'])
-                / 2)
 
-    def _get_et_proportions(self):
-        params = self.params['et']
-        use_weighted_sharpe = params['weighted_sharpe']
-        sharpe_col = (
-            'weighted_sharpe_scaled' if use_weighted_sharpe
-            else 'sharpe_scaled')
+    def _get_proportions(self, portfolio):
+        print(f'Getting proportions for {portfolio}...')
+        params = self.params[portfolio]
+        in_portfolio = {
+            'et': 'inEt',
+            'fid': 'inFid',
+            'schwab': 'in_self_managed',
+            'dm': 'inFid'
+        }.get(portfolio, 'in_self_managed')
         EXP = params['sharpe_scaled_exp']
-        sharpe_adj_status_type = params['sharpe_adj_status_type']
-        prop_et = (
-            (self._df[sharpe_col]**EXP)
-            * self._df[f'et_{sharpe_adj_status_type}sharpe_adj_status']
-            * self._df.inEt)
-        max_prop = params['max_prop_per_stock']
-        self._df['et_norm'] = self._rescale_props(prop_et, max_prop)
-    
-    def _get_fid_proportions(self):
-        params = self.params['fid']
-        use_weighted_sharpe = params['weighted_sharpe']
-        sharpe_col = (
-            'weighted_sharpe_scaled' if use_weighted_sharpe
-            else 'sharpe_scaled')
-        EXP = params['sharpe_scaled_exp']
-        sharpe_adj_status_type = params['sharpe_adj_status_type']
-        prop_fid = (
-            (self._df[sharpe_col]**EXP)
-            * self._df[f'fid_{sharpe_adj_status_type}sharpe_adj_status']
-            * self._df.inFid)
-        max_prop = params['max_prop_per_stock']
-        self._df['fid_norm'] = self._rescale_props(prop_fid, max_prop)
-
-    def _get_schwab_proportions(self):
-        params = self.params['schwab']
-        use_weighted_sharpe = params['weighted_sharpe']
-        sharpe_col = (
-            'weighted_sharpe_scaled' if use_weighted_sharpe
-            else 'sharpe_scaled')
-        EXP = params['sharpe_scaled_exp']
-        sharpe_adj_status_type = params['sharpe_adj_status_type']
-        prop_schwab = (
-            (self._df[sharpe_col]**EXP)
-            * self._df[f'schwab_{sharpe_adj_status_type}sharpe_adj_status']
-            * self._df.in_self_managed
+        prop = (
+            (self._df.sharpe_scaled ** EXP)
+            * self._df[f'{portfolio}_sharpe_adj_status']
+            * self._df[in_portfolio]
             * self._df.currentlyActive)
         max_prop = params['max_prop_per_stock']
-        self._df['schwab_norm'] = self._rescale_props(prop_schwab, max_prop)
-
-    def _get_sim_proportions(self):
-        sims = [
-            k for k in self.params.keys()
-            if k.startswith('sim') or k.startswith('dm')]
-        for sim in sims:
-            params = self.params[sim]
-            use_weighted_sharpe = params['weighted_sharpe']
-            sharpe_col = (
-                'weighted_sharpe_scaled' if use_weighted_sharpe
-                else 'sharpe_scaled')
-            EXP = params['sharpe_scaled_exp']
-            sharpe_adj_status_type = params['sharpe_adj_status_type']
-            prop_sim = (
-                (self._df[sharpe_col]**EXP)
-                * self._df[f'{sim}_{sharpe_adj_status_type}sharpe_adj_status']
-                * self._df.currentlyActive)
-            max_prop = params['max_prop_per_stock']
-            self._df[f'{sim}_norm'] = self._rescale_props(prop_sim, max_prop)
-
+        self._df[f'{portfolio}_norm'] = self._rescale_props(prop, max_prop)
+        
     @staticmethod
     def _rescale_props(prop, max_prop=0.05):
         prop_sum = prop.sum()
@@ -165,13 +95,14 @@ class TransactionDeterminer:
 
     def get_bid_ask_prices(self, account):
         print(f'Getting bid and ask prices for {account}...')
+        level = self.params[account]['level']
         bid_ask_multiplier = (
             self
             ._df[['direction', f'{account}_status_scaled', f'{account}_diff']]
-            .apply(lambda row: self._get_bid_ask(row, account), axis=1))
+            .apply(lambda row: self._get_bid_ask(row, account, level), axis=1))
         self._df[f'{account}_bid_ask'] = bid_ask_multiplier * self._df.price
-        
-    def _get_bid_ask(self, row, account):
+
+    def _get_bid_ask(self, row, account, level):
         try:
             distr = self._get_status_distribution(row, account)
             if distr is None:
@@ -179,6 +110,7 @@ class TransactionDeterminer:
             q = self._get_bid_ask_quantile_from_status_scaled(
                 row[f'{account}_status_scaled'],
                 account,
+                level,
                 row[f'{account}_diff'])
             # make sure q on [0.01, 0.99]
             if q < 0.01:
@@ -212,7 +144,8 @@ class TransactionDeterminer:
             distr = None
         return distr
 
-    def _get_bid_ask_quantile_from_status_scaled(self, status, account, diff):
+    def _get_bid_ask_quantile_from_status_scaled(
+            self, status, account, level, diff):
         # Prob of which buy/sell should happen given neutral status (0)
         #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'schwab': 0.5}[account]
         P_STATUS0_BUY = self.p_stats0_buy[account]
@@ -232,10 +165,10 @@ class TransactionDeterminer:
         # rise = P_STATUS0 - MIN if negative status (sell signal)
         # rise = MAX - P_STATUS0 if + status (buy signal)
         rise = P_STATUS0 - MIN_P if status <= 0 else MAX_P - P_STATUS0
-        m = rise / 5  # 5: status as which prob reaches 1
+        m = rise / level  # level: status as which prob reaches 1
         q = m*status + P_STATUS0
         q = min(max(q, MIN_P), MAX_P)
-        return q        
+        return q
 
     def get_n_shares_to_buy_or_sell(self, account):
         print('Determining ideal number of shares to buy/sell...')
@@ -307,8 +240,8 @@ class TransactionDeterminer:
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(
-                    f'{transaction_type.title():4s} {shares:+4d} shares of '
-                    f'{symbol:5s} at ${bid_ask:7,.2f} (Total: '
+                    f'{transaction_type.title():4s} {shares:+4d} shares '
+                    f'of {symbol:5s} at ${bid_ask:7,.2f} (Total: '
                     f'${abs(shares) * bid_ask:9,.2f}) '
                     f'Status: {status:.3f}')
             if abs(trans_total) >= abs(err):
@@ -326,3 +259,4 @@ class TransactionDeterminer:
             ascending=ascending,
             inplace=True)
 
+        
