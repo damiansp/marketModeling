@@ -18,15 +18,16 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   228380  # [217831, 235694]
-ET_VALUE =    177761  # [167274, 184216]
-SCHWAB_VALUE = 15790  # [ 14775,  16214]
-SIM1_VALUE =   85735 + 14387
-SIM2_VALUE =  179371 + 17033
-SIM3_VALUE =  194225 + 4275
+FID_VALUE =   235648  # [217831, 236093]
+ET_VALUE =    184471  # [167274, 184826]
+SCHWAB_VALUE = 16196  # [ 14775,  16216]
+SIM1_VALUE =  100912
+SIM2_VALUE =  200286
+SIM3_VALUE =  202051
 DM_VALUE   =   20134
-FRAC_IN = 0.7063
-BEST_SIM = 1  # update weekly (on Fri)
+BEST_SIM = 2  # update weekly (on Fri)
+FRAC_IN = 0.9533
+
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -40,12 +41,12 @@ PCT_TO_TRADE_DAILY = 0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.14},  # incr by 2
-    'fid':    {'buy': 0.01, 'sell': 0.14},  #         2
-    'schwab': {'buy': 0.01, 'sell': 0.18},  #         3
+    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 2
+    'fid':    {'buy': 0.10, 'sell': 0.01},  #         2
+    'schwab': {'buy': 0.15, 'sell': 0.01},  #         3
     'sim1':   {'buy': 0.01, 'sell': 0.06},  #         2 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.03},  #         1 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.08},  #         4 simsims
+    'sim2':   {'buy': 0.01, 'sell': 0.04},  #         1 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.04},  #         4 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -69,55 +70,24 @@ PARAMS = {
         'scaler': 0.6,
         'level': 5},
     'sim1': {
-        'level': 5,
-        'max_prop_per_stock': 0.1095,
-        'scaler': 0.6,
-        'sharpe_scaled_exp': 3.1903,
-        'status_weights': [3.266, 2.139, 1.0]},
-    'sim2': {
         'level': 5.1734,
         'max_prop_per_stock': 0.155,
         'scaler': 0.6332,
         'sharpe_scaled_exp': 3.2612,
         'status_weights': [3.029, 1.903, 1.0]},
+    'sim2': {
+        'level': 5.7028,
+        'max_prop_per_stock': 0.1761,
+        'scaler': 0.6238,
+        'sharpe_scaled_exp': 3.4912,
+        'status_weights': [116.38, 1.0, 32.356]},
     'sim3': {
-        'level': 5.5293,
-        'max_prop_per_stock': 0.1146,
-        'scaler': 0.6102,
-        'sharpe_scaled_exp': 3.98,
-        'status_weights': [3.78, 3.481, 1.0]}}
+        'level': 5.0878,
+        'max_prop_per_stock': 0.1679,
+        'scaler': 0.6009,
+        'sharpe_scaled_exp': 2.8326,
+        'status_weights': [3.048, 2.303, 1.0]}}
 PARAMS['dm'] = PARAMS['schwab']
-param_tracker = {
-    'max_prop': [
-        0.0641, 0.0587, 0.1155, 0.1155, 0.0962, 0.0962, 0.1095, 0.1095],
-    'exp': [
-        3.7602, 3.629, 3.5379, 3.5379, 3.9815, 3.9815, 3.1903, 3.1903],
-    'w_rsi': [
-        1.186, 4.160, 5.215, 5.215, 2.661, 2.661, 3.266, 3.266],
-    'w_fairval': [
-        1.485, 1.000, 1.000, 1.000, 1.030, 1.030, 2.139, 2.139],
-    'w_geomean': [
-        1.000, 6.988, 3.819, 3.819, 1.000, 1.000, 1.000, 1.000],
-    'scaler': [
-        0.6,   0.6,   0.6,   0.6,   0.6,   0.6,   0.6,   0.6],
-    'level': [
-        5,     5,     5,     5,     5,     5,     5,     5]}
-
-'''
-for param, ts in param_tracker.items():
-    if param == 'max_prop':
-        ts = [t * 100 for t in ts]
-    if param == 'exp':
-        ts = [t * 3 for t in ts]
-        param = '3(exp)'
-    if param == 'level':
-        ts = [t / 5 for t in ts]
-        param = 'level / 5'
-    plt.plot(ts, label=param)
-plt.legend()
-plt.show()
-exit()
-'''
 
 # File paths
 DATA = './data'
@@ -174,7 +144,7 @@ def main(start='beginning'):
 def make_sure_files_downloaded():
     downloads = [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')]
     n_found = 0
-    expected = ['PCRA', 'Portfolio', 'Positions', 'Dongmei']
+    expected = ['PCRA', 'Portfolio_Positions', 'Positions', 'Dongmei']
     for file_start in expected:
         for f in downloads:
             if f.startswith(file_start):

@@ -322,14 +322,14 @@ fracs.in <- c(fracs.in, f.in)
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; 
-f.out <- 0.03 # active bottom
+f.out <- 0 # 
 f.in <- 0.  # active top
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 #=============================================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
-	cat('STOP: missing a fractxion out.  Rerun')
+	cat('STOP: missing a fraction out.  Rerun')
 }
 
 remove.subsequent.fractions <- function(fractions) {
