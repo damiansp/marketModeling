@@ -14,8 +14,7 @@ TOMORROW = (datetime.now() + timedelta(1)).date()
 KEEP_N = 100
 YEARS_OF_DATA = 50
 MIN_YEARS = 10
-START = str(TOMORROW - timedelta(YEARS_OF_DATA * 365))
-print(f'START (init): {START}')
+START = TOMORROW - timedelta(round(YEARS_OF_DATA * 365.25))
 N_JOBS = 8
 
 
@@ -100,13 +99,19 @@ def process_batch(sharpes_list, batch, manual_symbols, min_start):
 
 
 def download_data(symbols):
-    std_out = sys.stdout
-    null = open(os.devnull, 'w')
-    sys.stdout = null
+    start = START
+    if start.weekday() == 5:  # Sat
+        start += timedelta(2)
+    elif start.weekday() == 6:  # Sun
+        start += timedelta(1)
+    print(f'start (init): {start}')
+    #std_out = sys.stdout
+    #null = open(os.devnull, 'w')
+    #sys.stdout = null
     try:
         data = (
             yf
-            .download(symbols, start=START, end=TOMORROW)
+            .download(symbols, start=str(start), end=TOMORROW)
             .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
         data.index = pd.to_datetime(data.index)
         data = data.sort_index()
@@ -116,10 +121,12 @@ def download_data(symbols):
         #data.drop(columns=missing_last, inplace=True)
         data.fillna(method='ffill', inplace=True)
         #data.to_csv(f'{data}/tmp/{symbols[0]}_{symbols[-1]}.csv')
-        sys.stdout = std_out
         return data
     except BaseException as e:
         print(f'Failed to download data:\n{e}')
+    #finally:
+    #    null.close()
+    #    sys.stdout = std_out
 
 
 def adjust_min_date(min_date, dates):
