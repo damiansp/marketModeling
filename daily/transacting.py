@@ -95,14 +95,17 @@ class TransactionDeterminer:
 
     def get_bid_ask_prices(self, account):
         print(f'Getting bid and ask prices for {account}...')
-        level = self.params[account]['level']
+        buy_level = self.params[account]['buy_level']
+        sell_level = self.params[account]['sell_level']
         bid_ask_multiplier = (
             self
             ._df[['direction', f'{account}_status_scaled', f'{account}_diff']]
-            .apply(lambda row: self._get_bid_ask(row, account, level), axis=1))
+            .apply(
+                lambda row: self._get_bid_ask(
+                    row, account, buy_level, sell_level), axis=1))
         self._df[f'{account}_bid_ask'] = bid_ask_multiplier * self._df.price
 
-    def _get_bid_ask(self, row, account, level):
+    def _get_bid_ask(self, row, account, buy_level, sell_level):
         try:
             distr = self._get_status_distribution(row, account)
             if distr is None:
@@ -110,7 +113,8 @@ class TransactionDeterminer:
             q = self._get_bid_ask_quantile_from_status_scaled(
                 row[f'{account}_status_scaled'],
                 account,
-                level,
+                buy_level,
+                sell_level,
                 row[f'{account}_diff'])
             # make sure q on [0.01, 0.99]
             if q < 0.01:
@@ -145,7 +149,7 @@ class TransactionDeterminer:
         return distr
 
     def _get_bid_ask_quantile_from_status_scaled(
-            self, status, account, level, diff):
+            self, status, account, buy_level, sell_level, diff):
         # Prob of which buy/sell should happen given neutral status (0)
         #P_STATUS0_BUY = {'et': 0.3, 'fid': 0.4, 'schwab': 0.5}[account]
         P_STATUS0_BUY = self.p_stats0_buy[account]
@@ -159,6 +163,7 @@ class TransactionDeterminer:
         #       0.50   0.50   0.59   0.68   0.77   0.86  0.95
         P_STATUS0 = (
             P_STATUS0_BUY['buy'] if diff >= 0 else 1 - P_STATUS0_BUY['sell'])
+        level = buy_level if diff >= 0 else sell_level
         MIN_P = 0.03  # p(buy | strong sell sig) or vice versa
         MAX_P = 0.97  # p(buy | strong buy sig)  ...
         # Piecewise linear interpolation: y = mx + b: b = P_STATUS_0

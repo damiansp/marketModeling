@@ -15,7 +15,7 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
 FID_VALUE =   234184  # [217831, 239119]
@@ -55,34 +55,40 @@ PARAMS = {
         'sharpe_scaled_exp': 3.9,
         'max_prop_per_stock': 0.05,
         # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
-        'scaler': 0.6,                   
-        'level': 5},
+        'scaler': 0.6,
+        'buy_level': 5,
+        'sell_level': 5},
     'fid': {
         'status_weights': [1, 1.1, 1],
         'sharpe_scaled_exp': 4,
         'max_prop_per_stock': 0.03,
         'scaler': 0.6,
-        'level': 5},
+        'buy_level': 5,
+        'sell_level': 5},
     'schwab': {
         'status_weights': [1, 1, 1.1],
         'sharpe_scaled_exp': 4.1,
         'max_prop_per_stock': 0.01,
         'scaler': 0.6,
-        'level': 5},
+        'buy_level': 5,
+        'sell_level': 5},
     'sim1': {
-        'level': 5.1734,
+        'buy_level': 5.1734,
+        'sell_level': 5.1734,
         'max_prop_per_stock': 0.155,
         'scaler': 0.6332,
         'sharpe_scaled_exp': 3.2612,
         'status_weights': [3.029, 1.903, 1.0]},
     'sim2': {
-        'level': 5.7028,
+        'buy_level': 5.7028,
+        'sell_level': 5.7028,
         'max_prop_per_stock': 0.1761,
         'scaler': 0.6238,
         'sharpe_scaled_exp': 3.4912,
         'status_weights': [116.38, 1.0, 32.356]},
     'sim3': {
-        'level': 5.0878,
+        'buy_level': 5.0878,
+        'sell_level': 5.0878,
         'max_prop_per_stock': 0.1679,
         'scaler': 0.6009,
         'sharpe_scaled_exp': 2.8326,
@@ -142,16 +148,19 @@ def main(start='beginning'):
 
     
 def make_sure_files_downloaded():
-    downloads = [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')]
-    n_found = 0
+    downloads = sorted(
+        [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')])
+    print('DOWNLOADS:', DOWNLOADS)
+    print('Downloads:', downloads)
     expected = ['PCRA', 'Portfolio_Positions', 'Positions', 'Dongmei']
     for file_start in expected:
+        found = False
         for f in downloads:
             if f.startswith(file_start):
-                n_found += 1
+                found = True
                 continue
-    if n_found != len(expected):
-        raise RuntimeError('One of more download missing.')
+        if not found:
+            raise RuntimeError(f'File starting with {file_start} not found')
     sims = [x for x in downloads if x.startswith('Holdings')]
     if len(sims) != 3:
         raise RuntimeError('One or more download missing.')
@@ -219,7 +228,8 @@ def join_metrics_and_transactions(stock_metrics, transactions):
 
 
 def print_buy_sell_statuses(account=None):
-    levels = {k: PARAMS[k]['level'] for k in PARAMS}
+    buy_levels = {k: PARAMS[k]['buy_level'] for k in PARAMS}
+    sell_levels = {k: PARAMS[k]['sell_level'] for k in PARAMS}
     for portfolio, data in P_STATS0_BUY.items():
         if account is not None and portfolio != account:
             continue
@@ -227,13 +237,23 @@ def print_buy_sell_statuses(account=None):
         print('-' * 25)
         print(portfolio)
         print('-' * 25)
+        # TODO: clean up -- do not need to get both
         for action, prob in data.items():
-            thresh, buy_frac, sell_frac = get_threshold(
-                levels[portfolio], prob)
+            thresh_b, buy_frac_b, sell_frac_b = get_threshold(
+                buy_levels[portfolio], prob)
+            thresh_s, buy_frac_s, sell_frac_s = get_threshold(
+                sell_levels[portfolio], prob)
             direction = 'above'
             if action == 'sell':
+                thresh = thresh_s
                 thresh *= -1
+                buy_frac = buy_frac_s
+                sell_frac = sell_frac_s
                 direction = 'below'
+            else:
+                thresh = thresh_b
+                buy_frac = buy_frac_b
+                sell_frac = sell_frac_b
             print(
                 f'  {action}: {thresh:.4f} and {direction} '
                 f'({buy_frac if action == "buy" else sell_frac:.4f})')
@@ -291,7 +311,8 @@ def update_sim_vals():
             'max_prop_per_stock': update_max_prop_per_stock(
                 sim1['max_prop_per_stock']),
             'scaler': update_scaler(sim1['scaler']),
-            'level': update_level(sim1['level'])}
+            'buy_level': update_level(sim1['buy_level']),
+            'sell_level': update_level(sim1['sell_level'])}
         out[f'sim{i + 1}'] = sim
     pprint(out)
 
