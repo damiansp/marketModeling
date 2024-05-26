@@ -26,7 +26,7 @@ SIM2_VALUE =  194850
 SIM3_VALUE =  200079
 DM_VALUE   =   20134
 BEST_SIM = 1  # update weekly (on Fri)
-FRAC_IN = 0.9999
+FRAC_IN = 0.9997
 
 
 TODAY = datetime.now().date()
@@ -37,7 +37,7 @@ HOME = os.environ['HOME']
 DOWNLOADS = f'{HOME}/Downloads'
 
 NEXT_DAY_DISTRIB_WINDOW = 750
-PCT_TO_TRADE_DAILY = 0.2
+PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
