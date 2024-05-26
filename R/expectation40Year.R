@@ -322,32 +322,32 @@ fracs.in <- c(fracs.in, f.in)
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; 
-f.out <- 0.1 # active top
-f.in <- 0.  #
-fracs.out <- c(fracs.out, f.out)
-fracs.in <- c(fracs.in, f.in)
+# f.out <- 0. # 
+# f.in <- 0.  #
+# fracs.out <- c(fracs.out, f.out)
+# fracs.in <- c(fracs.in, f.in)
 
-#=============================================================================
-if (length(fracs.out) != 7 | length(fracs.in) != 7) {
-	cat('STOP: missing a fraction out.  Rerun')
-}
+# #=============================================================================
+# if (length(fracs.out) != 7 | length(fracs.in) != 7) {
+	# cat('STOP: missing a fraction out.  Rerun')
+# }
 
-remove.subsequent.fractions <- function(fractions) {
-	amt.in <- 1
-	for (f in fractions) {
-		amt.in <- amt.in - f*amt.in
-	}
-	amt.in
-}
+# remove.subsequent.fractions <- function(fractions) {
+	# amt.in <- 1
+	# for (f in fractions) {
+		# amt.in <- amt.in - f*amt.in
+	# }
+	# amt.in
+# }
 
-add.subsequent.fractions <- function(fractions) {
-	reserves <- 1
-	for (f in fractions) {
-		reserves <- reserves - f*reserves
-	}
-	1 - reserves
-}
+# add.subsequent.fractions <- function(fractions) {
+	# reserves <- 1
+	# for (f in fractions) {
+		# reserves <- reserves - f*reserves
+	# }
+	# 1 - reserves
+# }
 
 
-(pct.invested <- remove.subsequent.fractions(fracs.out))
-(pct.reserves.to.add <- add.subsequent.fractions(fracs.in))
+# (pct.invested <- remove.subsequent.fractions(fracs.out))
+# (pct.reserves.to.add <- add.subsequent.fractions(fracs.in))
