@@ -15,18 +15,18 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   235810  # [217831, 239119]
-ET_VALUE =    178201  # [167274, 184826]
-SCHWAB_VALUE = 16049  # [ 14775,  16218]
-SIM1_VALUE =   99941
-SIM2_VALUE =  194850
-SIM3_VALUE =  200079
+FID_VALUE =   235337  # [217831, 239119]
+ET_VALUE =    172249  # [167274, 184826]
+SCHWAB_VALUE = 15950  # [ 14775,  16218]
+SIM1_VALUE =   99752
+SIM2_VALUE =  194080
+SIM3_VALUE =  200025
 DM_VALUE   =   20134
-BEST_SIM = 1  # update weekly (on Fri)
-FRAC_IN = 0.9997
+BEST_SIM = 3  # update weekly (on Fri)
+FRAC_IN = 1
 
 
 TODAY = datetime.now().date()
@@ -41,12 +41,12 @@ PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.18, 'sell': 0.01},  # incr by 2
-    'fid':    {'buy': 0.20, 'sell': 0.01},  #         2
-    'schwab': {'buy': 0.30, 'sell': 0.01},  #         2
-    'sim1':   {'buy': 0.08, 'sell': 0.01},  #         2 adelaide 2024
-    'sim2':   {'buy': 0.06, 'sell': 0.01},  #         1 aei
-    'sim3':   {'buy': 0.12, 'sell': 0.01},  #         4 simsims
+    'et':     {'buy': 0.27, 'sell': 0.01},  # incr by 3
+    'fid':    {'buy': 0.30, 'sell': 0.01},  #         3
+    'schwab': {'buy': 0.39, 'sell': 0.01},  #         3
+    'sim1':   {'buy': 0.20, 'sell': 0.01},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.10, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.32, 'sell': 0.01},  #         8 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -73,27 +73,27 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 5.1734,
-        'max_prop_per_stock': 0.155,
-        'scaler': 0.6332,
-        'sell_level': 5.1734,
-        'sharpe_scaled_exp': 3.2612,
-        'status_weights': [3.029, 1.903, 1.0]},
-    'sim2': {
-        'buy_level': 4.9402,
-        'max_prop_per_stock': 0.1617,
-        'scaler': 0.6668,
-        'sell_level': 5.2208,
-        'sharpe_scaled_exp': 3.0342,
-        'status_weights': [2.677, 1.0, 1.213]},
-    'sim3': {
         'buy_level': 4.506,
         'max_prop_per_stock': 0.1393,
         'scaler': 0.604,
         'sell_level': 5.6132,
         'sharpe_scaled_exp': 3.0511,
-        'status_weights': [1.807, 1.154, 1.0]}}
-PARAMS['dm'] = PARAMS['schwab']
+        'status_weights': [1.807, 1.154, 1.0]},
+    'sim2': {
+        'buy_level': 4.1661,
+        'max_prop_per_stock': 0.1397,
+        'scaler': 0.5456,
+        'sell_level': 4.7282,
+        'sharpe_scaled_exp': 3.6118,
+        'status_weights': [3.522, 1.0, 1.627]},
+    'sim3': {
+        'buy_level': 4.7412,
+        'max_prop_per_stock': 0.1469,
+        'scaler': 0.6557,
+        'sell_level': 6.8909,
+        'sharpe_scaled_exp': 3.002,
+        'status_weights': [1.723, 1.228, 1.0]}}
+PARAMS['dm'] = PARAMS['fid']
 
 # File paths
 DATA = './data'

@@ -55,11 +55,7 @@ class StockHoldingsUpdater:
     def _insert_current_best_stocks(self):
         print('Inserting current best stocks...')
         for stock in self.current_best_stocks:
-            if stock in self.current_stocks['blast_off']:
-                if stock not in self.buy_stats.index:
-                    self._append_new_stock(
-                        stock, ['inEt', 'inFid', 'in_self_managed'])
-            elif stock in self.current_stocks['stock_watcher']:
+            if stock in self.current_stocks['stock_watcher']:
                 if stock not in self.buy_stats.index:
                     self._append_new_stock(stock, ['inFid', 'in_self_managed'])
             elif stock in self.current_stocks['lingerers']:
