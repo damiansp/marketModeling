@@ -3,7 +3,7 @@
 library(tseries)
 library(TTR)
 
-SOURCE <- 'nasdaq1965.csv' #'sp1950.csv' # 'nya1965.csv'
+SOURCE <- 'sp1950.csv' # 'nasdaq1965.csv' # 'nya1965.csv'
 PATH <- sprintf('~/Learning/marketModeling/data/%s', SOURCE)
 
 random.color <- function() {

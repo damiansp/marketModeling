@@ -63,11 +63,20 @@ class TransactionDeterminer:
             'dm': 'inFid'
         }.get(portfolio, 'in_self_managed')
         EXP = params['sharpe_scaled_exp']
-        prop = (
-            (self._df.sharpe_scaled ** EXP)
-            * self._df[f'{portfolio}_sharpe_adj_status']
-            * self._df[in_portfolio]
-            * self._df.currentlyActive)
+        try:
+            prop = (
+                (self._df.sharpe_scaled ** EXP)
+                * self._df[f'{portfolio}_sharpe_adj_status']
+                * self._df[in_portfolio]
+                * self._df.currentlyActive)
+        except:
+            self._df.to_csv('~/Desktop/test.csv', index=False)
+            print('Values:')
+            print(
+                self._df[
+                    ['sharpe_scaled', f'{portfolio}_sharpe_adj_status',
+                     in_portfolio, 'currentlyActive']])
+            raise
         max_prop = params['max_prop_per_stock']
         self._df[f'{portfolio}_norm'] = self._rescale_props(prop, max_prop)
         

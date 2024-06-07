@@ -18,15 +18,18 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   235337  # [217831, 239119]
-ET_VALUE =    172249  # [167274, 184826]
-SCHWAB_VALUE = 15950  # [ 14775,  16218]
-SIM1_VALUE =   99752
-SIM2_VALUE =  194080
-SIM3_VALUE =  200025
+FID_VALUE =   233328  # [217831, 239119]
+ET_VALUE =    173222  # [167274, 184826]
+SCHWAB_VALUE = 15811  # [ 14775,  16218]
+SIM1_VALUE =  100881
+SIM2_VALUE =  199109
+SIM3_VALUE =  208321
 DM_VALUE   =   20134
 BEST_SIM = 3  # update weekly (on Fri)
-FRAC_IN = 1
+# 1 - 1 wk
+# 2
+# 3 - 1 wk
+FRAC_IN = 0.9860
 
 
 TODAY = datetime.now().date()
@@ -41,12 +44,12 @@ PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.27, 'sell': 0.01},  # incr by 3
-    'fid':    {'buy': 0.30, 'sell': 0.01},  #         3
-    'schwab': {'buy': 0.39, 'sell': 0.01},  #         3
-    'sim1':   {'buy': 0.20, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.10, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.32, 'sell': 0.01},  #         8 simsims
+    'et':     {'buy': 0.01, 'sell': 0.04},  # incr by 4
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.04},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.02},  #         2 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.08},  #         8 simsims
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -80,12 +83,12 @@ PARAMS = {
         'sharpe_scaled_exp': 3.0511,
         'status_weights': [1.807, 1.154, 1.0]},
     'sim2': {
-        'buy_level': 4.1661,
-        'max_prop_per_stock': 0.1397,
-        'scaler': 0.5456,
-        'sell_level': 4.7282,
-        'sharpe_scaled_exp': 3.6118,
-        'status_weights': [3.522, 1.0, 1.627]},
+        'buy_level': 4.4575,
+        'max_prop_per_stock': 0.1441,
+        'scaler': 0.6904,
+        'sell_level': 6.7065,
+        'sharpe_scaled_exp': 2.8938,
+        'status_weights': [4.128, 2.61, 1.0]},
     'sim3': {
         'buy_level': 4.7412,
         'max_prop_per_stock': 0.1469,
