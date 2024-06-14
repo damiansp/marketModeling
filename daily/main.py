@@ -18,19 +18,22 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   233328  # [217831, 239119]
-ET_VALUE =    173222  # [167274, 184826]
-SCHWAB_VALUE = 15811  # [ 14775,  16218]
-SIM1_VALUE =  100881
-SIM2_VALUE =  199109
-SIM3_VALUE =  208321
+FID_VALUE =   227824  # [217831, 239119]
+ET_VALUE =    170735  # [167274, 184826]
+SCHWAB_VALUE = 15628  # [ 14775,  16218]
+SIM1_VALUE =  100216
+SIM2_VALUE =  198856
+SIM3_VALUE =  201533
+SIM4_VALUE =  200000
+SIM5_VALUE =  200000
 DM_VALUE   =   20134
-BEST_SIM = 3  # update weekly (on Fri)
+BEST_SIM = 2  # update weekly (on Fri)
 # 1 - 1 wk
-# 2
+# 2 - 1 wk
 # 3 - 1 wk
-FRAC_IN = 0.9860
-
+# 4 - 0
+# 5 - 0
+FRAC_IN = 0.9880
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -44,12 +47,14 @@ PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.04},  # incr by 4
-    'fid':    {'buy': 0.01, 'sell': 0.04},  #         4
-    'schwab': {'buy': 0.01, 'sell': 0.04},  #         4
+    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
+    'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
+    'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
     'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.02},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.08},  #         8 simsims
+    'sim2':   {'buy': 0.01, 'sell': 0.06},  #         2 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.01},  #         8 simsims
+    'sim4':   {'buy': 0.04, 'sell': 0.01},  #         4 sim3
+    'sim5':   {'buy': 0.04, 'sell': 0.01},  #         4 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -58,44 +63,79 @@ PARAMS = {
         'sharpe_scaled_exp': 3.9,
         'max_prop_per_stock': 0.05,
         # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
-        'scaler': 0.6,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6},
+        #'scaler': 0.6,
         'buy_level': 5,
         'sell_level': 5},
     'fid': {
         'status_weights': [1, 1.1, 1],
         'sharpe_scaled_exp': 4,
         'max_prop_per_stock': 0.03,
-        'scaler': 0.6,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6
+        },
         'buy_level': 5,
         'sell_level': 5},
     'schwab': {
         'status_weights': [1, 1, 1.1],
         'sharpe_scaled_exp': 4.1,
         'max_prop_per_stock': 0.01,
-        'scaler': 0.6,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6
+        },
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
         'buy_level': 4.506,
         'max_prop_per_stock': 0.1393,
-        'scaler': 0.604,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6
+        },        
         'sell_level': 5.6132,
         'sharpe_scaled_exp': 3.0511,
         'status_weights': [1.807, 1.154, 1.0]},
     'sim2': {
         'buy_level': 4.4575,
         'max_prop_per_stock': 0.1441,
-        'scaler': 0.6904,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6
+        },
         'sell_level': 6.7065,
         'sharpe_scaled_exp': 2.8938,
         'status_weights': [4.128, 2.61, 1.0]},
     'sim3': {
         'buy_level': 4.7412,
         'max_prop_per_stock': 0.1469,
-        'scaler': 0.6557,
+        'scaling': {
+            'method': 'tan',
+            'scaler': 0.6
+        },
         'sell_level': 6.8909,
         'sharpe_scaled_exp': 3.002,
-        'status_weights': [1.723, 1.228, 1.0]}}
+        'status_weights': [1.723, 1.228, 1.0]},
+    'sim4': {
+        'buy_level': 5.497,
+        'max_prop_per_stock': 0.1228,
+        'scaling': {'method': 'quadratic', 'negpos': -1, 'center': 0.5},
+        'sell_level': 7.9944,
+        'sharpe_scaled_exp': 2.6324,
+        'status_weights': [3.704, 2.716, 1.0]},
+    'sim5': {
+        'buy_level': 4.5849,
+        'max_prop_per_stock': 0.1452,
+        'scaling': {
+            'intercept': -4.9067,
+            'method': 'linear',
+            'slope': -13.8662},
+        'sell_level': 6.4014,
+        'sharpe_scaled_exp': 2.028,
+        'status_weights': [2.667, 1.298, 1.0]}}
 PARAMS['dm'] = PARAMS['fid']
 
 # File paths
@@ -165,7 +205,7 @@ def make_sure_files_downloaded():
         if not found:
             raise RuntimeError(f'File starting with {file_start} not found')
     sims = [x for x in downloads if x.startswith('Holdings')]
-    if len(sims) != 3:
+    if len(sims) != 5:
         raise RuntimeError('One or more download missing.')
 
 
@@ -282,9 +322,10 @@ def get_transactions(stock_metrics, next_day_distributions):
         stock_metrics, next_day_distributions, FRAC_IN, P_STATS0_BUY, PARAMS)
     determiner.compile_data()
     for account, amt in zip(
-            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3', 'dm'],
+            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3', 'sim4', 'sim5',
+             'dm'],
             [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE,
-             SIM3_VALUE, DM_VALUE]):
+             SIM3_VALUE, SIM4_VALUE, SIM5_VALUE, DM_VALUE]):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -313,7 +354,7 @@ def update_sim_vals():
                 sim1['sharpe_scaled_exp']),
             'max_prop_per_stock': update_max_prop_per_stock(
                 sim1['max_prop_per_stock']),
-            'scaler': update_scaler(sim1['scaler']),
+            'scaling': update_scaling(sim1['scaling']),
             'buy_level': update_level(sim1['buy_level']),
             'sell_level': update_level(sim1['sell_level'])}
         out[f'sim{i + 1}'] = sim
@@ -345,10 +386,56 @@ def update_max_prop_per_stock(current):
     return max(min(round(prop, 4), MAX), MIN)
 
 
-def update_scaler(scaler):
-    factor = np.random.normal(loc=1, scale=0.1)
-    scaler *= factor
-    return round(scaler, 4)
+def update_scaling(scaling):
+    method = scaling['method']
+    i = ['linear', 'quadratic', 'tan'].index(method)
+    ps = np.array([1., 1., 1.])
+    ps[i] *= 4
+    ps = ps / ps.sum()
+    out_method = np.random.choice(['linear', 'quadratic', 'tan'], p=ps)
+    if out_method != method:
+        scaling = None
+    ###
+    print('in method:', method, 'out method:', out_method, 'scaling:', scaling)
+    ###
+    return {
+        'linear': update_linear_scaling,
+        'quadratic': update_quadratic_scaling,
+        'tan': update_tan_scaling
+    }[out_method](scaling)
+
+
+def update_linear_scaling(scaling):
+    if scaling is None:
+        intercept = round(np.random.uniform(-10, 10), 4)
+        slope = round(np.random.uniform(-20, 20), 4)
+    else:
+        intercept = round(np.random.normal(scaling['intercept'], scale=1), 4)
+        slope = round(np.random.normal(scaling['slope'], scale=1), 4)
+    return {'method': 'linear', 'intercept': intercept, 'slope': slope}
+
+
+def update_quadratic_scaling(scaling):
+    if scaling is None:
+        negpos = np.random.choice([-1, 1])
+        center = round(np.random.uniform(0, 1), 4)
+    else:
+        flip = np.random.choice([True, False], p=[0.1, 0.9])
+        if flip:
+            negpos = scaling['negpos'] * -1
+        center = round(np.random.normal(scaling['center'], scale=0.1), 4)
+    return {'method': 'quadratic', 'negpos': negpos, 'center': center}
+                       
+
+def update_tan_scaling(scaling):
+    if scaling is None:
+        scaler = np.random.normal(0.6, scale=0.05)
+    else:
+        scaler = scaling['scaler']
+        factor = np.random.normal(loc=1, scale=0.1)
+        scaler *= factor
+    return {'method': 'tan', 'scaler': round(scaler, 4)}
+
 
 def update_level(level):
     factor = np.random.normal(loc=1, scale=0.1)

@@ -28,10 +28,41 @@ class TransactionDeterminer:
             weights = params['status_weights']
             self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
                 weights, 'RSI', 'fair_value_mult', 'geomean')
-            scaler_scalar = params['scaler']
-            self._df[f'{portfolio}_status_scaled'] = (
-                (scaler_scalar
-                 * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5)))
+            #scaler_scalar = params['scaler']
+            #self._df[f'{portfolio}_status_scaled'] = (
+            #    (scaler_scalar
+            #     * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5)))
+            scaling = params['scaling']
+            method = scaling['method']
+            x = self._df[f'{portfolio}_status'].copy()
+            self._df[f'{portfolio}_status_scaled'] = {
+                'tan': self._scale_tan,
+                'linear': self._scale_linear,
+                'quadratic': self._scale_quadratic
+            }[method](x, scaling)
+
+    @staticmethod
+    def _scale_tan(x, scaling):
+        scaler_scalar = scaling['scaler']
+        y = scaler_scalar * np.tan(3 * (1 - x) - 1.5)
+        return y
+
+    @staticmethod
+    def _scale_linear(x,scaling):
+        intercept = scaling['intercept']
+        slope = scaling['slope']
+        y = intercept + slope * x
+        return y
+
+    @staticmethod
+    def _scale_quadratic(x, scaling):
+        negpos = scaling['negpos']  # 1 or -1
+        if negpos not in [-1, 1]:
+            raise ValueError('negpos must be 1 or -1')
+        center = scaling['center']
+        # 6.32455: makes parabola have height of 10 for center +- 0.5
+        y = negpos * ((6.32455 * (x - center))**2 - 5)
+        return y                
 
     def _get_weighted_harmonic_mean(self, weights, *cols):
         s_w = sum(weights)
