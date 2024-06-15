@@ -188,6 +188,27 @@ sim3.val <- sum(mw$Value)
 sim3.name <- 'simsims'
 
 
+sim4 <- (c(
+                  rep(NA, 113), 100000)
+  / 100000)
+sim4.res <- 15693
+mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(3).csv')
+mw$Value <- str_replace(mw$Value, ",", "")
+mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
+sim4.val <- sum(mw$Value)
+sim4.name <- 'sim3'
+
+sim5 <- (c(
+                  rep(NA, 113), 100000)
+  / 100000)
+sim5.res <- 15693
+mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(4).csv')
+mw$Value <- str_replace(mw$Value, ",", "")
+mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
+sim5.val <- sum(mw$Value)
+sim5.name <- 'simz'
+
+
 normalize.to.index <- function(x, index) {
 	x / x[index]
 }
@@ -254,9 +275,12 @@ mine.sh     <- get.sharpe.from.daily.values(mine[this.year])
 f1k.sh      <- get.sharpe.from.daily.values(f1k[this.year]) 
 fid.sh      <- get.sharpe.from.daily.values(fid[this.year]) 
 et.sh       <- get.sharpe.from.daily.values(et[this.year])
-sim1.sh      <- get.sharpe.from.daily.values(sim1)
-sim2.sh      <- get.sharpe.from.daily.values(sim2)
-sim3.sh      <- get.sharpe.from.daily.values(sim3)
+sim1.sh     <- get.sharpe.from.daily.values(sim1)
+sim2.sh     <- get.sharpe.from.daily.values(sim2)
+sim3.sh     <- get.sharpe.from.daily.values(sim3)
+sim4.sh     <- get.sharpe.from.daily.values(sim4)
+sim5.sh     <- get.sharpe.from.daily.values(sim5)
+
 
 # PLOT 1: This year's returns ---------------------------------------------------
 plot(
@@ -280,14 +304,16 @@ lines(days, f1k / f1k[year.start], lwd=3, col='maroon')
 lines(0:(length(sim1) - 1), sim1, lwd=3, col='hotpink')
 lines(0:(length(sim2) - 1), sim2, lwd=3, col='limegreen')
 lines(0:(length(sim3) - 1), sim3, lwd=3, col='cyan')
+lines(0:(length(sim4) - 1), sim4, lwd=3, col='gunmetal')
+lines(0:(length(sim5) - 1), sim5, lwd=3, col='coral')
 lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start], col=2)
 legend(
   'topleft',
   lty=1,
-  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1),
+  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1),
   col=c(
     'orange', 'darkgreen', 'purple', 'sienna', 'maroon', 'cadetblue', 'black', 
-    'hotpink', 'limegreen', 'cyan', 'red'),
+    'hotpink', 'limegreen', 'cyan', 'gubnetal', 'coral', 'red'),
   legend=c(
     paste(sp.sh, 'S&P'),
     paste(fid.sh, 'Fid'),
@@ -299,6 +325,8 @@ legend(
     paste(sim1.sh, sim1.name),
     paste(sim2.sh, sim2.name),
     paste(sim3.sh, sim3.name),
+    paste(sim4.sh, sim4.name),
+    paste(sim5.sh, sim5.name),
     paste('Diff(SP)')),
   bg=rgb(1, 1, 1, alpha=0.8))
 #--------------------------------------------------------------------------------
@@ -374,6 +402,8 @@ for (p in y) { cat(p, '\n') }
 (round(sim1.val) + (sim1.res))
 (round(sim2.val) + (sim2.res))
 (round(sim3.val) + (sim3.res))
+(round(sim4.val) + (sim4.res))
+(round(sim5.val) + (sim5.res))
 (pct.invested)
 
 n <- length(sim1)
@@ -381,6 +411,8 @@ NDAYS.LOOKBACK <- 5
 sim1[n] / sim1[n - NDAYS.LOOKBACK]
 sim2[n] / sim2[n - NDAYS.LOOKBACK]
 sim3[n] / sim3[n - NDAYS.LOOKBACK]
+sim4[n] / sim4[n - NDAYS.LOOKBACK]
+sim5[n] / sim5[n - NDAYS.LOOKBACK]
 
 n <- length(fid.val)
 fid.val[n] / fid.val[n - NDAYS.LOOKBACK]
