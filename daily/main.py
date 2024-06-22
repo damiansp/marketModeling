@@ -15,25 +15,25 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   227824  # [217831, 239119]
-ET_VALUE =    170735  # [167274, 184826]
-SCHWAB_VALUE = 15628  # [ 14775,  16218]
-SIM1_VALUE =  100216
-SIM2_VALUE =  198856
-SIM3_VALUE =  201533
-SIM4_VALUE =  200000
-SIM5_VALUE =  200000
+FID_VALUE =   231881  # [217831, 239119]
+ET_VALUE =    171110  # [167274, 184826]
+SCHWAB_VALUE = 15779  # [ 14775,  16218]
+SIM1_VALUE =  102452
+SIM2_VALUE =  208563
+SIM3_VALUE =  214541
+SIM4_VALUE =  200587
+SIM5_VALUE =  202198
 DM_VALUE   =   20134
-BEST_SIM = 2  # update weekly (on Fri)
-# 1 - 1 wk
-# 2 - 1 wk
-# 3 - 1 wk
-# 4 - 0
-# 5 - 0
-FRAC_IN = 0.9880
+BEST_SIM = 2  # updafte weekly (on Fri)
+# 1 - 0 wk
+# 2 - 2 wk
+# 3 - 0 wk
+# 4 - 0 wk 
+# 5 - 0 wk
+FRAC_IN = 0.9820
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -47,14 +47,14 @@ PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
+    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
     'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
     'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.06},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.01},  #         8 simsims
-    'sim4':   {'buy': 0.04, 'sell': 0.01},  #         4 sim3
-    'sim5':   {'buy': 0.04, 'sell': 0.01},  #         4 simz
+    'sim1':   {'buy': 0.04, 'sell': 0.01},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.02, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.16, 'sell': 0.01},  #         8 simsims
+    'sim4':   {'buy': 0.20, 'sell': 0.01},  #         4 sim3
+    'sim5':   {'buy': 0.20, 'sell': 0.01},  #         4 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -90,52 +90,40 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 4.506,
-        'max_prop_per_stock': 0.1393,
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6
-        },        
-        'sell_level': 5.6132,
-        'sharpe_scaled_exp': 3.0511,
-        'status_weights': [1.807, 1.154, 1.0]},
-    'sim2': {
         'buy_level': 4.4575,
         'max_prop_per_stock': 0.1441,
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6
-        },
+        'scaling': {'method': 'tan', 'scaler': 0.6},
         'sell_level': 6.7065,
         'sharpe_scaled_exp': 2.8938,
         'status_weights': [4.128, 2.61, 1.0]},
-    'sim3': {
-        'buy_level': 4.7412,
-        'max_prop_per_stock': 0.1469,
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6
-        },
-        'sell_level': 6.8909,
-        'sharpe_scaled_exp': 3.002,
-        'status_weights': [1.723, 1.228, 1.0]},
-    'sim4': {
-        'buy_level': 5.497,
-        'max_prop_per_stock': 0.1228,
-        'scaling': {'method': 'quadratic', 'negpos': -1, 'center': 0.5},
-        'sell_level': 7.9944,
-        'sharpe_scaled_exp': 2.6324,
-        'status_weights': [3.704, 2.716, 1.0]},
-    'sim5': {
-        'buy_level': 4.5849,
-        'max_prop_per_stock': 0.1452,
-        'scaling': {
-            'intercept': -4.9067,
-            'method': 'linear',
-            'slope': -13.8662},
-        'sell_level': 6.4014,
-        'sharpe_scaled_exp': 2.028,
-        'status_weights': [2.667, 1.298, 1.0]}}
+     'sim2': {
+         'buy_level': 3.7777,
+         'max_prop_per_stock': 0.1297,
+         'scaling': {'intercept': 4.509, 'method': 'linear', 'slope': 0.258},
+         'sell_level': 6.0425,
+         'sharpe_scaled_exp': 3.1456,
+         'status_weights': [2.387, 4.744, 1.0]},
+     'sim3': {
+         'buy_level': 4.4992,
+         'max_prop_per_stock': 0.1378,
+         'scaling': {'method': 'tan', 'scaler': 0.5637},
+         'sell_level': 6.9714,
+         'sharpe_scaled_exp': 2.7345,
+         'status_weights': [2.975, 2.461, 1.0]},
+     'sim4': {
+         'buy_level': 4.5151,
+         'max_prop_per_stock': 0.1652,
+         'scaling': {'intercept': 4.744, 'method': 'linear', 'slope': 3.0783},
+         'sell_level': 6.9052,
+         'sharpe_scaled_exp': 2.6483,
+         'status_weights': [6.575, 5.398, 1.0]},
+     'sim5': {
+         'buy_level': 4.7114,
+         'max_prop_per_stock': 0.1476,
+         'scaling': {'method': 'tan', 'scaler': 0.6069},
+         'sell_level': 6.7017,
+         'sharpe_scaled_exp': 2.4636,
+         'status_weights': [2.154, 1.346, 1.0]}}
 PARAMS['dm'] = PARAMS['fid']
 
 # File paths
@@ -390,7 +378,7 @@ def update_scaling(scaling):
     method = scaling['method']
     i = ['linear', 'quadratic', 'tan'].index(method)
     ps = np.array([1., 1., 1.])
-    ps[i] *= 4
+    ps[i] *= 3
     ps = ps / ps.sum()
     out_method = np.random.choice(['linear', 'quadratic', 'tan'], p=ps)
     if out_method != method:
@@ -420,9 +408,10 @@ def update_quadratic_scaling(scaling):
         negpos = np.random.choice([-1, 1])
         center = round(np.random.uniform(0, 1), 4)
     else:
+        negpos = scaling['negpos']
         flip = np.random.choice([True, False], p=[0.1, 0.9])
         if flip:
-            negpos = scaling['negpos'] * -1
+            negpos * -1
         center = round(np.random.normal(scaling['center'], scale=0.1), 4)
     return {'method': 'quadratic', 'negpos': negpos, 'center': center}
                        
