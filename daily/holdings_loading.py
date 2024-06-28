@@ -153,7 +153,7 @@ class HoldingsLoader:
         print('Uploading simulation data...')
         files = [
             f'Holdings - Damian Satterthwaite-Phillips{x}.csv' for
-            x in ['', '(1)', '(2)']]
+            x in ['', '(1)', '(2)', '(3)', '(4)']]  # TODO: arbitrary no.
         print(f'Found {len(files)} sim files.')
         dfs = []
         for f in files:

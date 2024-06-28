@@ -18,22 +18,22 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   231881  # [217831, 239119]
-ET_VALUE =    171110  # [167274, 184826]
-SCHWAB_VALUE = 15779  # [ 14775,  16218]
-SIM1_VALUE =  102452
-SIM2_VALUE =  208563
-SIM3_VALUE =  214541
-SIM4_VALUE =  200587
-SIM5_VALUE =  202198
+FID_VALUE =   233366  # [217831, 239119]
+ET_VALUE =    174805  # [167274, 184826]
+SCHWAB_VALUE = 15948  # [ 14775,  16218]
+SIM1_VALUE =  103837
+SIM2_VALUE =  213500
+SIM3_VALUE =  217815
+SIM4_VALUE =  199830
+SIM5_VALUE =  208374
 DM_VALUE   =   20134
-BEST_SIM = 2  # updafte weekly (on Fri)
+BEST_SIM = 2  # update weekly (on Fri)
 # 1 - 0 wk
 # 2 - 2 wk
 # 3 - 0 wk
 # 4 - 0 wk 
 # 5 - 0 wk
-FRAC_IN = 0.9820
+FRAC_IN = 0.9995
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -47,14 +47,14 @@ PCT_TO_TRADE_DAILY = 1.  #0.2
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
+    'et':     {'buy': 0.05, 'sell': 0.01},  # incr by 5
+    'fid':    {'buy': 0.03, 'sell': 0.01},  #         3
+    'schwab': {'buy': 0.24, 'sell': 0.01},  #         6
     'sim1':   {'buy': 0.04, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.02, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.16, 'sell': 0.01},  #         8 simsims
-    'sim4':   {'buy': 0.20, 'sell': 0.01},  #         4 sim3
-    'sim5':   {'buy': 0.20, 'sell': 0.01},  #         4 simz
+    'sim2':   {'buy': 0.06, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.48, 'sell': 0.01},  #         8 simsims
+    'sim4':   {'buy': 0.36, 'sell': 0.01},  #         4 sim3
+    'sim5':   {'buy': 0.36, 'sell': 0.01},  #         4 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -157,7 +157,7 @@ def main(start='beginning'):
     current_stocks, transactions = update_current_stocks(
         current_stocks, list(best_stocks.columns), transactions)
     print('\n\nBEGINNING COMPLETE\n\n')
-    if start in  ['beggining', 'transactions']:
+    if start in  ['beginning', 'transactions']:
         get_next_day_distributions(current_stocks)
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
     print('\n\nTRANSACTIONS COMPLETE\n\n')
@@ -166,11 +166,9 @@ def main(start='beginning'):
     print('\n\nMETRICS COMPLETE\n\n')
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = join_metrics_and_transactions(stock_metrics, transactions)
-    ###
     for col in holdings.columns:
         stock_metrics[col] = holdings[col]
         stock_metrics[col].fillna(0, inplace=True)
-    ###
     print_buy_sell_statuses()
     transactions = get_transactions(stock_metrics, next_day_distributions)
     transactions.sort_index().to_csv(TRANSACTIONS)

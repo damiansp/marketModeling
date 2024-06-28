@@ -5,6 +5,7 @@ class TransactionDeterminer:
     def __init__(
             self, metrics, next_day_distributions, frac_in, p_stats0_buy,
             params):
+        #metrics.to_csv('~/Desktop/test1.csv')
         self._df = metrics
         self.next_day_distributions = next_day_distributions
         self.frac_in = frac_in
@@ -25,13 +26,11 @@ class TransactionDeterminer:
 
     def _add_status(self):
         for portfolio, params in self.params.items():
+            print(portfolio)
             weights = params['status_weights']
+            print('weights:', weights) 
             self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
                 weights, 'RSI', 'fair_value_mult', 'geomean')
-            #scaler_scalar = params['scaler']
-            #self._df[f'{portfolio}_status_scaled'] = (
-            #    (scaler_scalar
-            #     * np.tan(3 * (1 - self._df[f'{portfolio}_status']) - 1.5)))
             scaling = params['scaling']
             method = scaling['method']
             x = self._df[f'{portfolio}_status'].copy()
@@ -41,9 +40,20 @@ class TransactionDeterminer:
                 'quadratic': self._scale_quadratic
             }[method](x, scaling)
 
+    def _get_weighted_harmonic_mean(self, weights, *cols):
+        s_w = sum(weights)
+        denom = 0
+        for w, col in zip(weights, cols):
+            denom += (w / self._df[col])
+        return s_w / denom
+
     @staticmethod
     def _scale_tan(x, scaling):
         scaler_scalar = scaling['scaler']
+        ###
+        print('sc_sc:', scaler_scalar)
+        print('x:', x)
+        ###
         y = scaler_scalar * np.tan(3 * (1 - x) - 1.5)
         return y
 
@@ -63,13 +73,6 @@ class TransactionDeterminer:
         # 6.32455: makes parabola have height of 10 for center +- 0.5
         y = negpos * ((6.32455 * (x - center))**2 - 5)
         return y                
-
-    def _get_weighted_harmonic_mean(self, weights, *cols):
-        s_w = sum(weights)
-        denom = 0
-        for w, col in zip(weights, cols):
-            denom += (w / self._df[col])
-        return s_w / denom
 
     def _add_scaled_sharpes(self):
         lower = self._df.sharpe.quantile(q=0.02)
