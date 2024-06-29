@@ -15,25 +15,25 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   233366  # [217831, 239119]
-ET_VALUE =    174805  # [167274, 184826]
-SCHWAB_VALUE = 15948  # [ 14775,  16218]
-SIM1_VALUE =  103837
-SIM2_VALUE =  213500
-SIM3_VALUE =  217815
-SIM4_VALUE =  199830
-SIM5_VALUE =  208374
+FID_VALUE =   233117  # [217831, 239119]
+ET_VALUE =    174790  # [167274, 184826]
+SCHWAB_VALUE = 15876  # [ 14775,  16218]
+SIM1_VALUE =  104391
+SIM2_VALUE =  214760
+SIM3_VALUE =  217159
+SIM4_VALUE =  197662
+SIM5_VALUE =  209742
 DM_VALUE   =   20134
 BEST_SIM = 2  # update weekly (on Fri)
-# 1 - 0 wk
-# 2 - 2 wk
-# 3 - 0 wk
+# 1 - 2 wk
+# 2 - 0 wk
+# 3 - 1 wk
 # 4 - 0 wk 
 # 5 - 0 wk
-FRAC_IN = 0.9995
+FRAC_IN = 0.9999
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -43,18 +43,18 @@ HOME = os.environ['HOME']
 DOWNLOADS = f'{HOME}/Downloads'
 
 NEXT_DAY_DISTRIB_WINDOW = 750
-PCT_TO_TRADE_DAILY = 1.  #0.2
+PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.05, 'sell': 0.01},  # incr by 5
-    'fid':    {'buy': 0.03, 'sell': 0.01},  #         3
-    'schwab': {'buy': 0.24, 'sell': 0.01},  #         6
-    'sim1':   {'buy': 0.04, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.06, 'sell': 0.01},  #         2 aei
-    'sim3':   {'buy': 0.48, 'sell': 0.01},  #         8 simsims
-    'sim4':   {'buy': 0.36, 'sell': 0.01},  #         4 sim3
-    'sim5':   {'buy': 0.36, 'sell': 0.01},  #         4 simz
+    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
+    'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
+    'schwab': {'buy': 0.25, 'sell': 0.01},  #         5
+    'sim1':   {'buy': 0.08, 'sell': 0.01},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.08, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.56, 'sell': 0.01},  #         8 simsims
+    'sim4':   {'buy': 0.40, 'sell': 0.01},  #         4 sim3
+    'sim5':   {'buy': 0.40, 'sell': 0.01},  #         4 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -90,40 +90,40 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 4.4575,
-        'max_prop_per_stock': 0.1441,
-        'scaling': {'method': 'tan', 'scaler': 0.6},
-        'sell_level': 6.7065,
-        'sharpe_scaled_exp': 2.8938,
-        'status_weights': [4.128, 2.61, 1.0]},
-     'sim2': {
-         'buy_level': 3.7777,
-         'max_prop_per_stock': 0.1297,
-         'scaling': {'intercept': 4.509, 'method': 'linear', 'slope': 0.258},
-         'sell_level': 6.0425,
-         'sharpe_scaled_exp': 3.1456,
-         'status_weights': [2.387, 4.744, 1.0]},
-     'sim3': {
-         'buy_level': 4.4992,
+        'buy_level': 3.7777,
+        'max_prop_per_stock': 0.1297,
+        'scaling': {'intercept': 4.509, 'method': 'linear', 'slope': 0.258},
+        'sell_level': 6.0425,
+        'sharpe_scaled_exp': 3.1456,
+        'status_weights': [2.387, 4.744, 1.0]},
+    'sim2': {
+        'buy_level': 3.7582,
+        'max_prop_per_stock': 0.1159,
+        'scaling': {'method': 'tan', 'scaler': 0.6489},
+        'sell_level': 7.0009,
+        'sharpe_scaled_exp': 2.8217,
+        'status_weights': [2.772, 7.569, 1.0]},
+    'sim3': {
+        'buy_level': 4.4992,
          'max_prop_per_stock': 0.1378,
-         'scaling': {'method': 'tan', 'scaler': 0.5637},
-         'sell_level': 6.9714,
-         'sharpe_scaled_exp': 2.7345,
-         'status_weights': [2.975, 2.461, 1.0]},
-     'sim4': {
-         'buy_level': 4.5151,
-         'max_prop_per_stock': 0.1652,
-         'scaling': {'intercept': 4.744, 'method': 'linear', 'slope': 3.0783},
-         'sell_level': 6.9052,
-         'sharpe_scaled_exp': 2.6483,
-         'status_weights': [6.575, 5.398, 1.0]},
-     'sim5': {
-         'buy_level': 4.7114,
-         'max_prop_per_stock': 0.1476,
-         'scaling': {'method': 'tan', 'scaler': 0.6069},
-         'sell_level': 6.7017,
-         'sharpe_scaled_exp': 2.4636,
-         'status_weights': [2.154, 1.346, 1.0]}}
+        'scaling': {'method': 'tan', 'scaler': 0.5637},
+        'sell_level': 6.9714,
+        'sharpe_scaled_exp': 2.7345,
+        'status_weights': [2.975, 2.461, 1.0]},
+    'sim4': {
+        'buy_level': 4.3558,
+        'max_prop_per_stock': 0.1624,
+        'scaling': {'method': 'tan', 'scaler': 0.6167},
+        'sell_level': 6.7059,
+        'sharpe_scaled_exp': 3.6277,
+        'status_weights': [2.395, 5.133, 1.0]},
+    'sim5': {
+        'buy_level': 3.8367,
+        'max_prop_per_stock': 0.1081,
+        'scaling': {'intercept': 5.3569, 'method': 'linear', 'slope': 1.7411},
+        'sell_level': 5.4204,
+        'sharpe_scaled_exp': 3.4773,
+        'status_weights': [5.504, 8.384, 1.0]}}
 PARAMS['dm'] = PARAMS['fid']
 
 # File paths
