@@ -3,6 +3,7 @@ import multiprocessing as mp
 import os
 import pickle
 import sys
+from time import sleep
 
 import numpy as np
 import pandas as pd
@@ -15,8 +16,13 @@ KEEP_N = 100
 YEARS_OF_DATA = 50
 MIN_YEARS = 10
 START = TOMORROW - timedelta(round(YEARS_OF_DATA * 365.25))
+MIN_PRICE = 2.
+MAX_ATTEMPTS = 6
 N_JOBS = 8
 
+
+def red(txt):
+    return f'\033[91m{txt}\033[0m'
 
 def get_best_stocks(outpath, manual_symbols=None):
     symbols = load_data()
@@ -46,6 +52,8 @@ def get_best_stocks(outpath, manual_symbols=None):
     final_candidates = manual_symbols | set(sharpes.index)
     print('Final candidates:', len(final_candidates), 'START:', START)
     n = 0
+    attempt = 0
+    throttle_seconds = 1
     while n == 0:
         data = (
             yf
@@ -54,11 +62,17 @@ def get_best_stocks(outpath, manual_symbols=None):
         data.index = pd.to_datetime(data.index)
         data = data.sort_index()
         n = len(data)
-        print('n retrieved:', n)
+        attempt += 1
+        sleep(throttle_seconds)
+        throttle_seconds *= 2
+        if attempt >= MAX_ATTEMPTS:
+            print(red(f'\n\n{MAX_ATTEMPTS} failed attempts. Aborting.\n\n'))
+            return None
     return data
 
     
 def load_data():
+    # file created by ../notebooks/stock_symbol_scrape.py
     with open(f'{DATA}/all_symbols.pkl', 'rb') as f:
         symbols = pickle.load(f)
     return set(symbols)
@@ -90,10 +104,11 @@ def process_batch(sharpes_list, batch, manual_symbols, min_start):
     try:
         print(batch[0], end='\r')
         data = download_data(batch)
-        min_start = adjust_min_date(min_start, data.index)
-        data = filter_by_min_date(data, manual_symbols, min_start)
-        sharpes = get_sharpes(data)
-        sharpes_list.append(sharpes)
+        if data is not None:
+            min_start = adjust_min_date(min_start, data.index)
+            data = filter_by_min_date(data, manual_symbols, min_start)
+            sharpes = get_sharpes(data)
+            sharpes_list.append(sharpes)
     except BaseException as e:
         print(f'Unexpected failure for batch {batch[0]}\n{e}')
 
@@ -104,22 +119,47 @@ def download_data(symbols):
         start += timedelta(2)
     elif start.weekday() == 6:  # Sun
         start += timedelta(1)
-    print(f'start (init): {start}')
     #std_out = sys.stdout
     #null = open(os.devnull, 'w')
     #sys.stdout = null
     try:
-        data = (
-            yf
-            .download(symbols, start=str(start), end=TOMORROW)
-            .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
-        data.index = pd.to_datetime(data.index)
-        data = data.sort_index()
+        n = 0
+        max_attempts = 5
+        attempt = 0
+        throttle_seconds = 1
+        while n == 0:
+            data = (
+                yf
+                .download(symbols, start=str(start), end=TOMORROW)
+                .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
+            data.index = pd.to_datetime(data.index)
+            data = data.sort_index()
+            n = len(data)
+            attempt += 1
+            sleep(throttle_seconds)
+            throttle_seconds *= 2
+            if attempt >= max_attempts:
+                print(
+                    red(
+                        f'\n\n{symbols[0]}-{symbols[-1]}: {MAX_ATTEMPTS} '
+                        f'failed attempts. Aborting.\n\n'))
+                return None
+        # drop any cols that are ALL null
         data = data.loc[:, data.isnull().sum() != len(data)]
+        print(red(f'{symbols[0]}-{symbols[-1]} (days, stocks): {data.shape}'))
         #missing_last = [
         #    col for col in list(data) if data[col].isnull()[-1]]
         #data.drop(columns=missing_last, inplace=True)
-        data.fillna(method='ffill', inplace=True)
+        #print(
+        #    'After dropping if last is NA: Shape (days, stocks):', data.shape)
+        data = fillna(data)
+        #data.fillna(method='ffill', inplace=True)
+        if MIN_PRICE is not None and MIN_PRICE > 0:
+            cheap = [col for col in list(data) if data[col][-1] < MIN_PRICE]
+            data.drop(columns=cheap, inplace=True)
+        #print(
+        #    'After dropping cheap stocks: Shape (days, stocks):', data.shape)
+        #print('\n\nDATE RANGE:', data.index[0], data.index[-1], '\n\n')
         #data.to_csv(f'{data}/tmp/{symbols[0]}_{symbols[-1]}.csv')
         return data
     except BaseException as e:
@@ -127,6 +167,19 @@ def download_data(symbols):
     #finally:
     #    null.close()
     #    sys.stdout = std_out
+
+    
+def fillna(data):
+    terminals = data.iloc[-1, :]
+    last_null = terminals[terminals.isnull()].index
+    for col in data.columns:
+        if col in last_null:
+            last_nonnull = data[col][data[col].notnull()].index[-1]
+            data.loc[:last_nonnull, col] = (
+                data.loc[:last_nonnull, col].fillna(method='ffill'))
+        else:
+                data[col] = data[col].fillna(method='ffill')
+    return data
 
 
 def adjust_min_date(min_date, dates):
