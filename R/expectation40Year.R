@@ -272,25 +272,27 @@ fracs.in <- c()
 
 # Money back in at the median line----------
 plot.for.ts(sp)
-# 75%/37% out; 100/50% in  (top/bottom)
-f.out <- 0
+# 75%/37% out; 100/50% in; Extreme (top/bottom)
+# 37%/18% out; ??/??% in; Near-Extreme (top/bottom)
+f.out <- 0.18  # bottom near-extr
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
-# 60%/30% out; 95/48% in; Extreme
-# 30%/15% out; ?????% in; Near-Extreme 
-f.out <- 0.15  # bottom near
+# 60%/30% out; 95/48% in; Extreme (top/bottom)
+# 30%/15% out; ?????% in; Near-Extreme (top/bottom)
+f.out <- 0.3  # bottom ext
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
-# 50%25% out; 75/38% in; 
-f.out <- 0
+# 50%25% out; 75/38% in; Extreme (top/bottom)
+# 25%12% out; ??/??% in; Near-Extreme (top/bottom)
+f.out <- 0.12  # bottom near-extr
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
@@ -305,8 +307,9 @@ fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
-# 30%/15% out; 25/13% in;
-f.out <- 0.3  # active top
+# 30%/15% out; 25/13% in; Extreme (top/bottom)
+# 15/7% out; ?/?% in; Near Extreme (top/bottom)
+f.out <- 0.3  # top extr; bottom near
 f.in <- 0
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
@@ -321,8 +324,9 @@ fracs.in <- c(fracs.in, f.in)
 
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
-# 10%/5% out; 6/3% in; 
-f.out <- 0 #
+# 10%/5% out; 6/3% in; Extreme (top/bottom)
+# 5%/2% out; ?/?% in; Near Extreme (top/bottom)
+f.out <- 0.1 # top ext; bottom near
 f.in <- 0.  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)

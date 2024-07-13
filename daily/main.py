@@ -18,22 +18,23 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   231919  # [217831, 239119]
-ET_VALUE =    176173  # [167274, 184826]
-SCHWAB_VALUE = 16002  # [ 14775,  16218]
-SIM1_VALUE =  104487
-SIM2_VALUE =  215589
-SIM3_VALUE =  216839
-SIM4_VALUE =  203031
-SIM5_VALUE =  202098
+FID_VALUE =   235110  # [217831, 239119]
+ET_VALUE =    179340  # [167274, 184826]
+SCHWAB_VALUE = 16389  # [ 14775,  16389]
+SIM1_VALUE =  103965
+SIM2_VALUE =  217224
+SIM3_VALUE =  220314
+SIM4_VALUE =  205080
+SIM5_VALUE =  210232
 DM_VALUE   =   20134
-BEST_SIM = 2  # update weekly (on Fri)
+BEST_SIM = 5  # update weekly (on Fri)
 # 1 - 2 wk
 # 2 - 1 wk
 # 3 - 1 wk
 # 4 - 0 wk 
-# 5 - 0 wk
-FRAC_IN = 0.9772
+# 5 - 1 wk
+FRAC_IN = (0.3182 + 0.9707 + 0.8248 + 1) / 4
+print('FRAC IN:', FRAC_IN)
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)
@@ -47,14 +48,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.15},  # incr by 3
-    'fid':    {'buy': 0.01, 'sell': 0.09},  #         3
-    'schwab': {'buy': 0.01, 'sell': 0.08},  #         4
-    'sim1':   {'buy': 0.01, 'sell': 0.12},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.08},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.25},  #         1 simsims
-    'sim4':   {'buy': 0.01, 'sell': 0.06},  #         2 sim3
-    'sim5':   {'buy': 0.01, 'sell': 0.14},  #         2 simz
+    'et':     {'buy': 0.06, 'sell': 0.01},  # incr by 3
+    'fid':    {'buy': 0.06, 'sell': 0.01},  #         3
+    'schwab': {'buy': 0.08, 'sell': 0.01},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.04, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.02, 'sell': 0.01},  #         1 simsims
+    'sim4':   {'buy': 0.04, 'sell': 0.01},  #         2 sim3
+    'sim5':   {'buy': 0.04, 'sell': 0.01},  #         2 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -63,30 +64,21 @@ PARAMS = {
         'sharpe_scaled_exp': 3.9,
         'max_prop_per_stock': 0.05,
         # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6},
-        #'scaler': 0.6,
+        'scaling': {'method': 'tan', 'scaler': 0.6},
         'buy_level': 5,
         'sell_level': 5},
     'fid': {
         'status_weights': [1, 1.1, 1],
         'sharpe_scaled_exp': 4,
         'max_prop_per_stock': 0.03,
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6
-        },
+        'scaling': {'method': 'tan', 'scaler': 0.6},
         'buy_level': 5,
         'sell_level': 5},
     'schwab': {
         'status_weights': [1, 1, 1.1],
         'sharpe_scaled_exp': 4.1,
         'max_prop_per_stock': 0.01,
-        'scaling': {
-            'method': 'tan',
-            'scaler': 0.6
-        },
+        'scaling': {'method': 'tan', 'scaler': 0.6},
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
@@ -111,13 +103,12 @@ PARAMS = {
         'sharpe_scaled_exp': 2.7345,
         'status_weights': [2.975, 2.461, 1.0]},
     'sim4': {
-        'buy_level': 4.0575,
-        'max_prop_per_stock': 0.1014,
-        'scaling': {
-            'intercept': 5.6681, 'method': 'linear', 'slope': -16.9272},
-        'sell_level': 7.879,
-        'sharpe_scaled_exp': 2.3731,
-        'status_weights': [3.39, 8.311, 1.0]},
+        'buy_level': 3.8007,
+        'max_prop_per_stock': 0.1058,
+        'scaling': {'method': 'tan', 'scaler': 0.6177},
+        'sell_level': 7.709,
+        'sharpe_scaled_exp': 2.5658,
+        'status_weights': [1.075, 3.86, 1.0]},
     'sim5': {
         'buy_level': 3.3297,
         'max_prop_per_stock': 0.1161,
@@ -125,7 +116,7 @@ PARAMS = {
         'sell_level': 7.5395,
         'sharpe_scaled_exp': 3.1521,
         'status_weights': [1.23, 5.297, 1.0]}}
-PARAMS['dm'] = PARAMS['fid']
+PARAMS['dm'] = PARAMS['schwab']
 
 # File paths
 DATA = './data'
