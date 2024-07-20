@@ -126,7 +126,7 @@ def download_data(symbols):
         n = 0
         max_attempts = 5
         attempt = 0
-        throttle_seconds = 1
+        throttle_seconds = 2
         while n == 0:
             data = (
                 yf
