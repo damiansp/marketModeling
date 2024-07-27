@@ -63,8 +63,8 @@ def get_best_stocks(outpath, manual_symbols=None):
         data = data.sort_index()
         n = len(data)
         attempt += 1
-        sleep(throttle_seconds)
-        throttle_seconds *= 2
+        sleep(int(round(throttle_seconds)))
+        throttle_seconds *= 2.22
         if attempt >= MAX_ATTEMPTS:
             print(red(f'\n\n{MAX_ATTEMPTS} failed attempts. Aborting.\n\n'))
             return None

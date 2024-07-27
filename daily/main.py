@@ -18,24 +18,26 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   230246  # [217831, 239119]
-ET_VALUE =    178311  # [167274, 184826]
-SCHWAB_VALUE = 16424  # [ 14775,  16774]
-SIM1_VALUE =  103288
-SIM2_VALUE =  210683
-SIM3_VALUE =  216100
-SIM4_VALUE =  199731
-SIM5_VALUE =  202476
+FID_VALUE =   230349  # [217831, 239119]
+ET_VALUE =    179651  # [167274, 184826]
+SCHWAB_VALUE = 16530  # [ 14775,  16774]
+SIM1_VALUE =  104534
+SIM2_VALUE =  226001
+SIM3_VALUE =  228930
+SIM4_VALUE =  197384
+SIM5_VALUE =  212627
 DM_VALUE   =   20134
-BEST_SIM = 1  # update weekly (on Fri)
-# 1 - 3 wk
-# 2 - 0 wk
+BEST_SIM = 2  # update weekly (on Fri)
+# 1 - 3 wk  # 0 since other
+# 2 - 1 wk
 # 3 - 0 wk
 # 4 - 0 wk 
 # 5 - 0 wk
 
-#          mine,    sp,      nas,     dow,     rus
-FRAC_IN = (0.3536 + 0.9999 + 0.9982 + 1 + 1) / 5  
+#                     mine,   sp,     nas,    dow,    rus
+fracs     = np.array([0.3536, 1,      1,      1,      1])
+f_weights = np.array([0.225,  0.225,  0.25,   0.15,   0.15])
+FRAC_IN = np.dot(fracs, f_weights)
 print('FRAC IN:', FRAC_IN)
 
 TODAY = datetime.now().date()
@@ -50,14 +52,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.08, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.12, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.12, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.04},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.02},  #         1 simsims
-    'sim4':   {'buy': 0.12, 'sell': 0.01},  #         8 sim3
-    'sim5':   {'buy': 0.01, 'sell': 0.08},  #         8 simz
+    'et':     {'buy': 0.01, 'sell': 0.04},  # incr by 4
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.04},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.16},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.02, 'sell': 0.01},  #         2 aei
+    'sim3':   {'buy': 0.08, 'sell': 0.01},  #         8 simsims
+    'sim4':   {'buy': 0.01, 'sell': 0.25},  #         1 sim3
+    'sim5':   {'buy': 0.01, 'sell': 0.32},  #        16 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -98,26 +100,26 @@ PARAMS = {
         'sharpe_scaled_exp': 3.2404,
         'status_weights': [2.131, 3.204, 1.0]},
     'sim3': {
-        'buy_level': 3.92,
-        'max_prop_per_stock': 0.1392,
-        'scaling': {'intercept': 3.2695, 'method': 'linear', 'slope': 1.3326},
-        'sell_level': 6.7538,
-        'sharpe_scaled_exp': 3.2777,
-        'status_weights': [3.119, 2.859, 1.0]},
+        'buy_level': 4.0365,
+        'max_prop_per_stock': 0.131,
+        'scaling': {'intercept': 2.8738, 'method': 'linear', 'slope': 2.5627},
+        'sell_level': 6.4891,
+        'sharpe_scaled_exp': 3.8075,
+        'status_weights': [2.729, 3.581, 1.0]},
     'sim4': {
-        'buy_level': 2.9823,
-        'max_prop_per_stock': 0.1627,
-        'scaling': {'method': 'tan', 'scaler': 0.6085},
-        'sell_level': 6.0747,
-        'sharpe_scaled_exp': 3.3588,
-        'status_weights': [3.299, 6.311, 1.0]},
+        'buy_level': 3.828,
+        'max_prop_per_stock': 0.1628,
+        'scaling': {'intercept': 7.1349, 'method': 'linear', 'slope': 3.3621},
+        'sell_level': 7.5507,
+        'sharpe_scaled_exp': 3.4603,
+        'status_weights': [3.344, 2.949, 1.0]},
     'sim5': {
-        'buy_level': 4.4487,
-        'max_prop_per_stock': 0.0928,
-        'scaling': {'method': 'tan', 'scaler': 0.5631},
-        'sell_level': 6.3244,
-        'sharpe_scaled_exp': 2.4328,
-        'status_weights': [1.712, 2.19, 1.0]}}
+        'buy_level': 4.2624,
+        'max_prop_per_stock': 0.1365,
+        'scaling': {'center': 0.4597, 'method': 'quadratic', 'negpos': -1},
+        'sell_level': 6.4425,
+        'sharpe_scaled_exp': 2.6759,
+        'status_weights': [1.0, 3.637, 1.325]}}
 PARAMS['dm'] = PARAMS['schwab']
 
 # File paths
