@@ -18,24 +18,24 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   227764  # [217831, 239119]
-ET_VALUE =    176273  # [167274, 184826]
-SCHWAB_VALUE = 15946  # [ 14775,  16774]
-SIM1_VALUE =  101957
-SIM2_VALUE =  225491
-SIM3_VALUE =  227961
-SIM4_VALUE =  181149
-SIM5_VALUE =  191730
+FID_VALUE =   230029  # [217831, 239119]
+ET_VALUE =    179645  # [167274, 184826]
+SCHWAB_VALUE = 15978  # [ 14775,  16774]
+SIM1_VALUE =  102785
+SIM2_VALUE =  226593
+SIM3_VALUE =  228527
+SIM4_VALUE =  182279
+SIM5_VALUE =  181148
 DM_VALUE   =   20134
-BEST_SIM = 2  # update weekly (on Fri)
-# 1 - 3 wk  # 0 since other
+BEST_SIM = 1  # update weekly (on Fri)
+# 1 - 4 wk  # 1 since other
 # 2 - 2 wk
 # 3 - 0 wk
 # 4 - 0 wk 
 # 5 - 0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.4018, 1,      1,      1,      1])
+fracs     = np.array([0.7,    1,      1,      1,      1])
 f_weights = np.array([0.225,  0.225,  0.25,   0.15,   0.15])
 FRAC_IN = np.dot(fracs, f_weights)
 print('FRAC IN:', FRAC_IN)
@@ -52,14 +52,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.08, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.08, 'sell': 0.01},  #         4
+    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
+    'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
+    'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
     'sim1':   {'buy': 0.04, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.10},  #         2 aei
-    'sim3':   {'buy': 0.01, 'sell': 0.40},  #         8 simsims
-    'sim4':   {'buy': 0.01, 'sell': 0.30},  #         1 sim3
-    'sim5':   {'buy': 0.01, 'sell': 0.99},  #        16 simz
+    'sim2':   {'buy': 0.03, 'sell': 0.01},  #         3 aei
+    'sim3':   {'buy': 0.06, 'sell': 0.01},  #         6 simsims
+    'sim4':   {'buy': 0.02, 'sell': 0.01},  #         2 sim3
+    'sim5':   {'buy': 0.08, 'sell': 0.01},  #         8 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -100,27 +100,27 @@ PARAMS = {
         'sharpe_scaled_exp': 3.2404,
         'status_weights': [2.131, 3.204, 1.0]},
     'sim3': {
-        'buy_level': 3.7313,
-        'max_prop_per_stock': 0.1054,
-        'scaling': {'intercept': 5.444, 'method': 'linear', 'slope': 2.4458},
-        'sell_level': 7.8318,
-        'sharpe_scaled_exp': 2.7077,
-        'status_weights': [2.723, 2.133, 1.0]},
+        'buy_level': 3.9083,
+        'max_prop_per_stock': 0.134,
+        'scaling': {'intercept': 4.1131, 'method': 'linear', 'slope': -0.0198},
+        'sell_level': 5.8032,
+        'sharpe_scaled_exp': 3.2021,
+        'status_weights': [2.93, 7.125, 1.0]},
     'sim4': {
-        'buy_level': 3.8865,
-        'max_prop_per_stock': 0.1186,
-        'scaling': {'intercept': 3.7616, 'method': 'linear', 'slope': 1.2455},
-        'sell_level': 6.4455,
-        'sharpe_scaled_exp': 3.5281,
-        'status_weights': [3.93, 5.931, 1.0]},
+        'buy_level': 3.4358,
+        'max_prop_per_stock': 0.1297,
+        'scaling': {'center': 0.5273, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 6.3458,
+        'sharpe_scaled_exp': 3.2943,
+        'status_weights': [375.035, 549.973, 1.0]},
     'sim5': {
-        'buy_level': 4.6952,
-        'max_prop_per_stock': 0.1864,
-        'scaling': {'method': 'tan', 'scaler': 0.6217},
-        'sell_level': 8.3103,
-        'sharpe_scaled_exp': 3.9325,
-        'status_weights': [3.25, 4.084, 1.0]}}
-PARAMS['dm'] = PARAMS['sim1']
+        'buy_level': 4.1645,
+        'max_prop_per_stock': 0.1597,
+        'scaling': {'intercept': 3.191, 'method': 'linear', 'slope': 1.5206},
+        'sell_level': 6.4315,
+        'sharpe_scaled_exp': 3.3029,
+        'status_weights': [3.424, 3.464, 1.0]}}
+PARAMS['dm'] = PARAMS['schwab']
 
 # File paths
 DATA = './data'

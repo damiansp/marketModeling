@@ -50,10 +50,6 @@ class TransactionDeterminer:
     @staticmethod
     def _scale_tan(x, scaling):
         scaler_scalar = scaling['scaler']
-        ###
-        print('sc_sc:', scaler_scalar)
-        print('x:', x)
-        ###
         y = scaler_scalar * np.tan(3 * (1 - x) - 1.5)
         return y
 
@@ -70,8 +66,9 @@ class TransactionDeterminer:
         if negpos not in [-1, 1]:
             raise ValueError('negpos must be 1 or -1')
         center = scaling['center']
+        exponent = scaling.get('exponent', 2)
         # 6.32455: makes parabola have height of 10 for center +- 0.5
-        y = negpos * ((6.32455 * (x - center))**2 - 5)
+        y = negpos * ((6.32455 * (x - center))**exponent - 5)
         return y                
 
     def _add_scaled_sharpes(self):
