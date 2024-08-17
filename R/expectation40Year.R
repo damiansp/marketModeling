@@ -326,8 +326,8 @@ sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; ?/?% in; Near Extreme (top/bottom)
-f.out <- 0 # 
-f.in <- 0.  # top/bottom active
+f.out <- 0.03 # Bottom active
+f.in <- 0.    #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 

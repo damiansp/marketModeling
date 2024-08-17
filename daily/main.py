@@ -18,24 +18,24 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   230029  # [217831, 239119]
-ET_VALUE =    179645  # [167274, 184826]
-SCHWAB_VALUE = 15978  # [ 14775,  16774]
-SIM1_VALUE =  102785
-SIM2_VALUE =  226593
-SIM3_VALUE =  228527
-SIM4_VALUE =  182279
-SIM5_VALUE =  181148
+FID_VALUE =   239255  # [217831, 239255]
+ET_VALUE =    187380  # [167274, 187380]
+SCHWAB_VALUE = 16561  # [ 14775,  16774]
+SIM1_VALUE =  105539
+SIM2_VALUE =  234511
+SIM3_VALUE =  242978
+SIM4_VALUE =  195854
+SIM5_VALUE =  192207
 DM_VALUE   =   20134
-BEST_SIM = 1  # update weekly (on Fri)
+BEST_SIM = 4  # update weekly (on Fri)
 # 1 - 4 wk  # 1 since other
 # 2 - 2 wk
 # 3 - 0 wk
-# 4 - 0 wk 
+# 4 - 1 wk 
 # 5 - 0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.7,    1,      1,      1,      1])
+fracs     = np.array([0.679,  0.3024, 1,      1,      1])
 f_weights = np.array([0.225,  0.225,  0.25,   0.15,   0.15])
 FRAC_IN = np.dot(fracs, f_weights)
 print('FRAC IN:', FRAC_IN)
@@ -52,14 +52,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.04, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.04, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.03, 'sell': 0.01},  #         3 aei
-    'sim3':   {'buy': 0.06, 'sell': 0.01},  #         6 simsims
-    'sim4':   {'buy': 0.02, 'sell': 0.01},  #         2 sim3
-    'sim5':   {'buy': 0.08, 'sell': 0.01},  #         8 simz
+    'et':     {'buy': 0.01, 'sell': 0.20},  # incr by 4
+    'fid':    {'buy': 0.01, 'sell': 0.12},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.16},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.16},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.09},  #         3 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.18},  #         6 simsims
+    'sim4':   {'buy': 0.01, 'sell': 0.06},  #         2 sim3
+    'sim5':   {'buy': 0.01, 'sell': 0.24},  #         8 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -100,12 +100,12 @@ PARAMS = {
         'sharpe_scaled_exp': 3.2404,
         'status_weights': [2.131, 3.204, 1.0]},
     'sim3': {
-        'buy_level': 3.9083,
-        'max_prop_per_stock': 0.134,
-        'scaling': {'intercept': 4.1131, 'method': 'linear', 'slope': -0.0198},
-        'sell_level': 5.8032,
-        'sharpe_scaled_exp': 3.2021,
-        'status_weights': [2.93, 7.125, 1.0]},
+        'buy_level': 3.1517,
+        'max_prop_per_stock': 0.1304,
+        'scaling': {'intercept': -6.663, 'method': 'linear', 'slope': -2.8949},
+        'sell_level': 6.308,
+        'sharpe_scaled_exp': 3.1343,
+        'status_weights': [539.816, 291.02, 1.0]},
     'sim4': {
         'buy_level': 3.4358,
         'max_prop_per_stock': 0.1297,
@@ -114,12 +114,14 @@ PARAMS = {
         'sharpe_scaled_exp': 3.2943,
         'status_weights': [375.035, 549.973, 1.0]},
     'sim5': {
-        'buy_level': 4.1645,
-        'max_prop_per_stock': 0.1597,
-        'scaling': {'intercept': 3.191, 'method': 'linear', 'slope': 1.5206},
-        'sell_level': 6.4315,
-        'sharpe_scaled_exp': 3.3029,
-        'status_weights': [3.424, 3.464, 1.0]}}
+        'buy_level': 3.9154,
+        'max_prop_per_stock': 0.1319,
+        'scaling': {'center': 0.6335, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 6.6527,
+        'sharpe_scaled_exp': 3.6502,
+        'status_weights': [542.406, 819.478, 1.0]}}
+
+
 PARAMS['dm'] = PARAMS['schwab']
 
 # File paths
