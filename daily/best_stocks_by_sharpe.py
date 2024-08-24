@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
+from mod_utils import red
+
 
 DATA = './data'
 TOMORROW = (datetime.now() + timedelta(1)).date()
@@ -20,9 +22,6 @@ MIN_PRICE = 2.
 MAX_ATTEMPTS = 6
 N_JOBS = 8
 
-
-def red(txt):
-    return f'\033[91m{txt}\033[0m'
 
 def get_best_stocks(outpath, manual_symbols=None):
     symbols = load_data()

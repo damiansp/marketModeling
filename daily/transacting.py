@@ -1,5 +1,7 @@
 import numpy as np
 
+from mod_utils import red
+
 
 class TransactionDeterminer:
     def __init__(
@@ -171,8 +173,9 @@ class TransactionDeterminer:
             print('distr:')
             print(distr)
             print(
-                'Notice this error sometimes due to bad data from Yahoo. '
-                'Just retry.')
+                red(
+                    'Notice this error sometimes due to bad data from Yahoo. '
+                    'Just retry.'))
             raise
 
     def _get_status_distribution(self, row, account):

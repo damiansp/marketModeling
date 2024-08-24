@@ -318,7 +318,7 @@ sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
 # 20%/10% out;  12/6% in;
 f.out <- 0
-f.in <- 0  # bottom active
+f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
