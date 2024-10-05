@@ -121,24 +121,40 @@ class HoldingsLoader:
         schwab = self._parse_schwab(path)
         return schwab
 
+    def _parse_schwab(self, path):
+        has_quotes = False
+        with open(path, 'r') as f:
+            for line in f:
+                if line.startswith('"Symbol'):
+                    has_quotes = True
+                    break
+        data, inds = self._parse_schwab_quoted(path, has_quotes)
+        return pd.DataFrame({'schwab': data}, index=inds)
+        
     @staticmethod
-    def _parse_schwab(path):
+    def _parse_schwab_quoted(path, has_quotes):
         data = []
         inds = []
         is_header = True
         with open(path, 'r') as f:
             for line in f:
-                if line.startswith('"Cash') or line.startswith('"Account'):
+                cash = '"Cash' if has_quotes else 'Cash'
+                acct = '"Acount' if has_quotes else 'Account'
+                if line.startswith(cash) or line.startswith(acct):
                     continue
                 if not is_header:
-                    cols = line.split(',"')
+                    col_split = ',"' if has_quotes else ','
+                    cols = line.split(col_split)
                     symbol = cols[0].strip('""')
-                    amt = float(cols[6].strip('"$'))
+                    dollar = '"$' if has_quotes else '$'
+                    amt = float(cols[6].strip(dollar))
+                    #print('amt:', amt)
                     inds.append(symbol)
                     data.append(amt)
-                if line.startswith('"Symbol"'):
+                sym = '"Symbol"' if has_quotes else 'Symbol'
+                if line.startswith(sym):
                     is_header = False
-        return pd.DataFrame({'schwab': data}, index=inds)
+        return data, inds
 
     def _upload_dm(self):
         dm = pd.read_csv(
@@ -166,3 +182,5 @@ class HoldingsLoader:
         return out
 
     
+if __name__ == '__main__':
+    HoldingsLoader()._upload_schwab()
