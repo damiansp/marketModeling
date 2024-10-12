@@ -147,7 +147,12 @@ class HoldingsLoader:
                     cols = line.split(col_split)
                     symbol = cols[0].strip('""')
                     dollar = '"$' if has_quotes else '$'
-                    amt = float(cols[6].strip(dollar))
+                    try:
+                        amt = float(cols[6].strip(dollar))
+                    except ValueError:
+                        amt = 0
+                    except:
+                        raise
                     #print('amt:', amt)
                     inds.append(symbol)
                     data.append(amt)

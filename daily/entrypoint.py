@@ -18,27 +18,27 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   246354  # [217831, 246833]
-ET_VALUE =    193711  # [167274, 194118]
-SCHWAB_VALUE = 16865  # [ 14775,  16952]
-SIM1_VALUE =  108193
-SIM2_VALUE =  245986
-SIM3_VALUE =  233268
-SIM4_VALUE =  194511
-SIM5_VALUE =  195903
+FID_VALUE =   250411  # [217831, 250411]
+ET_VALUE =    197645  # [167274, 197645]
+SCHWAB_VALUE = 17176  # [ 14775,  17176]
+SIM1_VALUE =  109196
+SIM2_VALUE =  249012
+SIM3_VALUE =  237983
+SIM4_VALUE =  204273
+SIM5_VALUE =  206596
 DM_VALUE   =   24403 + 2655
-BEST_SIM = 2  # update weekly (on Fri)
+BEST_SIM = 5  # update weekly (on Fri)
 # 1 - 5 wk  # 2 since other
 # 2 - 4 wk
 # 3 - 0 wk
 # 4 - 3 wk 
-# 5 - 2 wk
+# 5 - 3 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.7,    0.9987, 1,      1,      1])
+fracs     = np.array([0.72,   0.9751, 1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_WEIGHT = 2
+THUMB_WEIGHT = 2.4
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = (
     base_frac_in if THUMB_WEIGHT == 1
@@ -58,14 +58,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.01, 'sell': 0.12},  # incr by 4
-    'fid':    {'buy': 0.01, 'sell': 0.12},  #         4
-    'schwab': {'buy': 0.04, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.01, 'sell': 0.12},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.03, 'sell': 0.01},  #         3 aei
-    'sim3':   {'buy': 0.04, 'sell': 0.01},  #         4 simsims
-    'sim4':   {'buy': 0.01, 'sell': 0.09},  #         3 sim3
-    'sim5':   {'buy': 0.01, 'sell': 0.20},  #         5 simz
+    'et':     {'buy': 0.01, 'sell': 0.04},  # incr by 4
+    'fid':    {'buy': 0.01, 'sell': 0.04},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.04},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.03},  #         3 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.04},  #         4 simsims
+    'sim4':   {'buy': 0.12, 'sell': 0.01},  #         3 sim3
+    'sim5':   {'buy': 0.05, 'sell': 0.01},  #         5 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -106,12 +106,12 @@ PARAMS = {
         'sharpe_scaled_exp': 3.2404,
         'status_weights': [2.131, 3.204, 1.0]},
     'sim3': {
-        'buy_level': 4.4938,
-        'max_prop_per_stock': 0.1575,
-        'scaling': {'intercept': 4.0352, 'method': 'linear', 'slope': 5.1224},
-        'sell_level': 7.6109,
-        'sharpe_scaled_exp': 3.5044,
-        'status_weights': [1.619, 2.44, 1.0]},
+        'buy_level': 3.6808,
+        'max_prop_per_stock': 0.1152,
+        'scaling': {'center': 0.839, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 6.1155,
+        'sharpe_scaled_exp': 3.5573,
+        'status_weights': [1131.157, 128.562, 1.0]},
     'sim4': {
         'buy_level': 3.4358,
         'max_prop_per_stock': 0.1297,
