@@ -1,6 +1,6 @@
 {
     "stock_watcher": [
-                      "AAPL", "ACN", "ADBE", "AMZN", "ASML", "AXP", "BKNG", "BROS", "CART", "CB", "CELH", "CMG", "COF", "COST", "CP", "CPNG", "CRWD", "DASH", "DGX", "DIS", "ELF", "EQT", "FNV", "FTNT", "GDX", "GLD", "GMED", "GOLD", "GOOG", "GRAB", "HDB", "HHH", "HLT", "IBN", "IEFA", "INFY", "IVV", "JNJ", "JPXN", "KNSL", "KO", "KR", "KTEC", "LOW", "MA", "MASI", "MCD", "MCK", "MELI", "META", "MIY", "MMYT", "MSFT", "NEM", "NET", "NICE", "NOW", "NVDA", "ONON", "OPEN", "PEP", "PG", "PGR", "PTON", "QSR", "RBLX", "RDFN", "RDY", "RIVN", "RMD", "RVLV", "SAM", "SBUX", "SPY", "TSLA", "TTC", "TYL", "U", "V", "VLTO", "VTRS", "WING", "WIT", "WMT", "YTRA", "ZBRA"
+                      "AAPL", "ABNB", "ACN", "ADBE", "AMZN", "ASML", "AXP", "BKNG", "BROS", "CART", "CB", "CELH", "CMG", "COF", "COST", "CP", "CPNG", "CRWD", "DASH", "DGX", "DIS", "ELF", "EQT", "FNV", "FTNT", "GDX", "GLD", "GMED", "GOLD", "GOOG", "GRAB", "GRMN", "HDB", "HHH", "HLT", "IBN", "IEFA", "INFY", "IVV", "JNJ", "JPXN", "KNSL", "KO", "KR", "KTEC", "LOW", "MA", "MASI", "MCD", "MCK", "MELI", "META", "MIY", "MMYT", "MSFT", "NEM", "NET", "NFTY", "NICE", "NOW", "NVDA", "ONON", "OPEN", "PEP", "PG", "PGR", "PTON", "QSR", "RBLX", "RDFN", "RDY", "RIVN", "RMD", "RVLV", "SAM", "SBUX", "SPY", "TSLA", "TTC", "TYL", "U", "V", "VLTO", "VTRS", "WING", "WIT", "WMT", "YTRA", "ZBRA"
     ],
     "lingerers": [
         "AREN", "CHTR", "CIGI", "FBIN", "GGEI", "GTLS", "SIFY", "SMLR", "SPWR", "TPX", "UI", "ULTA", "XPEV"
