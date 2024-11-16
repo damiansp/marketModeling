@@ -19,15 +19,17 @@ YEARS_OF_DATA = 50
 MIN_YEARS = 10
 START = TOMORROW - timedelta(round(YEARS_OF_DATA * 365.25))
 MIN_PRICE = 2.
-MAX_ATTEMPTS = 6
-N_JOBS = 8
+MAX_ATTEMPTS = 2
+N_JOBS = 1
+BATCH_SIZE = 100
+THROTTLE_S = 2.5
 
 
 def get_best_stocks(outpath, manual_symbols=None):
     symbols = load_data()
     symbols |= manual_symbols
     symbols = sorted(list(symbols))
-    batches = prepare_batches(symbols)
+    batches = prepare_batches(symbols, batch_size=BATCH_SIZE)
     print('n batches:', len(batches))
     min_start = get_min_start()
 
@@ -43,6 +45,11 @@ def get_best_stocks(outpath, manual_symbols=None):
     pool.join()
 
     sharpes = pd.concat(sharpe_list)
+    try:
+        sharpes.to_csv(f'{DATA}/full_sharpes_list.csv')
+    except:
+        print('Failed to save sharpes:', type(sharpes))
+        print(sharpes)
     if len(sharpes) > KEEP_N:
         sharpes.sort_values(ascending=False, inplace=True)
         sharpes = sharpes.iloc[:KEEP_N]
@@ -52,11 +59,14 @@ def get_best_stocks(outpath, manual_symbols=None):
     print('Final candidates:', len(final_candidates), 'START:', START)
     n = 0
     attempt = 0
-    throttle_seconds = 1
+    throttle_seconds = THROTTLE_S
     while n == 0:
         data = (
             yf
-            .download(final_candidates, start=START, end=TOMORROW)
+            .download(
+                final_candidates,
+                start=pd.to_datetime(START, utc=True),
+                end=pd.to_datetime(TOMORROW, utc=True))
             .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
         data.index = pd.to_datetime(data.index)
         data = data.sort_index()
@@ -64,9 +74,10 @@ def get_best_stocks(outpath, manual_symbols=None):
         attempt += 1
         sleep(int(round(throttle_seconds)))
         throttle_seconds *= 2.22
-        if attempt >= MAX_ATTEMPTS:
+        if attempt > MAX_ATTEMPTS:
             print(red(f'\n\n{MAX_ATTEMPTS} failed attempts. Aborting.\n\n'))
             return None
+    sleep(THROTTLE_S)
     return data
 
     
@@ -123,13 +134,15 @@ def download_data(symbols):
     #sys.stdout = null
     try:
         n = 0
-        max_attempts = 5
         attempt = 0
-        throttle_seconds = 2
+        throttle_seconds = THROTTLE_S
         while n == 0:
             data = (
                 yf
-                .download(symbols, start=str(start), end=TOMORROW)
+                .download(
+                    symbols,
+                    start=pd.to_datetime(START, utc=True),
+                    end=pd.to_datetime(TOMORROW, utc=True))
                 .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
             data.index = pd.to_datetime(data.index)
             data = data.sort_index()
@@ -137,12 +150,13 @@ def download_data(symbols):
             attempt += 1
             sleep(throttle_seconds)
             throttle_seconds *= 2
-            if attempt >= max_attempts:
+            if attempt > MAX_ATTEMPTS:
                 print(
                     red(
                         f'\n\n{symbols[0]}-{symbols[-1]}: {MAX_ATTEMPTS} '
                         f'failed attempts. Aborting.\n\n'))
                 return None
+        sleep(THROTTLE_S)
         # drop any cols that are ALL null
         data = data.loc[:, data.isnull().sum() != len(data)]
         print(red(f'{symbols[0]}-{symbols[-1]} (days, stocks): {data.shape}'))

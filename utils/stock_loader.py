@@ -44,9 +44,9 @@ class Loader:
             .drop('Volume',  axis=1)
             .rename(columns={'Adj Close': 'Value'})
             .sort_index())
-        if len(self.symbols) == 1:
-            df.columns  = pd.MultiIndex.from_tuples(
-                [(x, self.symbols[0]) for x in list(df)])
+        #if len(self.symbols) == 1:
+        #    df.columns  = pd.MultiIndex.from_tuples(
+        #        [(x, self.symbols[0]) for x in list(df)])
         df['Date'] = df.index
         if append is not None:
             try:
