@@ -15,30 +15,32 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   253263  # [217831, 263659]
-ET_VALUE =    203633  # [167274, 208942]
-SCHWAB_VALUE = 17248  # [ 14775,  17842]
-SIM1_VALUE =  110627
-SIM2_VALUE =  259114
-SIM3_VALUE =  208184
-SIM4_VALUE =  198758
-SIM5_VALUE =  185849
-DM_VALUE   =   20358 + 2134
-BEST_SIM = 1  # update weekly (on Fri)
-# 1 - 5 wk  # 5 since other
-# 2 - 5 wk
-# 3 - 0 wk
-# 4 - 4 wk 
-# 5 - 3 wk
+FID_VALUE =   266737  # [217831, 266737]
+ET_VALUE =    210075  # [167274, 210075]
+SCHWAB_VALUE = 17862  # [ 14775,  17862]
+SIM1_VALUE =  115316
+SIM2_VALUE =  286929
+SIM3_VALUE =  231232
+SIM4_VALUE =  215329
+SIM5_VALUE =  211894
+DM_VALUE   =   27952 + 1655
+BEST_SIM = 5  # update weekly (on Fri)
+SECOND_BEST_SIM = 3
+# n weeks needed 7
+# 1 -  wk  #  since other
+# 2 -  wk
+# 3 -  wk
+# 4 -  wk 
+# 5 -  wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([0.6290, 1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_WEIGHT = 2
+THUMB_WEIGHT = 2.5
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = (
     base_frac_in if THUMB_WEIGHT == 1
@@ -58,14 +60,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.12, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.12, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.12, 'sell': 0.01},  #         4
-    'sim1':   {'buy': 0.12, 'sell': 0.01},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.06, 'sell': 0.01},  #         3 aei
-    'sim3':   {'buy': 0.12, 'sell': 0.01},  #         4 simsims
-    'sim4':   {'buy': 0.09, 'sell': 0.01},  #         3 sim3
-    'sim5':   {'buy': 0.15, 'sell': 0.01},  #         5 simz
+    'et':     {'buy': 0.04, 'sell': 0.01},  # incr by 4
+    'fid':    {'buy': 0.01, 'sell': 0.16},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.20},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.20},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.03},  #         3 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.08},  #         4 simsims
+    'sim4':   {'buy': 0.01, 'sell': 0.06},  #         3 sim3
+    'sim5':   {'buy': 0.05, 'sell': 0.01},  #         5 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
@@ -92,40 +94,40 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 3.7777,
-        'max_prop_per_stock': 0.1297,
-        'scaling': {'intercept': 4.509, 'method': 'linear', 'slope': 0.258},
-        'sell_level': 6.0425,
-        'sharpe_scaled_exp': 3.1456,
-        'status_weights': [2.387, 4.744, 1.0]},
+        'buy_level': 3.8328,
+        'max_prop_per_stock': 0.1026,
+        'scaling': {'center': 0.7041, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 6.345,
+        'sharpe_scaled_exp': 3.6424,
+        'status_weights': [567.348, 496.07, 1.0]},
     'sim2': {
-        'buy_level': 4.1948,
-        'max_prop_per_stock': 0.1528,
-        'scaling': {'intercept': 4.7018, 'method': 'linear', 'slope': 2.0146},
-        'sell_level': 6.9563,
-        'sharpe_scaled_exp': 3.2404,
-        'status_weights': [2.131, 3.204, 1.0]},
-    'sim3': {
         'buy_level': 3.0939,
         'max_prop_per_stock': 0.0869,
         'scaling': {'center': 0.5842, 'method': 'quadratic', 'negpos': 1},
         'sell_level': 6.3519,
         'sharpe_scaled_exp': 3.5535,
         'status_weights': [72.241, 360.057, 1.0]},
+    'sim3': {
+        'buy_level': 3.2516,
+        'max_prop_per_stock': 0.1064,
+        'scaling': {'center': 0.6952, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 4.5951,
+        'sharpe_scaled_exp': 3.2446,
+        'status_weights': [737.34, 760.251, 1.0]},
     'sim4': {
-        'buy_level': 3.4358,
-        'max_prop_per_stock': 0.1297,
-        'scaling': {'center': 0.5273, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 6.3458,
-        'sharpe_scaled_exp': 3.2943,
-        'status_weights': [375.035, 549.973, 1.0]},
+        'buy_level': 3.5228,
+        'max_prop_per_stock': 0.1303,
+        'scaling': {'center': 0.7, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 5.8534,
+        'sharpe_scaled_exp': 3.4363,
+        'status_weights': [390.344, 728.175, 1.0]},
     'sim5': {
-        'buy_level': 3.8328,
-        'max_prop_per_stock': 0.1026,
-        'scaling': {'center': 0.7041, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 6.345,
-        'sharpe_scaled_exp': 3.6424,
-        'status_weights': [567.348, 496.07, 1.0]}}
+        'buy_level': 3.2398,
+        'max_prop_per_stock': 0.0675,
+        'scaling': {'center': 0.6515, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 5.9102,
+        'sharpe_scaled_exp': 3.2578,
+        'status_weights': [214.766, 1357.232, 1.0]}}
 PARAMS['dm'] = PARAMS['fid']
 
 # File paths
@@ -347,17 +349,20 @@ def get_transactions(stock_metrics, next_day_distributions):
 def update_sim_vals():
     n_sims = len([k for k in PARAMS.keys() if k.startswith('sim')])
     sim1 = PARAMS[f'sim{BEST_SIM}']
-    out = {'sim1': sim1}
-    for i in range(1, n_sims):
+    sim2 = PARAMS[f'sim{SECOND_BEST_SIM}']
+    out = {'sim1': sim1, 'sim2': sim2}
+    for i in range(2, n_sims):
+        # Take 2 mutated from best and 1 mutated from second best
+        base = sim1 if i in (2, 3) else sim2
         sim = {
-            'status_weights': update_status_weights(sim1['status_weights']),
+            'status_weights': update_status_weights(base['status_weights']),
             'sharpe_scaled_exp': update_sharpe_scaled_exp(
-                sim1['sharpe_scaled_exp']),
+                base['sharpe_scaled_exp']),
             'max_prop_per_stock': update_max_prop_per_stock(
-                sim1['max_prop_per_stock']),
-            'scaling': update_scaling(sim1['scaling']),
-            'buy_level': update_level(sim1['buy_level']),
-            'sell_level': update_level(sim1['sell_level'])}
+                base['max_prop_per_stock']),
+            'scaling': update_scaling(base['scaling']),
+            'buy_level': update_level(base['buy_level']),
+            'sell_level': update_level(base['sell_level'])}
         out[f'sim{i + 1}'] = sim
     pprint(out)
 
