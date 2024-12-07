@@ -47,6 +47,18 @@ def sharpe_from_daily(x):
     return sharpe
 
 
+def td2yf(df):
+    'Convert twelvedata format to yfinance format'
+    df.drop(columns=['volume'], inplace=True)
+    df['Value'] = df.close.copy()
+    symbols = sorted(list({i[0] for i in df.index}))
+    dfs = [df.loc[sym] for sym in symbols]
+    for sym, df in zip(symbols, dfs):
+        df.columns = pd.MultiIndex.from_tuples(
+            [(col, sym) for col in ['Open', 'High', 'Low', 'Close', 'Value']])
+    return pd.concat(dfs, axis=1).astype(np.float64)
+
+
 def silence_pandas(silence):
     if silence:
         # Block annoying panda's warning about trying to set a value on a slice

@@ -5,6 +5,8 @@ import pandas as pd
 from twelvedata import TDClient
 import yfinance as yf
 
+from .utils import td2yf
+
 
 TODAY = datetime.now().date()
 
@@ -35,7 +37,7 @@ class Loader:
         self.client = None
 
     def init_tdclient(self, api_key):
-        if client is None:
+        if self.client is None:
             self.client = TDClient(apikey=api_key)
         else:
             print('Client already initialized.')
@@ -54,6 +56,8 @@ class Loader:
         #    df.columns  = pd.MultiIndex.from_tuples(
         #        [(x, self.symbols[0]) for x in list(df)])
         df['Date'] = df.index
+        if self.api != 'yf':
+            df.sort_values('Date', ascending=True, inplace=True)
         if append is not None:
             try:
                 df = pd.concat([df, append], axis=1)
@@ -74,13 +78,22 @@ class Loader:
                 .drop('Volume',  axis=1)
                 .rename(columns={'Adj Close': 'Value'})
                 .sort_index())
-        elif self.api == '12f':
+        elif self.api in ('12d', 'td', 'twelvedata'):
             if self.client is None:
                 print(
                     'TDClient has not been initialized. '
                     'Use Loader.init_teclient(api_key) to initialize')
                 return None
-            pass  # TODO: df = ...
+            df = self.client.time_series(
+                symbol=self.symbols,
+                interval='1day',
+                start_date=self.start,
+                end_date=self.end,
+                outputsize=5000,
+                timezone='Exchange',
+                order='asc'
+            ).as_pandas()
+            df = td2yf(df)
         else:
             raise ValueError(f'API: {self.api} not recognized')
         return df
