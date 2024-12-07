@@ -78,6 +78,8 @@ class HoldingsLoader:
             tomorrow = datetime.strftime(TOMORROW, '%b-%d-%Y')
             filename = filename.replace(today, tomorrow)
             fidelity = pd.read_csv(f'{DOWNLOADS}/{filename}')
+        fidelity = fidelity[fidelity['Last Price'].notnull()]
+        fidelity = fidelity[fidelity['Last Price'] != '--']
         fidelity = (
             fidelity[['Account Name', 'Symbol', 'Current Value']].dropna())
         fidelity['Current Value'] = (
@@ -139,7 +141,7 @@ class HoldingsLoader:
         with open(path, 'r') as f:
             for line in f:
                 cash = '"Cash' if has_quotes else 'Cash'
-                acct = '"Acount' if has_quotes else 'Account'
+                acct = '"Account' if has_quotes else 'Account'
                 if line.startswith(cash) or line.startswith(acct):
                     continue
                 if not is_header:
@@ -153,7 +155,6 @@ class HoldingsLoader:
                         amt = 0
                     except:
                         raise
-                    #print('amt:', amt)
                     inds.append(symbol)
                     data.append(amt)
                 sym = '"Symbol"' if has_quotes else 'Symbol'

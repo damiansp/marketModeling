@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
+from twelvedata import TDClient
 import yfinance as yf
 
 
@@ -9,7 +10,8 @@ TODAY = datetime.now().date()
 
 
 class Loader:
-    def __init__(self, symbols, start, end=None, verbose=False):
+    def __init__(
+            self, symbols, start, end=None, verbose=False, api: str = 'yf'):
         '''
         Get and prepare stock data for stock over a specified date range
         Args:
@@ -19,6 +21,7 @@ class Loader:
           (array of str): List of ticker symbols
         - start/end (str 'YYYY-MM-DD') start and end dates for stock data. 
             <end> defaults to <TODAY>
+        - api: 'yf' | '12d' ('yahoo finance' or 'twelvedata')
         '''
         self.symbols = (
             [symbols] if type(symbols) is str else sorted(symbols))
@@ -28,6 +31,14 @@ class Loader:
             else TODAY + timedelta(1))
         self.df = None
         self.verbose = verbose
+        self.api = api
+        self.client = None
+
+    def init_tdclient(self, api_key):
+        if client is None:
+            self.client = TDClient(apikey=api_key)
+        else:
+            print('Client already initialized.')
 
     @staticmethod
     def str_to_datetime(s):
@@ -38,12 +49,7 @@ class Loader:
         return self.df
 
     def download(self, append=None):
-        df = (
-            yf
-            .download(self.symbols, start=self.start, end=self.end)
-            .drop('Volume',  axis=1)
-            .rename(columns={'Adj Close': 'Value'})
-            .sort_index())
+        df = self._download_from_api()
         #if len(self.symbols) == 1:
         #    df.columns  = pd.MultiIndex.from_tuples(
         #        [(x, self.symbols[0]) for x in list(df)])
@@ -58,6 +64,25 @@ class Loader:
         df.index = range(n)
         df = self._get_derived_columns(df, n)
         self.df = df
+        return df
+
+    def _download_from_api(self):
+        if self.api == 'yf':
+            df = (
+                yf
+                .download(self.symbols, start=self.start, end=self.end)
+                .drop('Volume',  axis=1)
+                .rename(columns={'Adj Close': 'Value'})
+                .sort_index())
+        elif self.api == '12f':
+            if self.client is None:
+                print(
+                    'TDClient has not been initialized. '
+                    'Use Loader.init_teclient(api_key) to initialize')
+                return None
+            pass  # TODO: df = ...
+        else:
+            raise ValueError(f'API: {self.api} not recognized')
         return df
 
     def _get_derived_columns(self, df, n):
@@ -87,7 +112,7 @@ class Loader:
                         df.loc[(day), ('Open', s)]
                         / df.loc[(day - 1), ('Close', s)])
             except IndexError:
-                print(f'\nCould not downlad: {s}')
+                print(f'\nCould not download: {s}')
                 pass
         if self.verbose:
             print()

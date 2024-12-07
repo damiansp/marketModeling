@@ -12,6 +12,7 @@ API_KEY = os.getenv('TWELVE_DATA_API_KEY')
 td = TDClient(apikey=API_KEY)
 TOMORROW = (datetime.now() + timedelta(1)).date()
 
+
 def main():
     print(TOMORROW)
     df = read_or_download()
@@ -20,6 +21,7 @@ def main():
     plt.plot(df.close)
     plt.yscale('log')
     plt.show()
+    
 
 
 def read_or_download():
