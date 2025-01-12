@@ -15,12 +15,12 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   261847  # [217831, 271386]
-ET_VALUE =    213685  # [167274, 219673]
-SCHWAB_VALUE = 17525  # [ 14775,  18339]
+FID_VALUE =   259076  # [259076, 259076]
+ET_VALUE =    211043  # [211043. 211043]
+SCHWAB_VALUE = 17468  # [ 17468,  17468]
 SIM1_VALUE =  113250
 SIM2_VALUE =  270825
 SIM3_VALUE =  228746
@@ -38,7 +38,7 @@ SECOND_BEST_SIM = 5
 # 5 - 0 wk 1 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.7055, 1,      1,      1,      1])
+fracs     = np.array([1,      1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
 THUMB_FRAC = 0.75  # 1 = no thumb

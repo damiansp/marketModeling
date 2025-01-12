@@ -56,7 +56,7 @@ class TransactionDeterminer:
         return y
 
     @staticmethod
-    def _scale_linear(x,scaling):
+    def _scale_linear(x, scaling):
         intercept = scaling['intercept']
         slope = scaling['slope']
         y = intercept + slope * x
