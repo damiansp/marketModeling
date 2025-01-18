@@ -15,32 +15,32 @@ prev.last <- dim(df)[1]
 
 
 sp.actual <- c(
-  df$sp.actual,     5827)
+  df$sp.actual,     5827,  5836,  5843,  5950, 5937,  5997)
 
 fid.in <- c(
-  df$fid.in,      172299) #
+  df$fid.in,      172299,172299,172299,172299,172299,172299) #
 fid.val <- c(
-  df$fid.val,     259076) #
+  df$fid.val,     259076,259900,260932,262076,263078,263121) #
 
 f1k.in <- c(
-  df$f1k.in,       52664) # (1062.63)
+  df$f1k.in,       52664, 52664, 52664, 52664, 53385, 53385) # (1125.13)
 f1k.val <- c(
-  df$f1k.val,      82324) #
+  df$f1k.val,      82324, 82169, 82228, 82282, 83645, 83548) #
 
 self.mng.in <- c(
-  df$self.mng.in,  13857)  #
+  df$self.mng.in,  13857, 13857, 13857, 13857, 13857, 13857)  #
 self.mng.val <- c(
-  df$self.mng.val, 17468)  #
+  df$self.mng.val, 17468, 17480, 17547, 17681, 17776, 17783)  #
 
 et.in <- c(
-  df$et.in,        92607) # +396
+  df$et.in,        92607, 92997, 93120, 93120, 93120, 93120) #
 et.val <-c(
-  df$et.val,      211043)#
+  df$et.val,      211043,212988,214224,214870,216300,216008)#
 
 sim1 <- (c(
-           100000,100000)
+           100000,100000,100181,100920,102382,102281,101603)
   / 100000)
-sim1.res <- 200000
+sim1.res <- 50237
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips.csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -48,24 +48,19 @@ sim1.val <- sum(mw$Value)
 sim1.name <- 'adelaide'
 
 sim2 <- (c(
-           100000,100000)
+           100000,100000,100158,100885,102728,102840,102406)
   / 100000)
-sim2.res <- 200000
+sim2.res <- 71221
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(1).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
 sim2.val <- sum(mw$Value)
 sim2.name <- 'boisterous'
 
-extr <- (c(
-           100000,100000)
-  / 100000)
-  
-
 sim3 <- (c(
-           100000,100000)
+           100000,100000,100368,101189,102743,102670,102045)
   / 100000)
-sim3.res <- 200000
+sim3.res <- 45806
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(2).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -74,9 +69,9 @@ sim3.name <- 'cantankerous'
 
 
 sim4 <- (c(
-           100000,100000)
+           100000,100000,100403,101316,103055,102786,102118)
   / 100000)
-sim4.res <- 200000
+sim4.res <- 43324
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(3).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -84,14 +79,24 @@ sim4.val <- sum(mw$Value)
 sim4.name <- 'deeelite'
 
 sim5 <- (c(
-           100000,100000)
+           100000,100000,100329,101080,102579,102888,102376)
   / 100000)
-sim5.res <- 200000
+sim5.res <- 61516
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(4).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
 sim5.val <- sum(mw$Value)
 sim5.name <- 'edjucated'
+
+extr <- (c(
+           100000,100000,100000,100497,101274,101045,100579)
+  / 100000)
+extr.res <- 159147
+mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(5).csv')
+mw$Value <- str_replace(mw$Value, ",", "")
+mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
+extr.val <- sum(mw$Value)
+extr.name <- 'extrema'
 
 
 normalize.to.index <- function(x, index) {
@@ -167,7 +172,6 @@ sim3.sh     <- get.sharpe.from.daily.values(sim3)
 sim4.sh     <- get.sharpe.from.daily.values(sim4)
 sim5.sh     <- get.sharpe.from.daily.values(sim5)
 extr.sh     <- get.sharpe.from.daily.values(extr)
-idx.only.sh <- get.sharpe.from.daily.values(idx.only)
 
 
 # PLOT 1: This year's returns ---------------------------------------------------
@@ -178,7 +182,7 @@ plot(
   col='orange',
   lwd=3, 
   xlim=range(days[days >= 0]), 
-  ylim=c(0.7, 1.6),
+  ylim=c(0.9, 1.1),
   log='y')
 abline(h=seq(0, 8, 0.1), lty=2, col=rgb(0, 0, 0, 0.2))
 abline(h=seq(0, 8, 0.5), lty=4, col=rgb(0, 0, 0, 0.8))
@@ -195,15 +199,14 @@ lines(0:(length(sim3) - 1), sim3, lwd=3, col='cyan')
 lines(0:(length(sim4) - 1), sim4, lwd=3, col='burlywood4')
 lines(0:(length(sim5) - 1), sim5, lwd=3, col='coral')
 lines(0:(length(extr) - 1), extr, lwd=2, col='green')
-lines(0:(length(idx.only) - 1), idx.only, lwd=2, col='blue')
 lines(days, (1 + tot - sp) / (1 + tot - sp)[year.start], col=2)
 legend(
   'topleft',
   lty=1,
-  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1),
+  lwd=c(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1),
   col=c(
     'orange', 'darkgreen', 'purple', 'sienna', 'maroon', 'cadetblue', 'black', 
-    'hotpink', 'limegreen', 'cyan', 'burlywood4', 'coral', 'green', 'blue', 'red'),
+    'hotpink', 'limegreen', 'cyan', 'burlywood4', 'coral', 'green', 'red'),
   legend=c(
     paste(sp.sh, 'S&P'),
     paste(fid.sh, 'Fid'),
@@ -218,7 +221,6 @@ legend(
     paste(sim4.sh, sim4.name),
     paste(sim5.sh, sim5.name),
     paste(extr.sh, 'extrema'),
-    paste(idx.only.sh, 'idx funds'),
     paste('Diff(SP)')),
   bg=rgb(1, 1, 1, alpha=0.8))
 #--------------------------------------------------------------------------------
@@ -300,11 +302,11 @@ for (p in y) { cat(p, '\n') }
 
 n <- length(sim1)
 NDAYS.LOOKBACK <- 7 * 5
-sim1[n] / sim1[n - NDAYS.LOOKBACK]
-sim2[n] / sim2[n - NDAYS.LOOKBACK]
-sim3[n] / sim3[n - NDAYS.LOOKBACK]
-sim4[n] / sim4[n - NDAYS.LOOKBACK]
-sim5[n] / sim5[n - NDAYS.LOOKBACK]
+sim1[n] / sim1[max(n - NDAYS.LOOKBACK, 1)]
+sim2[n] / sim2[max(n - NDAYS.LOOKBACK, 1)]
+sim3[n] / sim3[max(n - NDAYS.LOOKBACK, 1)]
+sim4[n] / sim4[max(n - NDAYS.LOOKBACK, 1)]
+sim5[n] / sim5[max(n - NDAYS.LOOKBACK, 1)]
 
 n <- length(fid.val)
 fid.val[n] / fid.val[n - NDAYS.LOOKBACK]
@@ -315,10 +317,10 @@ self.mng.val[n] / self.mng.val[n - NDAYS.LOOKBACK]
 
 
 # Perf:    1st 2nd 3rd  Pts(3x2x1)
-# sim1       7   7   7   42
-# fid        5   6   3   35
-# et        10   9   1   51
-# self.mng   5   6   6   31
+# sim1           1        2
+# fid                     0
+# et         1            3
+# self.mng           1    1
 
 
 #--------------------------------------------------------
