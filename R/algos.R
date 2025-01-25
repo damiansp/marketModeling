@@ -15,32 +15,42 @@ prev.last <- dim(df)[1]
 
 
 sp.actual <- c(
-  df$sp.actual,     5827,  5836,  5843,  5950, 5937,  5997)
+  df$sp.actual,     5827,  5836,  5843,  5950, 5937,  5997,  6049, 6086,  6119,
+    6101)
 
 fid.in <- c(
-  df$fid.in,      172299,172299,172299,172299,172299,172299) #
+  df$fid.in,      172299,172299,172299,172299,172299,172299,172299,172299,172299,
+  172299) #
 fid.val <- c(
-  df$fid.val,     259076,259900,260932,262076,263078,263121) #
+  df$fid.val,     259076,259900,260932,262076,263078,263121,264259,264409,265029,
+  264323) #
 
 f1k.in <- c(
-  df$f1k.in,       52664, 52664, 52664, 52664, 53385, 53385) # (1125.13)
+  df$f1k.in,       52664, 52664, 52664, 52664, 53385, 53385, 53385, 53385, 53385,
+   54088) # (1125.13)
 f1k.val <- c(
-  df$f1k.val,      82324, 82169, 82228, 82282, 83645, 83548) #
+  df$f1k.val,      82324, 82169, 82228, 82282, 83645, 83548, 84187, 84966, 85417,
+   86877) #
 
 self.mng.in <- c(
-  df$self.mng.in,  13857, 13857, 13857, 13857, 13857, 13857)  #
+  df$self.mng.in,  13857, 13857, 13857, 13857, 13857, 13857, 13857, 13857, 13857,
+   13857)  #
 self.mng.val <- c(
-  df$self.mng.val, 17468, 17480, 17547, 17681, 17776, 17783)  #
+  df$self.mng.val, 17468, 17480, 17547, 17681, 17776, 17783, 17934, 17906, 17923,
+   17937)  #
 
 et.in <- c(
-  df$et.in,        92607, 92997, 93120, 93120, 93120, 93120) #
+  df$et.in,        92607, 92997, 93120, 93120, 93120, 93120, 93120, 93120, 93120,
+   93120) #
 et.val <-c(
-  df$et.val,      211043,212988,214224,214870,216300,216008)#
+  df$et.val,      211043,212988,214224,214870,216300,216008,216174,216336,216595,
+  215513) #
 
 sim1 <- (c(
-           100000,100000,100181,100920,102382,102281,101603)
+           100000,100000,100181,100920,102382,102281,101603,103160,104907,104306,
+  104823)
   / 100000)
-sim1.res <- 50237
+sim1.res <- 81528
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips.csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -48,9 +58,10 @@ sim1.val <- sum(mw$Value)
 sim1.name <- 'adelaide'
 
 sim2 <- (c(
-           100000,100000,100158,100885,102728,102840,102406)
+           100000,100000,100158,100885,102728,102840,102406,104599,106418,105942,
+  106168)
   / 100000)
-sim2.res <- 71221
+sim2.res <- 82550
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(1).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -58,9 +69,10 @@ sim2.val <- sum(mw$Value)
 sim2.name <- 'boisterous'
 
 sim3 <- (c(
-           100000,100000,100368,101189,102743,102670,102045)
+           100000,100000,100368,101189,102743,102670,102045,103523,105270,104372,
+  104101)
   / 100000)
-sim3.res <- 45806
+sim3.res <- 80777
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(2).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -69,9 +81,10 @@ sim3.name <- 'cantankerous'
 
 
 sim4 <- (c(
-           100000,100000,100403,101316,103055,102786,102118)
+           100000,100000,100403,101316,103055,102786,102118,103324,104838,103757,
+  103325)
   / 100000)
-sim4.res <- 43324
+sim4.res <- 80279
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(3).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -79,9 +92,10 @@ sim4.val <- sum(mw$Value)
 sim4.name <- 'deeelite'
 
 sim5 <- (c(
-           100000,100000,100329,101080,102579,102888,102376)
+           100000,100000,100329,101080,102579,102888,102376,104699,106291,106069,
+  105501)
   / 100000)
-sim5.res <- 61516
+sim5.res <- 81916
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(4).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -89,9 +103,10 @@ sim5.val <- sum(mw$Value)
 sim5.name <- 'edjucated'
 
 extr <- (c(
-           100000,100000,100000,100497,101274,101045,100579)
+           100000,100000,100000,100497,101274,101045,100579,101267,101191,101483,
+   99729)
   / 100000)
-extr.res <- 159147
+extr.res <- 101342
 mw <- read.csv('~/Downloads/Holdings - Damian Satterthwaite-Phillips(5).csv')
 mw$Value <- str_replace(mw$Value, ",", "")
 mw$Value <- as.numeric(str_replace(mw$Value, "\\$", ""))
@@ -317,10 +332,10 @@ self.mng.val[n] / self.mng.val[n - NDAYS.LOOKBACK]
 
 
 # Perf:    1st 2nd 3rd  Pts(3x2x1)
-# sim1           1        2
+# sim1       1   1        5
 # fid                     0
-# et         1            3
-# self.mng           1    1
+# et         1   1        5
+# self.mng           2    2
 
 
 #--------------------------------------------------------
