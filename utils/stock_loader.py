@@ -115,6 +115,7 @@ class Loader:
                 [np.nan] * n, name=('OvernightChange', s), index=df.index)
             df = pd.concat(
                 [df, log_val, intra_ch, day_day_ch, overnight_ch], axis=1)
+            df.sort_index(inplace=True)
             try:
                 first_value = df.Value[s][df.Value[s].notna()].index[0]
                 for day in range(first_value + 1, n):
