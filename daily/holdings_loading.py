@@ -27,7 +27,8 @@ class HoldingsLoader:
         etrade = self._upload_etrade()
         fidelity = self._upload_fidelity()
         schwab = self._upload_schwab()
-        dm = self._upload_dm()
+        #dm = self._upload_dm()
+        dm = self._upload_etrade(is_dm=True)
         sims = self._upload_sims()
         out = pd.concat(
             [etrade, fidelity, schwab, dm, sims], axis=1
@@ -37,19 +38,20 @@ class HoldingsLoader:
         out = out.round().astype(int)
         return out
 
-    def _upload_etrade(self):
-        filename = 'Positions.csv'
+    def _upload_etrade(self, is_dm=False):
+        filename = 'Positions(1).csv'  if is_dm else 'Positions.csv'
         path = f'{DOWNLOADS}/{filename}'
         self._preclean_etrade(path)
         print('Uploading E*Trade data...')
+        val_col = 'dm' if is_dm else 'et'
         etrade = (
             pd
             .read_csv(path, index_col=0, skiprows=1)[['Market Value']]
-            .rename(columns={'Market Value': 'et'}))
+            .rename(columns={'Market Value': val_col}))
         etrade.index = map(lambda x: x.split()[0], etrade.index)
         drops = [d for d in ['FNRG', 'Portfolio', 'Cash'] if d in etrade.index]
         etrade.drop(index=drops, inplace=True)
-        if len(etrade[etrade.et == '--']):
+        if len(etrade[etrade[val_col] == '--']):
             raise ValueError(
                 f'Missing price data in ETrade file ({filename}). Correct.')
         return etrade
@@ -162,14 +164,14 @@ class HoldingsLoader:
                     is_header = False
         return data, inds
 
-    def _upload_dm(self):
-        dm = pd.read_csv(
-            f'{DOWNLOADS}/Dongmei.csv',
-            index_col=0,
-            usecols=['Position', 'Market Value']
-        ).rename(columns={'Market Value': 'dm'})
-        dm.index = [x.replace(' shares', '') for x in dm.index]
-        return dm
+    #def _upload_dm(self):
+    #    dm = pd.read_csv(
+    #        f'{DOWNLOADS}/Dongmei.csv',
+    #        index_col=0,
+    #        usecols=['Position', 'Market Value']
+    #    ).rename(columns={'Market Value': 'dm'})
+    #    dm.index = [x.replace(' shares', '') for x in dm.index]
+    #    return dm
 
     def _upload_sims(self):
         print('Uploading simulation data...')
