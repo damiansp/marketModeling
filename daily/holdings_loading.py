@@ -54,6 +54,7 @@ class HoldingsLoader:
         if len(etrade[etrade[val_col] == '--']):
             raise ValueError(
                 f'Missing price data in ETrade file ({filename}). Correct.')
+        etrade[val_col] = etrade[val_col].astype(float)
         return etrade
 
     @staticmethod

@@ -7,7 +7,6 @@ class TransactionDeterminer:
     def __init__(
             self, metrics, next_day_distributions, frac_in, p_stats0_buy,
             params):
-        #metrics.to_csv('~/Desktop/test1.csv')
         self._df = metrics
         self.next_day_distributions = next_day_distributions
         self.frac_in = frac_in
@@ -30,7 +29,7 @@ class TransactionDeterminer:
         for portfolio, params in self.params.items():
             print(portfolio)
             weights = params['status_weights']
-            print('weights:', weights) 
+            print('weights:', weights)
             self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
                 weights, 'RSI', 'fair_value_mult', 'geomean')
             scaling = params['scaling']

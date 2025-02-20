@@ -76,8 +76,11 @@ class Loader:
                 yf
                 .download(self.symbols, start=self.start, end=self.end)
                 .drop('Volume',  axis=1)
-                .rename(columns={'Adj Close': 'Value'})
+                #.rename(columns={'Adj Close': 'Value'})
+                .rename(columns={'Close': 'Value'})
                 .sort_index())
+            for sym in self.symbols:
+                df[('Close', sym)] = df[('Value', sym)].copy()
         elif self.api in ('12d', 'td', 'twelvedata'):
             if self.client is None:
                 print(

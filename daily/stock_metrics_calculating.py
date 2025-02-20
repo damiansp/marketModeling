@@ -25,8 +25,11 @@ class StockMetricsCalculator:
         data = (
             yf
             .download(self.stocks, start=str(self.start), end=str(TOMORROW))
-            .rename(columns={'Adj Close': 'AdjClose'})
+            #.rename(columns={'Adj Close': 'AdjClose'})
+            .rename(columns={'Close': 'AdjClose'})
             .sort_index())
+        for s in self.stocks:
+            data[('Close', s)] = data[('AdjClose', s)].copy()
         data.fillna(method='ffill')
         return data
 

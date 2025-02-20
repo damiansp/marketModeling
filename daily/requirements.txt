@@ -1,4 +1,4 @@
 numpy==1.26.3
 pandas==2.0.2
 twelvedata==1.2.24
-yfinance==0.2.49
+yfinance==0.2.54
