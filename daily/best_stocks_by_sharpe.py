@@ -238,3 +238,7 @@ def get_sharpe(returns, window=None):
     returns = returns[~np.isnan(returns)]
     sharpe = (np.sqrt(252) * returns.mean()) / returns.std()
     return sharpe
+
+
+if __name__ == '__main__':
+    get_best_stocks('./data/sharpes.csv')
