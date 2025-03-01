@@ -18,30 +18,30 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   263805  # [259076, 270148]
-ET_VALUE =    213512  # [211043, 220065]
-SCHWAB_VALUE = 18341  # [ 17468,  18750]
-SIM1_VALUE =  210088
-SIM2_VALUE =  218526
-SIM3_VALUE =  219597
-SIM4_VALUE =  226479
-SIM5_VALUE =  217870
-DM_VALUE   =   32583 + 262
+FID_VALUE =   259909  # [258084, 270148]
+ET_VALUE =    215769  # [211043, 220065]
+SCHWAB_VALUE = 17846  # [ 17468,  18750]
+SIM1_VALUE =  202286
+SIM2_VALUE =  204096
+SIM3_VALUE =  203380
+SIM4_VALUE =  214575
+SIM5_VALUE =  229590
+DM_VALUE   =   32492 + 517
 BEST_SIM = 4  # update weekly (on Fri)
-SECOND_BEST_SIM = 3
-# n weeks needed: 5 / 7
+SECOND_BEST_SIM = 5
+# n weeks needed: 6 / 7
 #     1st  2nd
 # 1 - 1 wk 0 wk  #  since other
 # 2 - 3 wk 2 wk
 # 3 - 0 wk 1 wk
-# 4 - 1 wk 0 wk
-# 5 - 1 wk 3 wk
+# 4 - 2 wk 0 wk
+# 5 - 1 wk 4 wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([1,      1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_FRAC = 0.742  # 1 = no thumb
+THUMB_FRAC = 0.74  # 1 = no thumb
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
@@ -59,14 +59,14 @@ PCT_TO_TRADE_DAILY = 1.
 N_STATE_BASED_STOCKS = 100
 # increase values if trying to increase prob of on/offloading
 P_STATS0_BUY = {
-    'et':     {'buy': 0.08, 'sell': 0.01},  # incr by 4
-    'fid':    {'buy': 0.12, 'sell': 0.01},  #         4
-    'schwab': {'buy': 0.01, 'sell': 0.16},  #         4
-    'sim1':   {'buy': 0.01, 'sell': 0.08},  #         4 adelaide 2024
-    'sim2':   {'buy': 0.01, 'sell': 0.06},  #         3 aei
-    'sim3':   {'buy': 0.04, 'sell': 0.01},  #         4 simsims
-    'sim4':   {'buy': 0.03, 'sell': 0.01},  #         3 sim3
-    'sim5':   {'buy': 0.01, 'sell': 0.10},  #         5 simz
+    'et':     {'buy': 0.01, 'sell': 0.12},  # incr by 4
+    'fid':    {'buy': 0.08, 'sell': 0.01},  #         4
+    'schwab': {'buy': 0.01, 'sell': 0.04},  #         4
+    'sim1':   {'buy': 0.01, 'sell': 0.04},  #         4 adelaide 2024
+    'sim2':   {'buy': 0.01, 'sell': 0.03},  #         3 aei
+    'sim3':   {'buy': 0.01, 'sell': 0.04},  #         4 simsims
+    'sim4':   {'buy': 0.01, 'sell': 0.03},  #         3 sim3
+    'sim5':   {'buy': 0.10, 'sell': 0.01},  #         5 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
 PARAMS = {
