@@ -19,10 +19,10 @@ YEARS_OF_DATA = 50
 MIN_YEARS = 10
 START = TOMORROW - timedelta(round(YEARS_OF_DATA * 365.25))
 MIN_PRICE = 2.
-MAX_ATTEMPTS = 2
+MAX_ATTEMPTS = 1
 N_JOBS = 1
 BATCH_SIZE = 100
-THROTTLE_S = 2.5
+THROTTLE_S = 10
 
 
 def get_best_stocks(outpath, manual_symbols=None):
