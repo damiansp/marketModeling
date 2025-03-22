@@ -21,8 +21,8 @@ START = TOMORROW - timedelta(round(YEARS_OF_DATA * 365.25))
 MIN_PRICE = 2.
 MAX_ATTEMPTS = 1
 N_JOBS = 1
-BATCH_SIZE = 100
-THROTTLE_S = 10
+BATCH_SIZE = 200
+THROTTLE_S = 12
 
 
 def get_best_stocks(outpath, manual_symbols=None):
@@ -143,7 +143,8 @@ def download_data(symbols):
                     symbols,
                     start=pd.to_datetime(START, utc=True),
                     end=pd.to_datetime(TOMORROW, utc=True))
-                .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
+                #.rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
+                .rename(columns={'Close': 'AdjClose'}))['AdjClose']
             data.index = pd.to_datetime(data.index)
             data = data.sort_index()
             n = len(data)
@@ -158,7 +159,7 @@ def download_data(symbols):
                 return None
         sleep(THROTTLE_S)
         # drop any cols that are ALL null
-        data = data.loc[:, data.isnull().sum() != len(data)]
+        data = data.loc[:, data.isnull().sum() < len(data)]
         print(red(f'{symbols[0]}-{symbols[-1]} (days, stocks): {data.shape}'))
         #missing_last = [
         #    col for col in list(data) if data[col].isnull()[-1]]
