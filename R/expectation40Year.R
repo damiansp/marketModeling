@@ -273,35 +273,36 @@ fracs.in <- c()
 # Money back in at the median line----------
 plot.for.ts(sp)
 # 75%/37% out; 100/50% in; Extreme (top/bottom)
-# 37%/18% out; ??/??% in; Near-Extreme (top/bottom)
+# 37%/18% out; 50/25% in; Near-Extreme (top/bottom)
 f.out <- 0  # 
-f.in <- 0
+f.in <- 0.25 # Near Extreme botom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
 plot.for.ts(sp.1k.days, long=20*250)
 # 60%/30% out; 95/48% in; Extreme (top/bottom)
-# 30%/15% out; ?????% in; Near-Extreme (top/bottom)
+# 30%/15% out; 48/23% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0
+f.in <- 0.23  # Near extr bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
 plot.for.ts(sp.1k.days, long=10*250)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
-# 25%12% out; ??/??% in; Near-Extreme (top/bottom)
+# 25%12% out; 38/19% in; Near-Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0
+f.in <- 0.19  # Bottom near ext
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=5*250)
 plot.for.ts(sp.1k.days, long=5*250)
-# 40%/20% out; 50/25% in; 
+# 40%/20% out; 50/25% in; Extreme (top/bottom)
+# 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0
+f.in <- 0.25  # Bottom extr
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -328,11 +329,11 @@ plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0.06  # top extreme .06
+f.in <- 0.06  # both extreme .06
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
-# 0.3598   # init amt: $13002
+# 0.7823  0.5628  # init amt: $18463
 #=============================================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
 	cat('STOP: missing a fraction out.  Rerun')
