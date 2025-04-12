@@ -275,7 +275,7 @@ plot.for.ts(sp)
 # 75%/37% out; 100/50% in; Extreme (top/bottom)
 # 37%/18% out; 50/25% in; Near-Extreme (top/bottom)
 f.out <- 0  # 
-f.in <- 0.25 # Near Extreme botom
+f.in <- 0.25 # Near Extreme bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -293,7 +293,7 @@ plot.for.ts(sp.1k.days, long=10*250)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
 # 25%12% out; 38/19% in; Near-Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0.19  # Bottom near ext
+f.in <- 0.38  # Top near ext, bottom extr
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -329,11 +329,11 @@ plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0.06  # both extreme .06
+f.in <- 0.06  # top extreme .06
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
-# 0.7823  0.5628  # init amt: $18463
+# 0.8334 0.7823  # init amt: $18463
 #=============================================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
 	cat('STOP: missing a fraction out.  Rerun')
