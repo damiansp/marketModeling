@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from twelvedata import TDClient
 
 
 def get_macd(stock_data, fast=60, slow=90, signal=80, up_down=False):
@@ -45,6 +46,20 @@ def sharpe_from_daily(x):
     returns = get_daily_returns(x)
     sharpe = get_sharpe_ratio(returns)
     return sharpe
+
+
+def download_td(td_client, symbols, start, end):
+    df = td_client.time_series(
+        symbol=symbols,
+        interval='1day',
+        start_date=start,
+        end_date=end,
+        outputsize=5000,
+        timezone='Exchange',
+        order='asc'
+    ).as_pandas()
+    df = td2yf(df)
+    return df
 
 
 def td2yf(df):

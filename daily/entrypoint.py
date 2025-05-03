@@ -18,27 +18,27 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   257496  # [232208, 270148]
-ET_VALUE =    221733  # [199256, 221733]
-SCHWAB_VALUE = 22421  # [ 17415,  23233]
-SIM1_VALUE =  176928
-SIM2_VALUE =  189088
-SIM3_VALUE =  195481
-SIM4_VALUE =  186710
-SIM5_VALUE =  188337
-DM_VALUE   =   22464 + 6208
-BEST_SIM = 3  # update weekly (on Fri)
-SECOND_BEST_SIM = 2
-# n weeks needed: 6 / 8
+FID_VALUE =   262891  # [232208, 270148]
+ET_VALUE =    227143  # [199256, 227143]
+SCHWAB_VALUE = 22791  # [ 17415,  23233]
+SIM1_VALUE =  189773
+SIM2_VALUE =  205889
+SIM3_VALUE =  206063
+SIM4_VALUE =  198494
+SIM5_VALUE =  204996
+DM_VALUE   =   23004 + 9094
+BEST_SIM = 2  # update weekly (on Fri)
+SECOND_BEST_SIM = 3
+# n weeks needed: 7 / 8
 #     1st  2nd
 # 1 - 0 wk 0 wk  #  since other
-# 2 - 0 wk 1 wk
-# 3 - 3 wk 0 wk
+# 2 - 1 wk 1 wk
+# 3 - 3 wk 1 wk
 # 4 - 2 wk 2 wk
 # 5 - 1 wk 3 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.97,      1,      1,      1,      1])
+fracs     = np.array([0.9118, 0.0112, 1,      1,      0.9999])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
 THUMB_FRAC = 0.64  # 1 = no thumb

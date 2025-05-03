@@ -1,13 +1,16 @@
 from datetime import datetime, timedelta
 import multiprocessing as mp
 
+from curl_cffi import requests
 import numpy as np
 import pandas as pd
-import yfinance as yf
+#import yfinance as yf
+import yf_clone.yfinance as yf
 
 
 TOMORROW = (datetime.now() + timedelta(1)).date()
 N_JOBS = 20
+session = requests.Session(impersonate='chrome')
 
 
 class StockMetricsCalculator:
@@ -24,7 +27,11 @@ class StockMetricsCalculator:
     def _get_data(self):
         data = (
             yf
-            .download(self.stocks, start=str(self.start), end=str(TOMORROW))
+            .download(
+                self.stocks,
+                start=str(self.start),
+                end=str(TOMORROW),
+                session=session)
             #.rename(columns={'Adj Close': 'AdjClose'})
             .rename(columns={'Close': 'AdjClose'})
             .sort_index())

@@ -24,3 +24,4 @@ __pycache__
 data/
 *logs/
 .env
+yf_clone/

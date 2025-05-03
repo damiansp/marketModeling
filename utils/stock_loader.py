@@ -1,14 +1,18 @@
 from datetime import datetime, timedelta
+import sys
 
+from curl_cffi import requests
 import numpy as np
 import pandas as pd
 from twelvedata import TDClient
-import yfinance as yf
+#import yfinance as yf
 
 from .utils import td2yf
-
+sys.path.append('..')
+import yf_clone.yfinance as yf
 
 TODAY = datetime.now().date()
+session = requests.Session(impersonate='chrome')
 
 
 class Loader:
@@ -74,7 +78,11 @@ class Loader:
         if self.api == 'yf':
             df = (
                 yf
-                .download(self.symbols, start=self.start, end=self.end)
+                .download(
+                    self.symbols,
+                    start=self.start,
+                    end=self.end,
+                    session=session)
                 .drop('Volume',  axis=1)
                 #.rename(columns={'Adj Close': 'Value'})
                 .rename(columns={'Close': 'Value'})
