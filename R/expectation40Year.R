@@ -320,7 +320,7 @@ plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
 # 20%/10% out; 12/6% in; Extreme (top/bottom)
 # 10/5% out; 6/3% in; Near Extreme (top/bottom)
 f.out <- 0.06 # bottom extr
-f.in <- 0.  #
+f.in <- 0.12  # top extr
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
