@@ -275,7 +275,7 @@ plot.for.ts(sp)
 # 75%/37% out; 100/50% in; Extreme (top/bottom)
 # 37%/18% out; 50/25% in; Near-Extreme (top/bottom)
 f.out <- 0  # 
-f.in <- 0.25 # Near Extreme bottom
+f.in <- 0 # 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -284,7 +284,7 @@ plot.for.ts(sp.1k.days, long=20*250)
 # 60%/30% out; 95/48% in; Extreme (top/bottom)
 # 30%/15% out; 48/23% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0.23  # Near extr bottom
+f.in <- 0  # Near extr bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -293,7 +293,7 @@ plot.for.ts(sp.1k.days, long=10*250)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
 # 25%12% out; 38/19% in; Near-Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0.38  # Top near ext, bottom extr
+f.in <- 0.38  # bottom extr
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -302,7 +302,7 @@ plot.for.ts(sp.1k.days, long=5*250)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0.25  # Bottom extr
+f.in <- 0  # Bottom extr
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -310,8 +310,8 @@ sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
-f.out <- 0
-f.in <- 0.25  # both extr. 
+f.out <- 0.07
+f.in <- 0.25  # top extr. 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -328,12 +328,13 @@ sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
-f.out <- 0.03  # bottom ext
+f.out <- 0.1  # both ext
 f.in <- 0  # 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 # 0.81  # init amt: $18463
+plot.for.ts(sp.1yr, long=round(1*250), proj=F)
 #=============================================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
 	cat('STOP: missing a fraction out.  Rerun')
