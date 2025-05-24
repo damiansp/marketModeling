@@ -284,7 +284,7 @@ plot.for.ts(sp.1k.days, long=20*250)
 # 60%/30% out; 95/48% in; Extreme (top/bottom)
 # 30%/15% out; 48/23% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0  # Near extr bottom
+f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -302,7 +302,7 @@ plot.for.ts(sp.1k.days, long=5*250)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
 f.out <- 0
-f.in <- 0  # Bottom extr
+f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -310,7 +310,7 @@ sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
-f.out <- 0.07
+f.out <- 0.07 # bottom near extr
 f.in <- 0.25  # top extr. 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
@@ -328,7 +328,7 @@ sp.6mos <- clip.series(sp, n.days=round(0.5*250))
 plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
-f.out <- 0.1  # both ext
+f.out <- 0.1  # top
 f.in <- 0  # 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
