@@ -18,30 +18,30 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   274144  # [232208, 274995]
-ET_VALUE =    237442  # [199256, 237574]
-SCHWAB_VALUE = 23449  # [ 17415,  23645]
-SIM1_VALUE =  205704
-SIM2_VALUE =  224822
-SIM3_VALUE =  215664
-SIM4_VALUE =  218456
-SIM5_VALUE =  219463
-DM_VALUE   =   23969 + 7491
+FID_VALUE =   277970  # [232208, 277970]
+ET_VALUE =    239329  # [199256, 239329]
+SCHWAB_VALUE = 23925  # [ 17415,  23925]
+SIM1_VALUE =  211693
+SIM2_VALUE =  235036
+SIM3_VALUE =  225233
+SIM4_VALUE =  226772
+SIM5_VALUE =  230868
+DM_VALUE   =   24212 + 7832
 BEST_SIM = 2  # update weekly (on Fri)
 SECOND_BEST_SIM = 4
-# n weeks needed: 1 / 8.1 (41 market days)
+# n weeks needed: 0 / 8.1 (41 market days)
 #     1st  2nd
 # 1 - 0 wk 0 wk  #  since other
-# 2 - 4 wk 0 wk
+# 2 - 0 wk 0 wk
 # 3 - 0 wk 0 wk
-# 4 - 0 wk 3 wk
+# 4 - 0 wk 0 wk
 # 5 - 0 wk 0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([0.78678,1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_FRAC = 0.66  # 1 = no thumb (current min: 62)
+THUMB_FRAC = 0.64  # 1 = no thumb (current min: 62)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
@@ -93,40 +93,40 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 3.2398,
-        'max_prop_per_stock': 0.0675,
-        'scaling': {'center': 0.6515, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 5.9102,
-        'sharpe_scaled_exp': 3.2578,
-        'status_weights': [214.766, 1357.232, 1.0]},
-    'sim2': {
         'buy_level': 3.9325,
         'max_prop_per_stock': 0.0824,
         'scaling': {'method': 'tan', 'scaler': 0.5557},
         'sell_level': 5.7728,
         'sharpe_scaled_exp': 3.4524,
         'status_weights': [172.72, 804.876, 1.0]},
-    'sim3': {
-        'buy_level': 3.7203,
-        'max_prop_per_stock': 0.0773,
-        'scaling': {'center': 0.6298, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 4.643,
-        'sharpe_scaled_exp': 3.8869,
-        'status_weights': [342.014, 2909.907, 1.0]},
-    'sim4': {
+    'sim2': {
         'buy_level': 3.3234,
         'max_prop_per_stock': 0.0698,
         'scaling': {'center': 0.6832, 'method': 'quadratic', 'negpos': 1},
         'sell_level': 6.0869,
         'sharpe_scaled_exp': 3.3086,
         'status_weights': [216.214, 766.466, 1.0]},
+    'sim3': {
+        'buy_level': 3.9848,
+        'max_prop_per_stock': 0.054,
+        'scaling': {'center': 0.8284, 'method': 'quadratic', 'negpos': -1},
+        'sell_level': 5.4957,
+        'sharpe_scaled_exp': 3.8297,
+        'status_weights': [266.758, 1118.487, 1.0]},
+    'sim4': {
+        'buy_level': 3.4969,
+        'max_prop_per_stock': 0.0894,
+        'scaling': {'method': 'tan', 'scaler': 0.5548},
+        'sell_level': 5.9483,
+        'sharpe_scaled_exp': 4.001,
+        'status_weights': [144.677, 663.65, 1.0]},
     'sim5': {
-        'buy_level': 3.7376,
-        'max_prop_per_stock': 0.0844,
-        'scaling': {'center': 0.9754, 'method': 'quadratic', 'negpos': -1},
-        'sell_level': 6.0543,
-        'sharpe_scaled_exp': 3.4576,
-        'status_weights': [340.815, 2192.774, 1.0]}}
+        'buy_level': 3.2523,
+        'max_prop_per_stock': 0.0745,
+        'scaling': {'center': 0.7083, 'method': 'quadratic', 'negpos': 1},
+        'sell_level': 4.9795,
+        'sharpe_scaled_exp': 3.8749,
+        'status_weights': [166.208, 725.364, 1.0]}}
 PARAMS['dm'] = PARAMS['et']
 
 # File paths
