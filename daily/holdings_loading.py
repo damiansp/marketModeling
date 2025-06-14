@@ -27,8 +27,8 @@ class HoldingsLoader:
         etrade = self._upload_etrade()
         fidelity = self._upload_fidelity()
         schwab = self._upload_schwab()
-        #dm = self._upload_dm()
-        dm = self._upload_etrade(is_dm=True)
+        dm = self._upload_dm()
+        #dm = self._upload_etrade(is_dm=True)
         sims = self._upload_sims()
         out = pd.concat(
             [etrade, fidelity, schwab, dm, sims], axis=1
@@ -38,12 +38,24 @@ class HoldingsLoader:
         out = out.round().astype(int)
         return out
 
-    def _upload_etrade(self, is_dm=False):
-        filename = 'Positions(1).csv'  if is_dm else 'Positions.csv'
+    def _upload_dm(self):
+        #dfs = []
+        #for pos in [1]:  #, 2, 3]:
+        #    df = self._upload_etrade(pos)
+        #    dfs.append(df)
+        #df = pd.concat(dfs, axis=1)
+        #df = pd.DataFrame(df.sum(axis=1), columns=['dm'])
+        df = self._upload_etrade(1)
+        df.columns = ['dm']
+        return df
+
+    def _upload_etrade(self, pos=None):
+        filename = (
+            f'Positions({pos}).csv' if pos is not None else 'Positions.csv')
         path = f'{DOWNLOADS}/{filename}'
         self._preclean_etrade(path)
         print('Uploading E*Trade data...')
-        val_col = 'dm' if is_dm else 'et'
+        val_col = 'dm' if pos is not None else 'et'
         etrade = (
             pd
             .read_csv(path, index_col=0, skiprows=1)[['Market Value']]
