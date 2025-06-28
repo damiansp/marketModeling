@@ -310,7 +310,7 @@ sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
 plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
-f.out <- 0.07 # bottom near extr
+f.out <- 0.15 # bottom extr
 f.in <- 0.25  # top extr. 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
