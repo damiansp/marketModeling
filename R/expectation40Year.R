@@ -311,7 +311,7 @@ plot.for.ts(sp.1k.days, long=round(2.5*250))
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
 f.out <- 0  # 
-f.in <- 0.25  # top extr. 
+f.in <- 0   # 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -319,7 +319,7 @@ sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
 # 20%/10% out; 12/6% in; Extreme (top/bottom)
 # 10/5% out; 6/3% in; Near Extreme (top/bottom)
-f.out <- 0 #
+f.out <- 0.1 # top near extr
 f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
