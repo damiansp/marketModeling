@@ -15,34 +15,34 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   293422  # [232208, 296221]
-ET_VALUE =    246353  # [199256, 249129]
-SCHWAB_VALUE = 35299  # [ 17415,  35773]
-SIM1_VALUE =  267101
-SIM2_VALUE =  257997
-SIM3_VALUE =  296104
-SIM4_VALUE =  285478
-SIM5_VALUE =  255487
-DM_VALUE   =   62415
+FID_VALUE =   298731  # [232208, 298731]
+ET_VALUE =    252158  # [199256, 252194]
+SCHWAB_VALUE = 35617  # [ 17415,  35773]
+SIM1_VALUE =  277111
+SIM2_VALUE =  260067
+SIM3_VALUE =  309797
+SIM4_VALUE =  296311
+SIM5_VALUE =  257270
+DM_VALUE   =   63697
 BEST_SIM = 3  # update weekly (on Fri)
 SECOND_BEST_SIM = 1
-# n weeks needed: 34 / 42 market days - same if new; expand if same
+# n weeks needed: 38 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0  25    7 wk  #  since other
+# 1 -  0  29    7 wk  #  since other
 # 2 -  0   0    0 wk
-# 3 - 32   0    0 wk
-# 4 -  0   6   23 wk
+# 3 - 36   0    0 wk
+# 4 -  0   6   27 wk
 # 5 -  0   1    2 wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([0.64,   1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_FRAC = 0.76  # 1 = no thumb (current min: 62, current max: 80)
+THUMB_FRAC = 0.72  # 1 = no thumb (current min: 62, current max: 80)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
@@ -72,13 +72,13 @@ P_STATS0_BUY = {
 
 PARAMS = {
     'et': {
-        'status_weights': [1.1, 1, 1],   # RSI, fair_value_mult, geomean
-        'sharpe_scaled_exp': 3.9,
-        'max_prop_per_stock': 0.05,
+        'buy_level': 2.9621,
+        'max_prop_per_stock': 0.0544,
         # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
-        'scaling': {'method': 'tan', 'scaler': 0.6},
-        'buy_level': 5,
-        'sell_level': 5},
+        'scaling': {'method': 'tan', 'scaler': 0.5277},
+        'sell_level': 4.9991,
+        'sharpe_scaled_exp': 3.6575,
+        'status_weights': [176.51, 774.213, 1.0]},  # RSI, fair_val_mlt, geomn
     'fid': {
         'status_weights': [144.677, 663.65, 1.0],
         'sharpe_scaled_exp': 4.001,
@@ -128,7 +128,7 @@ PARAMS = {
         'sell_level': 6.2672,
         'sharpe_scaled_exp': 2.6279,
         'status_weights': [146.745, 513.347, 1.0]}}
-PARAMS['dm'] = PARAMS['fid']
+PARAMS['dm'] = PARAMS['et']
 
 # File paths
 DATA = './data'
@@ -162,11 +162,13 @@ def main(start='beginning'):
         current_stocks, list(best_stocks.columns), transactions)
     print('\n\nBEGINNING COMPLETE\n\n')
     if start in  ['beginning', 'transactions']:
-        get_next_day_distributions(current_stocks)
+        #get_next_day_distributions(current_stocks)
+        get_next_day_distributions(stock_set)
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
     print('\n\nTRANSACTIONS COMPLETE\n\n')
     if start in ['beginning', 'transactions', 'metrics']:
-        get_stock_metrics(current_stocks)
+        #get_stock_metrics(current_stocks)
+        get_stock_metrics(stock_set)
     print('\n\nMETRICS COMPLETE\n\n')
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
     stock_metrics = join_metrics_and_transactions(stock_metrics, transactions)
@@ -225,8 +227,9 @@ def update_current_stocks(current_stocks, best_stocks, transactions):
 def get_next_day_distributions(current_stocks):
     print('Getting next-day distributions...')
     stocks = ['^GSPC']
-    for s in current_stocks.values():
-        stocks += s
+    #for s in current_stocks.values():
+    #    stocks += s
+    stocks += list(current_stocks)  ###
     next_day_distributions = (
         NextDayMultiplier(sorted(stocks), n_days=NEXT_DAY_DISTRIB_WINDOW)
         .get_next_day_distributions())
@@ -236,9 +239,10 @@ def get_next_day_distributions(current_stocks):
 
 def get_stock_metrics(current_stocks):
     print('Getting stock metrics...')
-    stocks = []
-    for s in current_stocks.values():
-        stocks += s
+    #stocks = []
+    #for s in current_stocks.values():
+    #    stocks += s
+    stocks = list(current_stocks)  ###
     metrics = StockMetricsCalculator(
         sorted(stocks),
         years_of_data=10,
