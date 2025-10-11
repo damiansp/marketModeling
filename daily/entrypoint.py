@@ -18,31 +18,31 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   297797  # [232208, 298731]
-ET_VALUE =    252336  # [199256, 252194]
-SCHWAB_VALUE = 35678  # [ 17415,  35773]
-SIM1_VALUE =  276658
-SIM2_VALUE =  258625
-SIM3_VALUE =  309108
-SIM4_VALUE =  296184
-SIM5_VALUE =  255261
-DM_VALUE   =   63684
+FID_VALUE =   289508  # [232208, 298731]
+ET_VALUE =    245000  # [199256, 253309]
+SCHWAB_VALUE = 35152  # [ 17415,  35900]
+SIM1_VALUE =  270541
+SIM2_VALUE =  253131
+SIM3_VALUE =  297382
+SIM4_VALUE =  290849
+SIM5_VALUE =  245689
+DM_VALUE   =   61894
 BEST_SIM = 3  # update weekly (on Fri)
-SECOND_BEST_SIM = 1
-# n weeks needed: 39 / 42 market days - same if new; expand if same
+SECOND_BEST_SIM = 4
+# n weeks needed: 2 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
-#      3   2    1     #  points
-# 1 -  0  30    7 wk  #  since other
+#      3   2    2     #  points
+# 1 -  0   0    1 wk  #  since other
 # 2 -  0   0    0 wk
-# 3 - 37   0    0 wk
-# 4 -  0   6   28 wk
-# 5 -  0   1    2 wk
+# 3 -  2   0    0 wk
+# 4 -  0   2    0 wk
+# 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([0.64,   1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 
-THUMB_FRAC = 0.71  # 1 = no thumb (current min: 62, current max: 80)
+THUMB_FRAC = 0.73  # 1 = no thumb (current min: 62, current max: 80)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
@@ -72,11 +72,11 @@ P_STATS0_BUY = {
 
 PARAMS = {
     'et': {
-        'buy_level': 2.9621,
+        'buy_level': 5,
         'max_prop_per_stock': 0.0544,
         # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
         'scaling': {'method': 'tan', 'scaler': 0.5277},
-        'sell_level': 4.9991,
+        'sell_level': 5,
         'sharpe_scaled_exp': 3.6575,
         'status_weights': [176.51, 774.213, 1.0]},  # RSI, fair_val_mlt, geomn
     'fid': {
@@ -94,40 +94,41 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 3.4969,
-        'max_prop_per_stock': 0.0894,
-        'scaling': {'method': 'tan', 'scaler': 0.5548},
-        'sell_level': 5.9483,
-        'sharpe_scaled_exp': 4.001,
-        'status_weights': [144.677, 663.65, 1.0]},
-    'sim2': {
-        'buy_level': 3.3234,
-        'max_prop_per_stock': 0.0698,
-        'scaling': {'center': 0.6832, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 6.0869,
-        'sharpe_scaled_exp': 3.3086,
-        'status_weights': [216.214, 766.466, 1.0]},
-    'sim3': {
-        'buy_level': 2.9621,
+        'buy_level': 5,
         'max_prop_per_stock': 0.0544,
         'scaling': {'method': 'tan', 'scaler': 0.5277},
-        'sell_level': 4.9991,
+        'sell_level': 5,
+        'sharpe_scaled_exp': 3.6575,
+        'status_weights': [176.51, 774.213, 1.0]},
+    'sim2': {
+        'buy_level': 5,
+        'max_prop_per_stock': 0.0894,
+        'scaling': {'method': 'tan', 'scaler': 0.5548},
+        'sell_level': 5,
+        'sharpe_scaled_exp': 4.001,
+        'status_weights': [144.677, 663.65, 1.0]},
+    'sim3': {
+        'buy_level': 5.5,
+        'max_prop_per_stock': 0.0544,
+        'scaling': {'method': 'tan', 'scaler': 0.5277},
+        'sell_level': 5.5,
         'sharpe_scaled_exp': 3.6575,
         'status_weights': [176.51, 774.213, 1.0]},
     'sim4': {
-        'buy_level': 3.3126,
-        'max_prop_per_stock': 0.0754,
-        'scaling': {'method': 'tan', 'scaler': 0.5359},
-        'sell_level': 6.3747,
-        'sharpe_scaled_exp': 4.0959,
-        'status_weights': [146.567, 419.119, 1.0]},
+        'buy_level': 4.5,
+        'max_prop_per_stock': 0.0544,
+        'scaling': {'method': 'tan', 'scaler': 0.5277},
+        'sell_level': 4.5,
+        'sharpe_scaled_exp': 3.6575,
+        'status_weights': [176.51, 774.213, 1.0]},
     'sim5': {
-        'buy_level': 4.2933,
-        'max_prop_per_stock': 0.0538,
-        'scaling': {'center': 0.5773, 'method': 'quadratic', 'negpos': 1},
-        'sell_level': 6.2672,
-        'sharpe_scaled_exp': 2.6279,
-        'status_weights': [146.745, 513.347, 1.0]}}
+        'buy_level': 4.5,
+        'max_prop_per_stock': 0.0894,
+        'scaling': {'method': 'tan', 'scaler': 0.5548},
+        'sell_level': 5.5,
+        'sharpe_scaled_exp': 4.001,
+        'status_weights': [144.677, 663.65, 1.0]}}
+
 PARAMS['dm'] = PARAMS['et']
 
 # File paths
