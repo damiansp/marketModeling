@@ -129,7 +129,7 @@ class HoldingsLoader:
 
     def _upload_schwab(self):
         print('Uploading Schwab data...')
-        path_start = f'PCRA_Custodial-Positions-{str(TODAY)}'
+        path_start = f'PCRA'  #_Custodial-Positions-{str(TODAY)}'
         print(f'Looking for Schwab file: {path_start}...')
         filename = [
             f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
@@ -165,7 +165,7 @@ class HoldingsLoader:
                     symbol = cols[0].strip('""')
                     dollar = '"$' if has_quotes else '$'
                     try:
-                        amt = float(cols[6].strip(dollar))
+                        amt = float(cols[7].strip(dollar))  # 6/7
                     except ValueError:
                         amt = 0
                     except:
@@ -204,4 +204,5 @@ class HoldingsLoader:
 
     
 if __name__ == '__main__':
-    HoldingsLoader()._upload_schwab()
+    sch = HoldingsLoader()._upload_schwab()
+    print(sch)
