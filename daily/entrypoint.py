@@ -18,24 +18,24 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   285965 # [232208, 298731]
-ET_VALUE =    243088  # [199256, 253309]
-SCHWAB_VALUE = 35072  # [ 17415,  36058]
-SIM1_VALUE =  272708
-SIM2_VALUE =  255350
-SIM3_VALUE =  297349
-SIM4_VALUE =  287382
-SIM5_VALUE =  256873
-DM_VALUE   =   61166
+FID_VALUE =   283939 # [232208, 298731]
+ET_VALUE =    243537  # [199256, 253309]
+SCHWAB_VALUE = 35084  # [ 17415,  36058]
+SIM1_VALUE =  267045
+SIM2_VALUE =  250091
+SIM3_VALUE =  294563
+SIM4_VALUE =  281698
+SIM5_VALUE =  249338
+DM_VALUE   =   60741
 BEST_SIM = 1  # update weekly (on Fri)
 SECOND_BEST_SIM = 3
-# n weeks needed: 21 / 42 market days - same if new; expand if same
+# n weeks needed: 26 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
 #      3   2    2     #  points
-# 1 -  1  16    4 wk  #  since other
+# 1 -  3  19    4 wk  #  since other
 # 2 -  0   0    0 wk
-# 3 - 20   1    0 wk
-# 4 -  0   4   17 wk
+# 3 - 23   3    0 wk
+# 4 -  0   4   22 wk
 # 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
