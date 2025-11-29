@@ -287,7 +287,7 @@ class TransactionDeterminer:
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(
-                    f'{transaction_type.title():4s} {shares:+4d} shares '
+                    f'{transaction_type.title():4s} {shares:+4d} '
                     f'of {symbol:5s} at ${bid_ask:7,.2f} (Total: '
                     f'${abs(shares) * bid_ask:9,.2f}) '
                     f'Status: {status:.3f}')
