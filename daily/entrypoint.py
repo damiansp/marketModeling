@@ -15,34 +15,33 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-2]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   291127  # [232208, 298731]
-ET_VALUE =    253878  # [199256, 254898]
-SCHWAB_VALUE = 35899  # [ 17415,  36058]
-SIM1_VALUE =  283599
-SIM2_VALUE =  255394
-SIM3_VALUE =  315821
-SIM4_VALUE =  298245
-SIM5_VALUE =  258399
-DM_VALUE   =   63005
-BEST_SIM = 5  # update weekly (on Fri)
+FID_VALUE =   289904  # [232208, 298731]
+ET_VALUE =    255210  # [199256, 256360]
+SCHWAB_VALUE = 36139  # [ 17415,  36220]
+SIM1_VALUE =  284835
+SIM2_VALUE =  250416
+SIM3_VALUE =  310163
+SIM4_VALUE =  300139
+SIM5_VALUE =  251417
+DM_VALUE   =   62183
+BEST_SIM = 1  # update weekly (on Fri)
 SECOND_BEST_SIM = 3
-# n weeks needed: 40 / 42 market days - same if new; expand if same
+# n weeks needed: 2 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
 #      3   2    2     #  points
-# 1 -  8  24    8 wk  #  since other
+# 1 -  2   0    0 wk  #  since other
 # 2 -  0   0    0 wk
-# 3 - 29  11    0 wk
-# 4 -  0   4   28 wk
-# 5 -  3   1    4 wk
+# 3 -  0   2    0 wk
+# 4 -  0   0    2 wk
+# 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.80,   1,      1,      1,      1])
+fracs     = np.array([0.80,   1,      1,      0.9997,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-
-THUMB_FRAC = 0.60  # 1 = no thumb (current min: 62, current max: 88)
+THUMB_FRAC = 0.64  # 1 = no thumb (current min: 62, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
@@ -94,40 +93,40 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5},
     'sim1': {
-        'buy_level': 5,
-        'max_prop_per_stock': 0.0544,
-        'scaling': {'method': 'tan', 'scaler': 0.5277},
-        'sell_level': 5,
-        'sharpe_scaled_exp': 3.6575,
-        'status_weights': [176.51, 774.213, 1.0]},
-    'sim2': {
-        'buy_level': 5,
-        'max_prop_per_stock': 0.0894,
-        'scaling': {'method': 'tan', 'scaler': 0.5548},
-        'sell_level': 5,
-        'sharpe_scaled_exp': 4.001,
-        'status_weights': [144.677, 663.65, 1.0]},
-    'sim3': {
         'buy_level': 5.5,
         'max_prop_per_stock': 0.0544,
         'scaling': {'method': 'tan', 'scaler': 0.5277},
         'sell_level': 5.5,
         'sharpe_scaled_exp': 3.6575,
         'status_weights': [176.51, 774.213, 1.0]},
-    'sim4': {
-        'buy_level': 4.5,
+    'sim2': {
+        'buy_level': 5,
         'max_prop_per_stock': 0.0544,
         'scaling': {'method': 'tan', 'scaler': 0.5277},
-        'sell_level': 4.5,
+        'sell_level': 5,
         'sharpe_scaled_exp': 3.6575,
         'status_weights': [176.51, 774.213, 1.0]},
+    'sim3': {
+        'buy_level': 6.0139,
+        'max_prop_per_stock': 0.0627,
+        'scaling': {'method': 'tan', 'scaler': 0.6063},
+        'sell_level': 4.8566,
+        'sharpe_scaled_exp': 3.5652,
+        'status_weights': [130.843, 280.353, 1.0]},
+    'sim4': {
+        'buy_level': 6.7766,
+        'max_prop_per_stock': 0.0646,
+        'scaling': {'method': 'tan', 'scaler': 0.5158},
+        'sell_level': 5.2413,
+        'sharpe_scaled_exp': 4.0042,
+        'status_weights': [734.014, 3318.66, 1.0]},
     'sim5': {
-        'buy_level': 4.5,
-        'max_prop_per_stock': 0.0894,
-        'scaling': {'method': 'tan', 'scaler': 0.5548},
-        'sell_level': 5.5,
-        'sharpe_scaled_exp': 4.001,
-        'status_weights': [144.677, 663.65, 1.0]}}
+        'buy_level': 4.694,
+        'max_prop_per_stock': 0.0728,
+        'scaling': {'center': 0.4759, 'method': 'quadratic', 'negpos': -1},
+        'sell_level': 5.7016,
+        'sharpe_scaled_exp': 4.161,
+        'status_weights': [125.183, 516.797, 1.0]}}
 
 PARAMS['dm'] = PARAMS['et']
 
@@ -337,6 +336,7 @@ def get_transactions(stock_metrics, next_day_distributions):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
+        print_buy_sell_statuses(account)
         determiner.get_target_amounts(account, amt)
         determiner.get_bid_ask_prices(account)
         determiner.get_n_shares_to_buy_or_sell(account)
@@ -347,7 +347,7 @@ def get_transactions(stock_metrics, next_day_distributions):
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt, amt)
         print()
-        print_buy_sell_statuses(account)
+        #print_buy_sell_statuses(account)
     return determiner.df
 
 
