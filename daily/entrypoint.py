@@ -15,33 +15,33 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-2]
 
 # Daily inputs:
-FID_VALUE =   289904  # [232208, 298731]
-ET_VALUE =    255210  # [199256, 256360]
-SCHWAB_VALUE = 36139  # [ 17415,  36220]
-SIM1_VALUE =  284835
-SIM2_VALUE =  250416
-SIM3_VALUE =  310163
-SIM4_VALUE =  300139
-SIM5_VALUE =  251417
-DM_VALUE   =   62183
-BEST_SIM = 1  # update weekly (on Fri)
-SECOND_BEST_SIM = 3
-# n weeks needed: 2 / 42 market days - same if new; expand if same
+FID_VALUE =   288836  # [232208, 298731]
+ET_VALUE =    257090  # [199256, 257090]
+SCHWAB_VALUE = 36037  # [ 17415,  36220]
+SIM1_VALUE =  282825
+SIM2_VALUE =  249396
+SIM3_VALUE =  308920
+SIM4_VALUE =  300034
+SIM5_VALUE =  245839
+DM_VALUE   =   62391
+BEST_SIM = 3  # update weekly (on Fri)
+SECOND_BEST_SIM = 1
+# n weeks needed: 7 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
 #      3   2    2     #  points
-# 1 -  2   0    0 wk  #  since other
+# 1 -  4   3    0 wk  #  since other
 # 2 -  0   0    0 wk
-# 3 -  0   2    0 wk
-# 4 -  0   0    2 wk
+# 3 -  3   4    0 wk
+# 4 -  0   0    7 wk
 # 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.80,   1,      1,      0.9997,      1])
+fracs     = np.array([0.80,   1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.64  # 1 = no thumb (current min: 62, current max: 88)
+THUMB_FRAC = 0.70  # 1 = no thumb (current min: 62, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     
