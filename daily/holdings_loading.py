@@ -28,8 +28,21 @@ class HoldingsLoader:
         fidelity = self._upload_fidelity()
         schwab = self._upload_schwab()
         dm = self._upload_dm()
-        #dm = self._upload_etrade(is_dm=True)
         sims = self._upload_sims()
+        ###
+        for name, df in zip(
+                ('et', 'f', 'sch', 'dm', 'sim'),
+                (etrade, fidelity, schwab, dm, sims)):
+            print(name)
+            if len(df.columns) != len(set(df.columns)):
+                print('dupe cols')
+                df.to_csv(f'~/Desktop/{name}_dupes.csv')
+                exit()
+            if len(df.index) != len(set(df.index)):
+                print('dupe rows')
+                df.to_csv(f'~/Desktop/{name}_dupes.csv')
+                exit()
+        ###
         out = pd.concat(
             [etrade, fidelity, schwab, dm, sims], axis=1
         ).sort_index()
@@ -39,12 +52,6 @@ class HoldingsLoader:
         return out
 
     def _upload_dm(self):
-        #dfs = []
-        #for pos in [1]:  #, 2, 3]:
-        #    df = self._upload_etrade(pos)
-        #    dfs.append(df)
-        #df = pd.concat(dfs, axis=1)
-        #df = pd.DataFrame(df.sum(axis=1), columns=['dm'])
         df = self._upload_etrade(1)
         df.columns = ['dm']
         return df
@@ -87,6 +94,7 @@ class HoldingsLoader:
         today = datetime.strftime(TODAY, '%b-%d-%Y')
         filename = f'Portfolio_Positions_{today}.csv'
         print('Looking for Fidelity file:', filename)
+        self._clean_hanging_comma(filename)
         try:
             fidelity = pd.read_csv(f'{DOWNLOADS}/{filename}')
         except FileNotFoundError:
@@ -112,6 +120,15 @@ class HoldingsLoader:
         return fidelity
 
     @staticmethod
+    def _clean_hanging_comma(filename):
+        with open(f'{DOWNLOADS}/{filename}', 'r') as fi:
+            data_in = fi.readlines()
+            with open(f'{DOWNLOADS}/{filename}', 'w') as fo:
+                for line in data_in:
+                    line = line.strip(',\n') + '\n'
+                    fo.write(line)
+            
+    @staticmethod
     def _convert_value(s):
         return round(float(s.replace('$', '').replace(',', '')))
 
@@ -129,7 +146,7 @@ class HoldingsLoader:
 
     def _upload_schwab(self):
         print('Uploading Schwab data...')
-        path_start = f'PCRA'  #_Custodial-Positions-{str(TODAY)}'
+        path_start = 'PCRA'
         print(f'Looking for Schwab file: {path_start}...')
         filename = [
             f for f in os.listdir(DOWNLOADS) if f.startswith(path_start)
@@ -177,15 +194,6 @@ class HoldingsLoader:
                     is_header = False
         return data, inds
 
-    #def _upload_dm(self):
-    #    dm = pd.read_csv(
-    #        f'{DOWNLOADS}/Dongmei.csv',
-    #        index_col=0,
-    #        usecols=['Position', 'Market Value']
-    #    ).rename(columns={'Market Value': 'dm'})
-    #    dm.index = [x.replace(' shares', '') for x in dm.index]
-    #    return dm
-
     def _upload_sims(self):
         print('Uploading simulation data...')
         files = [
@@ -197,6 +205,7 @@ class HoldingsLoader:
             df = pd.read_csv(
                 f'{DOWNLOADS}/{f}', index_col=0, usecols=['Symbol', 'Value'])
             df.Value = df.Value.str.replace(',', '').str[1:].astype(float)
+            print(df.head(10))
             dfs.append(df)
         out = pd.concat(dfs, axis=1)
         out.columns = [f'sim{i}' for i in range(1, len(files) + 1)]
