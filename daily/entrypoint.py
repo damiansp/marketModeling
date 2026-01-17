@@ -18,15 +18,15 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   297678  # [287247, 297678]
-ET_VALUE =    270396  # [256006, 270396]
-SCHWAB_VALUE = 36757  # [ 35776,  36757]
-SIM1_VALUE =  199909
-SIM2_VALUE =  200210
-SIM3_VALUE =  199948
+FID_VALUE =   293302  # [287247, 299111]
+ET_VALUE =    274306  # [256006, 273467]
+SCHWAB_VALUE = 36701  # [ 35776,  36901]
+SIM1_VALUE =  198952
+SIM2_VALUE =  198714
+SIM3_VALUE =  198578
 SIM4_VALUE =  200000
-SIM5_VALUE =  208063
-DM_VALUE   =   64853  # [ 62057,  65138]
+SIM5_VALUE =  213253
+DM_VALUE   =   63205  # [ 62057,  65277]
 BEST_SIM = 1  # update weekly (on Fri)
 SECOND_BEST_SIM = 4
 # n weeks needed: 13 / 42 market days - same if new; expand if same
@@ -39,9 +39,9 @@ SECOND_BEST_SIM = 4
 # 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.86,   1,      1,      1,      1])
+fracs     = np.array([0.91,   1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.70  # 1 = no thumb (current min: 62, current max: 88)
+THUMB_FRAC = 0.74  # 1 = no thumb (current min: 62, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
     

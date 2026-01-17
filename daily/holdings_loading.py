@@ -170,6 +170,7 @@ class HoldingsLoader:
         data = []
         inds = []
         is_header = True
+        value_idx = -1
         with open(path, 'r') as f:
             for line in f:
                 cash = '"Cash' if has_quotes else 'Cash'
@@ -178,20 +179,28 @@ class HoldingsLoader:
                     continue
                 if not is_header:
                     col_split = ',"' if has_quotes else ','
-                    cols = line.split(col_split)
+                    cols = [x.strip('"') for x in line.split(col_split)]
+                    #print(cols)
                     symbol = cols[0].strip('""')
                     dollar = '"$' if has_quotes else '$'
                     try:
-                        amt = float(cols[7].strip(dollar))  # 6/7
+                        amt = float(cols[value_idx].strip(dollar))
                     except ValueError:
                         amt = 0
                     except:
                         raise
+                    print(symbol, amt)
                     inds.append(symbol)
                     data.append(amt)
                 sym = '"Symbol"' if has_quotes else 'Symbol'
                 if line.startswith(sym):
                     is_header = False
+                    header_cols = line.split(',')
+                    for i, col in enumerate(header_cols):
+                        if 'Mkt' in col:
+                            value_idx = i
+                            break
+                    print('val idx:', value_idx)
         return data, inds
 
     def _upload_sims(self):
