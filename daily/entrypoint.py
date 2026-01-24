@@ -18,15 +18,15 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   293302  # [287247, 299111]
-ET_VALUE =    274306  # [256006, 273467]
-SCHWAB_VALUE = 36701  # [ 35776,  36901]
-SIM1_VALUE =  198952
-SIM2_VALUE =  198714
-SIM3_VALUE =  198578
-SIM4_VALUE =  200000
-SIM5_VALUE =  213253
-DM_VALUE   =   63205  # [ 62057,  65277]
+FID_VALUE =   291663  # [287247, 299111]
+ET_VALUE =    272747  # [256006, 273467]
+SCHWAB_VALUE = 36440  # [ 35776,  36901]
+SIM1_VALUE =  201915
+SIM2_VALUE =  201720
+SIM3_VALUE =  202070
+SIM4_VALUE =  201336
+SIM5_VALUE =  211576
+DM_VALUE   =   63111  # [ 62057,  65277]
 BEST_SIM = 1  # update weekly (on Fri)
 SECOND_BEST_SIM = 4
 # n weeks needed: 13 / 42 market days - same if new; expand if same
@@ -39,7 +39,7 @@ SECOND_BEST_SIM = 4
 # 5 -  0   0    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.91,   1,      1,      1,      1])
+fracs     = np.array([0.95,   1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 THUMB_FRAC = 0.74  # 1 = no thumb (current min: 62, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
