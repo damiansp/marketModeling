@@ -15,28 +15,28 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-2]
 
 # Daily inputs:
-FID_VALUE =   272943  # [265496, 299111]
-ET_VALUE =    255104  # [248723, 273467]
-SCHWAB_VALUE = 35416  # [ 35547,  36901]
-SIM1_VALUE =  192197
-SIM2_VALUE =  188316
-SIM3_VALUE =  185367
-SIM4_VALUE =  199329
-SIM5_VALUE =  203209
-DM_VALUE   =   57898  # [ 56697,  65277]
+FID_VALUE =   273769  # [265496, 299111]
+ET_VALUE =    253063  # [248723, 273467]
+SCHWAB_VALUE = 34565  # [ 34299,  36901]
+SIM1_VALUE =  191038
+SIM2_VALUE =  187977
+SIM3_VALUE =  185378
+SIM4_VALUE =  198805
+SIM5_VALUE =  199230
+DM_VALUE   =   56712  # [ 56697,  65277]
 BEST_SIM = 5  # update weekly (on Fri)
 SECOND_BEST_SIM = 4
-# n weeks needed: 5 / 42 market days - same if new; expand if same
+# n weeks needed: 10 / 42 market days - same if new; expand if same
 #      1st 2nd 3rd
 #      3   2    2     #  points
-# 1 -  0   0    5 wk  #  since other
+# 1 -  0   0   10 wk  #  since other
 # 2 -  0   0    0 wk
 # 3 -  0   0    0 wk
-# 4 -  2   3    0 wk
-# 5 -  3   2    0 wk
+# 4 -  2   8    0 wk
+# 5 -  8   2    0 wk
 
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([1,      1,      1,      1,      1])
