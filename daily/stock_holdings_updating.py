@@ -37,7 +37,8 @@ class StockHoldingsUpdater:
                 self._decay_holdings(stock)
             else:
                 print(f'removing {stock} from lingerers')
-                self.current_stocks['lingerers'].remove(stock)
+                self.current_stocks['lingerers'] = (
+                    self.current_stocks['lingerers'].remove(stock))
 
     def _is_owned(self, stock):
         if stock not in self.buy_stats.index.tolist():
@@ -78,7 +79,8 @@ class StockHoldingsUpdater:
         self.buy_stats.loc[total_in == 0, 'currentlyActive'] = 0
 
     def _move_lingerer_to_best(self, stock):
-        self.current_stocks['lingerers'].remove(stock)
+        self.current_stocks['lingerers'] = (
+            self.current_stocks['lingerers'].remove(stock))
         self.best.append(stock)
         self.buy_stats.loc[stock, 'inFid'] = 0
         self.buy_stats.loc[stock, 'in_self_managed'] = 1.
@@ -90,7 +92,8 @@ class StockHoldingsUpdater:
                 self._decay_holdings(stock)
             else:
                 if stock in self.current_stocks['lingerers']:
-                    self.current_stocks['lingerers'].remove(stock)
+                    self.current_stocks['lingerers'] = (
+                        self.current_stocks['lingerers'].remove(stock))
 
     def _clean_current_stocks(self):
         for group, stocks in self.current_stocks.items():
