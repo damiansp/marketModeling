@@ -36,9 +36,10 @@ class StockHoldingsUpdater:
             if self._is_owned(stock):
                 self._decay_holdings(stock)
             else:
-                print(f'removing {stock} from lingerers')
-                self.current_stocks['lingerers'] = (
-                    self.current_stocks['lingerers'].remove(stock))
+                if self.current_stocks['lingerers']:
+                    print(f'removing {stock} from lingerers')
+                    self.current_stocks['lingerers'] = (
+                        self.current_stocks['lingerers'].remove(stock))
 
     def _is_owned(self, stock):
         if stock not in self.buy_stats.index.tolist():
@@ -59,7 +60,9 @@ class StockHoldingsUpdater:
             if stock in self.current_stocks['stock_watcher']:
                 if stock not in self.buy_stats.index:
                     self._append_new_stock(stock, ['inFid', 'in_self_managed'])
-            elif stock in self.current_stocks['lingerers']:
+            elif (
+                    self.current_stocks['lingerers']
+                    and stock in self.current_stocks['lingerers']):
                 self._move_lingerer_to_best(stock)
             elif stock in self.old_best:
                 self.old_best.remove(stock)
@@ -97,12 +100,14 @@ class StockHoldingsUpdater:
 
     def _clean_current_stocks(self):
         for group, stocks in self.current_stocks.items():
-            self.current_stocks[group] = sorted(list(set(stocks)))
+            if stocks is not None:
+                self.current_stocks[group] = sorted(list(set(stocks)))
 
     def _clean_buy_stats(self):
         all_current_stocks = []
         for stocks in self.current_stocks.values():
-            all_current_stocks += stocks
+            if stocks is not None:
+                all_current_stocks += stocks
         for symbol in self.buy_stats.index:
             if symbol not in all_current_stocks:
                 if self.buy_stats.loc[symbol, 'owned'].any():
