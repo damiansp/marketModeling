@@ -27,7 +27,7 @@ class TransactionDeterminer:
 
     def _add_status(self):
         for portfolio, params in self.params.items():
-            print(portfolio)
+            print('portfolio:', portfolio)
             weights = params['status_weights']
             print('weights:', weights)
             self._df[f'{portfolio}_status'] = self._get_weighted_harmonic_mean(
@@ -35,6 +35,11 @@ class TransactionDeterminer:
             scaling = params['scaling']
             method = scaling['method']
             x = self._df[f'{portfolio}_status'].copy()
+            ###
+            print('scaling:', scaling)
+            print('method:', method)
+            print('x:', x)
+            ###
             self._df[f'{portfolio}_status_scaled'] = {
                 'tan': self._scale_tan,
                 'linear': self._scale_linear,
@@ -60,7 +65,7 @@ class TransactionDeterminer:
         slope = scaling['slope']
         y = intercept + slope * x
         return y
-
+    
     @staticmethod
     def _scale_quadratic(x, scaling):
         negpos = scaling['negpos']  # 1 or -1
@@ -94,20 +99,27 @@ class TransactionDeterminer:
             'schwab': 'in_self_managed',
             'dm': 'inFid'
         }.get(portfolio, 'in_self_managed')
-        EXP = params['sharpe_scaled_exp']
+        EXP = float(params['sharpe_scaled_exp'])
+        self._df = self._df[self._df['sharpe_scaled'].notnull()]
+        self._df['sharpe_scaled'] = self._df['sharpe_scaled'].astype('float64')
+        print('\n\nsharpe scaled:')
+        print(self._df['sharpe_scaled'])
+        print(self._df['sharpe_scaled'].dtype)
+        print('EXP:', EXP, type(EXP))
         try:
             prop = (
-                (self._df.sharpe_scaled ** EXP)
+                (self._df['sharpe_scaled'] ** EXP)
                 * self._df[f'{portfolio}_sharpe_adj_status']
                 * self._df[in_portfolio]
                 * self._df.currentlyActive)
         except:
-            self._df.to_csv('~/Desktop/test.csv', index=False)
+            self._df.to_csv('~/Desktop/test.csv', index=True)
             print('Values:')
-            print(
-                self._df[
-                    ['sharpe_scaled', f'{portfolio}_sharpe_adj_status',
-                     in_portfolio, 'currentlyActive']])
+            check = self._df[
+                ['sharpe_scaled', f'{portfolio}_sharpe_adj_status',
+                 in_portfolio, 'currentlyActive']]
+            print(check)
+            print(check.dtypes)
             raise
         max_prop = params['max_prop_per_stock']
         self._df[f'{portfolio}_norm'] = self._rescale_props(prop, max_prop)

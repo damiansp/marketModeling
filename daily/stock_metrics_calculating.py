@@ -15,7 +15,7 @@ session = requests.Session(impersonate='chrome')
 
 class StockMetricsCalculator:
     def __init__(
-            self, stocks, years_of_data, macd_params=(60, 90, 80),
+            self, stocks, years_of_data, macd_params,
             rsi_window=14, lmb=0.9):
         self.stocks = stocks
         self.start = TOMORROW - timedelta(int(round(years_of_data * 365.25)))
@@ -32,7 +32,6 @@ class StockMetricsCalculator:
                 start=str(self.start),
                 end=str(TOMORROW),
                 session=session)
-            #.rename(columns={'Adj Close': 'AdjClose'})
             .rename(columns={'Close': 'AdjClose'})
             .sort_index())
         for s in self.stocks:
@@ -47,7 +46,6 @@ class StockMetricsCalculator:
         pool = mp.Pool(N_JOBS)
         for stock in self.stocks:
             pool.apply_async(self._process_stock, args=(stock, out))
-            #self._process_stock(stock, out)
         pool.close()
         pool.join()
         out = out[:]  # convert managed list to regular list
@@ -58,7 +56,12 @@ class StockMetricsCalculator:
         print('Processing:', stock)
         stock_data = self._get_stock_data(stock)
         n = len(stock_data.AdjClose[stock_data.AdjClose.notnull()])
-        stock_data['direction'] = self._get_macd(stock_data, *self.macd_params)
+        direction_cols = []
+        for acct, macd_params in self.macd_params.items():
+            dir_col = f'{acct}_direction'
+            direction_cols.append(dir_col)
+            stock_data[dir_col] = self._get_macd(
+                stock_data, *macd_params)
         stock_data['rsi'] = self._get_rsi(stock_data)
         stock_data.rsi = stock_data.rsi.rank(pct=True)
         stock_data.fillna(method='ffill', inplace=True)
@@ -67,18 +70,17 @@ class StockMetricsCalculator:
         sharpe = self._get_sharpe(daily_returns)
         stock_data = self._get_updown_geomean(stock_data, n)
         stock_data = self._get_fair_value(stock_data, n)
-        stats = (
+        stats = [
             stock_data.AdjClose.tolist()[-1],
-            stock_data.direction.tolist()[-1],
             stock_data.rsi.tolist()[-1],
             stock_data.resid.tolist()[-1],  # 'fair value'
             stock_data.geomean.tolist()[-1],
-            sharpe)
+            sharpe
+        ] + [stock_data[col].tolist()[-1] for col in direction_cols]
         out.append([stock, *stats])
 
     def _get_stock_data(self, stock):
         sub = self.data.loc[:, [x for x in list(self.data) if x[1] == stock]]
-        #try:
         first_val = sub.AdjClose[stock][sub.AdjClose[stock].notnull()].index[0]
         sub = sub.loc[first_val:, :]
         sub.columns = sub.columns.to_series().apply(lambda x: x[0])
@@ -184,17 +186,25 @@ class StockMetricsCalculator:
         stock_data.resid = stock_data.resid.rank(pct=True)
         return stock_data
 
-    @staticmethod
-    def _format_output(out):
+    def _format_output(self, out):
+        direction_cols = [f'{acct}_direction' for acct in self.macd_params]
+        print('out:', out)
+        print('dir cols:', len(direction_cols))
         out_df = pd.DataFrame(
             data=out,
             columns=[
-                'stock', 'price', 'direction', 'RSI', 'fair_value_mult',
-                'geomean', 'sharpe'])
+                'stock', 'price', 'RSI', 'fair_value_mult', 'geomean',
+                'sharpe'
+            ] + direction_cols)
         out_df.RSI.fillna(out_df.RSI.median())
         out_df['RSIRev'] = 1 - out_df.RSI
         out_df = out_df[[
-            'stock', 'price', 'direction', 'RSI', 'RSIRev', 'fair_value_mult',
-            'geomean', 'sharpe']]
+            'stock', 'price'
+            ] + direction_cols + [
+                'RSI', 'RSIRev', 'fair_value_mult', 'geomean', 'sharpe'
+            ]]
         out_df.sort_values('stock', inplace=True)
         return out_df
+
+
+    

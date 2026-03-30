@@ -15,31 +15,31 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   268822  # [265496, 299111]
-ET_VALUE =    249329  # [248723, 273467]
+FID_VALUE =   261832  # [261832, 299111]
+ET_VALUE =    241802  # [241802, 273467]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  172850
-SIM2_VALUE =  171194
-SIM3_VALUE =  164598
-SIM4_VALUE =  185824
-SIM5_VALUE =  169822
-DM_VALUE   =   54680  # [ 54680,  65277]
+SIM1_VALUE =  164123
+SIM2_VALUE =  160582
+SIM3_VALUE =  155229
+SIM4_VALUE =  173893
+SIM5_VALUE =  163903
+DM_VALUE   =   53420  # [ 53420,  65277]
 BEST_SIM = 4  # update weekly (on Fri)
 SECOND_BEST_SIM = 1
-# n weeks needed: 32 / 42 market days - shrink if new; expand if same
+# n weeks needed: 37 / 42 market days - shrink if new; expand if same
 #      1st 2nd 3rd
 #      3   2    2     #  points
-# 1 -  1  12   19 wk  #  since other
-# 2 -  0   0   13 wk
+# 1 -  1  17   19 wk  #  since other
+# 2 -  0   0   17 wk
 # 3 -  0   0    0 wk
-# 4 - 15  17    0 wk
-# 5 - 16   3    0 wk
+# 4 - 20  17    0 wk
+# 5 - 16   3    1 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(1,0,0,15,16, 12,0,0,17,3, 19,13,0,0,0), nrow=5)
+M <- matrix(c(1,0,0,20,16, 17,0,0,17,3, 19,17,0,0,1), nrow=5)
 M %*% w
 '''
 
@@ -47,7 +47,7 @@ M %*% w
 #                     mine,   sp,     nas,    dow,    rus
 fracs     = np.array([1,      1,      1,      1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.84  # 1 = no thumb (current min: 62, current max: 88)
+THUMB_FRAC = 0.80  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
 
@@ -83,56 +83,64 @@ PARAMS = {
         'scaling': {'method': 'tan', 'scaler': 0.5277},
         'sell_level': 5,
         'sharpe_scaled_exp': 3.6575,
-        'status_weights': [176.51, 774.213, 1.0]},  # RSI, fair_val_mlt, geomn
+        'status_weights': [176.51, 774.213, 1.0],
+        'macd': (60, 90, 80)},  # RSI, fair_val_mlt, geomn
     'fid': {
         'status_weights': [144.677, 663.65, 1.0],
         'sharpe_scaled_exp': 4.001,
         'max_prop_per_stock': 0.0894,
         'scaling': {'method': 'tan', 'scaler': 0.5548},
         'buy_level': 3.4969,
-        'sell_level': 5.9483},
+        'sell_level': 5.9483,
+        'macd': (60, 90, 80)},
     'schwab': {
         'status_weights': [1, 1, 1.1],
         'sharpe_scaled_exp': 4.1,
         'max_prop_per_stock': 0.01,
         'scaling': {'method': 'tan', 'scaler': 0.6},
         'buy_level': 5,
-        'sell_level': 5},
+        'sell_level': 5,
+        'macd': (60, 90, 80)},
     'sim1': {
         'buy_level': 5.5,
         'max_prop_per_stock': 0.0544,
         'scaling': {'method': 'tan', 'scaler': 0.5277},
         'sell_level': 5.5,
         'sharpe_scaled_exp': 3.6575,
-        'status_weights': [176.51, 774.213, 1.0]},
+        'status_weights': [176.51, 774.213, 1.0],
+        'macd': (60, 90, 80)},
     'sim2': {
         'buy_level': 5,
         'max_prop_per_stock': 0.0544,
         'scaling': {'method': 'tan', 'scaler': 0.5277},
         'sell_level': 5,
         'sharpe_scaled_exp': 3.6575,
-        'status_weights': [176.51, 774.213, 1.0]},
+        'status_weights': [176.51, 774.213, 1.0],
+        'macd': (60, 90, 80)},
     'sim3': {
         'buy_level': 6.0139,
         'max_prop_per_stock': 0.0627,
         'scaling': {'method': 'tan', 'scaler': 0.6063},
         'sell_level': 4.8566,
         'sharpe_scaled_exp': 3.5652,
-        'status_weights': [130.843, 280.353, 1.0]},
+        'status_weights': [130.843, 280.353, 1.0],
+        'macd': (60, 90, 80)},
     'sim4': {
         'buy_level': 6.7766,
         'max_prop_per_stock': 0.0646,
         'scaling': {'method': 'tan', 'scaler': 0.5158},
         'sell_level': 5.2413,
         'sharpe_scaled_exp': 4.0042,
-        'status_weights': [734.014, 3318.66, 1.0]},
+        'status_weights': [734.014, 3318.66, 1.0],
+        'macd': (60, 90, 80)},
     'sim5': {
         'buy_level': 4.694,
         'max_prop_per_stock': 0.0728,
         'scaling': {'center': 0.4759, 'method': 'quadratic', 'negpos': -1},
         'sell_level': 5.7016,
         'sharpe_scaled_exp': 4.161,
-        'status_weights': [125.183, 516.797, 1.0]}}
+        'status_weights': [125.183, 516.797, 1.0],
+        'macd': (60, 90, 80)}}
 
 PARAMS['dm'] = PARAMS['et']
 
@@ -168,12 +176,10 @@ def main(start='beginning'):
         current_stocks, list(best_stocks.columns), transactions)
     print('\n\nBEGINNING COMPLETE\n\n')
     if start in  ['beginning', 'transactions']:
-        #get_next_day_distributions(current_stocks)
         get_next_day_distributions(stock_set)
     next_day_distributions = pd.read_csv(NEXT_DAY_DISTRIBUTIONS)
     print('\n\nTRANSACTIONS COMPLETE\n\n')
     if start in ['beginning', 'transactions', 'metrics']:
-        #get_stock_metrics(current_stocks)
         get_stock_metrics(stock_set)
     print('\n\nMETRICS COMPLETE\n\n')
     stock_metrics = pd.read_csv(STOCK_METRICS, index_col=0)
@@ -233,9 +239,7 @@ def update_current_stocks(current_stocks, best_stocks, transactions):
 def get_next_day_distributions(current_stocks):
     print('Getting next-day distributions...')
     stocks = ['^GSPC']
-    #for s in current_stocks.values():
-    #    stocks += s
-    stocks += list(current_stocks)  ###
+    stocks += list(current_stocks) 
     next_day_distributions = (
         NextDayMultiplier(sorted(stocks), n_days=NEXT_DAY_DISTRIB_WINDOW)
         .get_next_day_distributions())
@@ -245,13 +249,18 @@ def get_next_day_distributions(current_stocks):
 
 def get_stock_metrics(current_stocks):
     print('Getting stock metrics...')
-    #stocks = []
-    #for s in current_stocks.values():
-    #    stocks += s
-    stocks = list(current_stocks)  ###
+    stocks = list(current_stocks)
+    ###
+    macd_params = {}
+    for param in PARAMS:
+        if param.startswith('sim'):
+            macd = PARAMS[param]['macd']
+            macd_params[param] = macd
+    ###
     metrics = StockMetricsCalculator(
         sorted(stocks),
         years_of_data=10,
+        macd_params=macd_params
     ).get_metrics()
     metrics.to_csv(STOCK_METRICS, index=False)
     print('Metrics saved to', STOCK_METRICS)
@@ -259,20 +268,21 @@ def get_stock_metrics(current_stocks):
 
 def join_metrics_and_transactions(stock_metrics, transactions):
     ###
-    for df_name, df in zip(
-            ['metrics', 'trans'], [stock_metrics, transactions]):
-        print(df_name)
-        idx = sorted(df.index)
-        cols = sorted(df.columns)
-        for name, dim in zip(['index', 'cols'], [idx, cols]):
-            print(name)
-            for i in range(2, len(dim)):
-                if dim[i - 1] == dim[i]:
-                    print('repeat:', dim[i] )
-        print()
+    #for df_name, df in zip(
+    #        ['metrics', 'trans'], [stock_metrics, transactions]):
+    #    print(df_name)
+    #    idx = sorted(df.index)
+    #    cols = sorted(df.columns)
+    #    for name, dim in zip(['index', 'cols'], [idx, cols]):
+    #        print(name)
+    #        for i in range(2, len(dim)):
+    #            if dim[i - 1] == dim[i]:
+    #                print('repeat:', dim[i] )
+    #    print()
     ###
+    drop = set(transactions.columns) & set(stock_metrics.columns)
     out = pd.concat(
-        [stock_metrics, transactions.drop(columns=stock_metrics.columns)],
+        [stock_metrics, transactions.drop(columns=drop)],  ###
         axis=1)
     fill_0 = [
         'et', 'rollover', 'roth', 'simple', 'fid', 'schwab', 'dm', 'sim1',
@@ -339,6 +349,7 @@ def get_transactions(stock_metrics, next_day_distributions):
              'dm'],
             [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE,
              SIM3_VALUE, SIM4_VALUE, SIM5_VALUE, DM_VALUE]):
+        stock_metrics.to_csv('~/Desktop/stock_metrics_test.csv')
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
@@ -353,7 +364,6 @@ def get_transactions(stock_metrics, next_day_distributions):
         determiner.list_transactions(
             account, invested_amt, daily_transaction_amt, amt)
         print()
-        #print_buy_sell_statuses(account)
     return determiner.df
 
 
@@ -373,7 +383,8 @@ def update_sim_vals():
                 base['max_prop_per_stock']),
             'scaling': update_scaling(base['scaling']),
             'buy_level': update_level(base['buy_level']),
-            'sell_level': update_level(base['sell_level'])}
+            'sell_level': update_level(base['sell_level']),
+            'macd': update_macd(base['macd'])}
         out[f'sim{i + 1}'] = sim
     pprint(out)
 
@@ -456,6 +467,14 @@ def update_level(level):
     factor = np.random.normal(loc=1, scale=0.1)
     level *= factor
     return round(level, 4)
+
+
+def update_macd(macd):
+    factor = 0.2
+    lower = 1 - factor 
+    upper = 1 + factor
+    macd = (int(round(np.random.uniform(lower*m, upper*m))) for m in macd)
+    return tuple(m if m > 0 else 1 for m in macd)
 
 
 if __name__ == '__main__':
