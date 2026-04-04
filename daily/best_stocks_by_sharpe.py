@@ -69,7 +69,8 @@ def get_best_stocks(outpath, manual_symbols=None):
                 final_candidates,
                 start=pd.to_datetime(START, utc=True),
                 end=pd.to_datetime(TOMORROW, utc=True))
-            .rename(columns={'Adj Close': 'AdjClose'}))['AdjClose']
+            .rename(columns={'Close': 'AdjClose'}))
+        data=data['AdjClose']
         data.index = pd.to_datetime(data.index)
         data = data.sort_index()
         n = len(data)
