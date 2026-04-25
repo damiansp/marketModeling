@@ -15,39 +15,39 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
 
 # Daily inputs:
-FID_VALUE =   284438  # [261288, 299111]
-ET_VALUE =    265991  # [241152, 273467]
+FID_VALUE =   283125  # [261288, 299111]
+ET_VALUE =    260838  # [241152, 273467]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  202114
-SIM2_VALUE =  198886
-SIM3_VALUE =  190901
-SIM4_VALUE =  195849
-SIM5_VALUE =  205851
-DM_VALUE   =   60503  # [ 53420,  65277]
-BEST_SIM = 2  # update daily
-SECOND_BEST_SIM = 1
-# n weeks needed: 9 / 40 market days - shrink if new; expand if same
+SIM1_VALUE =  195368
+SIM2_VALUE =  192260
+SIM3_VALUE =  185513
+SIM4_VALUE =  193043
+SIM5_VALUE =  205128
+DM_VALUE   =   59389  # [ 53420,  65277]
+BEST_SIM = 5  # update daily
+SECOND_BEST_SIM = 2
+# n weeks needed: 14 / 40 market days - shrink if new; expand if same
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   6    1 wk  #  since other
-# 2 -  7   0    2 wk
-# 3 -  0   0    0 wk
+# 1 -  0   9    3 wk  #  since other
+# 2 - 11   1    2 wk
+# 3 -  0   0    3 wk
 # 4 -  0   3    1 wk
-# 5 -  2   0    5 wk
+# 5 -  3   1    5 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,7,0,0,2, 6,0,0,3,0, 1,2,0,1,5), nrow=5)
+M <- matrix(c(0,11,0,0,3, 9,1,0,3,1, 3,2,3,1,5), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.855,  0.1805, 0.9983, 0.2418, 0.0181])
+fracs     = np.array([0.855,     1,      1,     1,     0.9998])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.59  # 1 = no thumb (current min: 50, current max: 88)
+THUMB_FRAC = 0.66  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
 
