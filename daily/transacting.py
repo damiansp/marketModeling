@@ -8,6 +8,7 @@ class TransactionDeterminer:
             self, metrics, next_day_distributions, frac_in, p_stats0_buy,
             params):
         self._df = metrics
+        self._df.to_csv
         self.next_day_distributions = next_day_distributions
         self.frac_in = frac_in
         self.p_stats0_buy = p_stats0_buy
@@ -35,11 +36,6 @@ class TransactionDeterminer:
             scaling = params['scaling']
             method = scaling['method']
             x = self._df[f'{portfolio}_status'].copy()
-            ###
-            print('scaling:', scaling)
-            print('method:', method)
-            print('x:', x)
-            ###
             self._df[f'{portfolio}_status_scaled'] = {
                 'tan': self._scale_tan,
                 'linear': self._scale_linear,

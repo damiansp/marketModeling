@@ -15,39 +15,39 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][0]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   283125  # [261288, 299111]
-ET_VALUE =    260838  # [241152, 273467]
+FID_VALUE =   282665  # [261288, 299111]
+ET_VALUE =    259980  # [241152, 273467]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  195368
-SIM2_VALUE =  192260
-SIM3_VALUE =  185513
-SIM4_VALUE =  193043
-SIM5_VALUE =  205128
-DM_VALUE   =   59389  # [ 53420,  65277]
+SIM1_VALUE =  193545
+SIM2_VALUE =  189881
+SIM3_VALUE =  185253
+SIM4_VALUE =  193449
+SIM5_VALUE =  205555
+DM_VALUE   =   59085  # [ 53420,  65277]
 BEST_SIM = 5  # update daily
-SECOND_BEST_SIM = 2
-# n weeks needed: 14 / 40 market days - shrink if new; expand if same
+SECOND_BEST_SIM = 1
+# n weeks needed: 5 / 40 market days - shrink if new; expand if same
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   9    3 wk  #  since other
-# 2 - 11   1    2 wk
-# 3 -  0   0    3 wk
-# 4 -  0   3    1 wk
-# 5 -  3   1    5 wk
+# 1 -  0   1    4 wk  #  since other
+# 2 -  0   4    0 wk
+# 3 -  0   0    0 wk
+# 4 -  0   0    1 wk
+# 5 -  5   0    0 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,11,0,0,3, 9,1,0,3,1, 3,2,3,1,5), nrow=5)
+M <- matrix(c(0,0,0,0,5, 1,4,0,0,0, 4,0,0,1,0), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.855,     1,      1,     1,     0.9998])
+fracs     = np.array([0.855,     1,      1,     1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.66  # 1 = no thumb (current min: 50, current max: 88)
+THUMB_FRAC = 0.57  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
 FRAC_IN = THUMB_FRAC * base_frac_in
 
@@ -168,7 +168,7 @@ def main(start='beginning'):
     else:
         best_stocks = pd.read_csv(BEST_STOCKS, index_col=0)
         best_stocks.index = pd.to_datetime(best_stocks.index)
-    transactions = (pd.read_csv(TRANSACTIONS, index_col=0))
+    transactions = pd.read_csv(TRANSACTIONS, index_col=0)
     # save backup
     transactions.to_csv(TRANSACTIONS.replace('.csv', '_bk.csv'), index=False)
     transactions = update_current_holdings(transactions, holdings)
@@ -250,13 +250,11 @@ def get_next_day_distributions(current_stocks):
 def get_stock_metrics(current_stocks):
     print('Getting stock metrics...')
     stocks = list(current_stocks)
-    ###
     macd_params = {}
     for param in PARAMS:
         if param.startswith('sim'):
             macd = PARAMS[param]['macd']
             macd_params[param] = macd
-    ###
     metrics = StockMetricsCalculator(
         sorted(stocks),
         years_of_data=10,
@@ -267,22 +265,9 @@ def get_stock_metrics(current_stocks):
 
 
 def join_metrics_and_transactions(stock_metrics, transactions):
-    ###
-    #for df_name, df in zip(
-    #        ['metrics', 'trans'], [stock_metrics, transactions]):
-    #    print(df_name)
-    #    idx = sorted(df.index)
-    #    cols = sorted(df.columns)
-    #    for name, dim in zip(['index', 'cols'], [idx, cols]):
-    #        print(name)
-    #        for i in range(2, len(dim)):
-    #            if dim[i - 1] == dim[i]:
-    #                print('repeat:', dim[i] )
-    #    print()
-    ###
     drop = set(transactions.columns) & set(stock_metrics.columns)
     out = pd.concat(
-        [stock_metrics, transactions.drop(columns=drop)],  ###
+        [stock_metrics, transactions.drop(columns=drop)],
         axis=1)
     fill_0 = [
         'et', 'rollover', 'roth', 'simple', 'fid', 'schwab', 'dm', 'sim1',
