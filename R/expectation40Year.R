@@ -145,11 +145,16 @@ resid.plot <- function(resids, condition) {
              | resids[n - 1] > med & resids[n] <= med) {
   	legend(pos2, legend='Median Crossed', bg='white')
   }
-  legend('left',
-         legend=c(sprintf('now: %.4f', resids[n]), 
-                  sprintf('%.2f: %.4f', ps[7], qs[7]),
-                  sprintf('Cash in: %d', 1 * (resids[n] <= qs[7]))),
-         bg='white')
+  legend(
+  	'left',
+    legend=c(
+    	sprintf(
+    		'now: %.4f', resids[n]), 
+            sprintf('%.2f: %.4f', ps[7], qs[7]),
+            sprintf('Cash in: %d', 1 * (resids[n] <= qs[7]))),
+    bg='white')
+  #resids[n]
+  (rank(resids) / length(resids))[n]
 }
 
 
@@ -208,19 +213,25 @@ all.plots <- function(
   par(mfrow=c(n.plots, 1))
   par(mar=c(1, 4, 0, 0))
   ts.plot(ts, days, trend, linear.trend) # +lt
-  resid.plot(linear.resids, 'sell')
+  r1 <- resid.plot(linear.resids, 'sell')
   legend('topleft', legend='Sell Guide', bg='white')
-  resid.plot(resids, 'buy')
+  r2 <- resid.plot(resids, 'buy')
   legend('bottomleft', legend='Buy Guide', bg='white')
   var.plot(ts)
   #vol.plot(ts, days, ema)
   if (proj) {
     projection.plot(y1.val, c.list, short, long, ts, n)
   }
+  c(r1, r2)
 }
 
 
 plot.for.ts <- function(ts, k=250, short=250, long=5*250, proj=F) {
+	#ts = sp
+	#k = 250
+	#short=250
+	#long = 5*250
+	#proj = F
   n <- dim(ts)[1]              
   days <- 1:n
   linear.trend <- get.linear.trend(ts, days)
@@ -235,20 +246,22 @@ plot.for.ts <- function(ts, k=250, short=250, long=5*250, proj=F) {
   resids <- get.resids(ts, trend)
   ema90 <- EMA(ts$Volume, n=90)
   cat('n: ', n)
-  all.plots(ts, 
-            days, 
-            trend, 
-            resids, 
-            linear.trend, 
-            linear.resids, 
-            y1.val, 
-            c.list, 
-            k, 
-            n, 
-            ema90, 
-            short, 
-            long, 
-            proj)
+  rs <- all.plots(
+  	ts, 
+	days, 
+	trend, 
+	resids, 
+	linear.trend, 
+	linear.resids, 
+	y1.val, 
+	c.list, 
+	k, 
+	n, 
+	ema90, 
+	short, 
+	long, 
+	proj)
+  rs
 }
 
 
@@ -260,6 +273,25 @@ clip.series <- function(ts, n.days=NULL, day.range=NULL) {
   return(ts[day.range[1]:day.range[2], ])
 }
 
+
+q.to.percent.in <- function(q) {
+	#pct.in <- 2*(0.5 - sqrt(0.5^2 - (q - 1)^2)) 
+	#pct.in <- 5*(0.2 - sqrt(0.2^2 - (q - 0.95)^2))
+	
+	#pct.in <- 2*(sqrt(0.5^2 - (q - 0.5)^2))
+	#pct.in <- 5*(sqrt(0.2^2 - (q - 0.75)^2))
+	
+	#pct.in <- -2*q + 2
+	if (q >= 0.5) {
+		cat('Percent of portfilio in:\n')
+		pct.in <- 0.5 * sin(2*pi*(q - 0.25)) + 0.5
+	} else {
+		cat('100% of portfolio in. Percent of savings in:\n')
+		pct.in <- 0.5 * sin(2*pi*(q - 0.25)) + 0.5
+	}
+	pct.in
+}
+
 #=============================================================================
 twoK.downtrend <- c(12500, 13500)
 housing.crash <- c(14500, 15000)
@@ -269,9 +301,11 @@ tail(sp)
 
 fracs.out <- c()
 fracs.in <- c()
+qs <- c()
 
 # Money back in at the median line----------
-plot.for.ts(sp)
+q <- plot.for.ts(sp)
+qs <- c(qs, q)
 # 75%/37% out; 100/50% in; Extreme (top/bottom)
 # 37%/18% out; 50/25% in; Near-Extreme (top/bottom)
 f.out <- 0  # 
@@ -280,7 +314,8 @@ fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=20*250)
-plot.for.ts(sp.1k.days, long=20*250)
+q <- plot.for.ts(sp.1k.days, long=20*250)
+qs <- c(qs, q)
 # 60%/30% out; 95/48% in; Extreme (top/bottom)
 # 30%/15% out; 48/23% in; Near-Extreme (top/bottom)
 f.out <- 0
@@ -289,7 +324,8 @@ fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=10*250)
-plot.for.ts(sp.1k.days, long=10*250)
+q <- plot.for.ts(sp.1k.days, long=10*250)
+qs <- c(qs, q)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
 # 25%12% out; 38/19% in; Near-Extreme (top/bottom)
 f.out <- 0  #
@@ -298,7 +334,8 @@ fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=5*250)
-plot.for.ts(sp.1k.days, long=5*250)
+q <- plot.for.ts(sp.1k.days, long=5*250)
+qs <- c(qs, q)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
 f.out <- 0 #
@@ -307,25 +344,28 @@ fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1k.days <- clip.series(sp, n.days=round(2.5*250))
-plot.for.ts(sp.1k.days, long=round(2.5*250))
+q <- plot.for.ts(sp.1k.days, long=round(2.5*250))
+qs <- c(qs, q)
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
-f.out <- 0  # 
+f.out <- 0.15  #  bottom extr
 f.in <- 0   #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
-plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
+q <- plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)
+qs <- c(qs, q)
 # 20%/10% out; 12/6% in; Extreme (top/bottom)
 # 10/5% out; 6/3% in; Near Extreme (top/bottom)
 f.out <- 0.05 # bottom near extr
-f.in <- 0  # top near extr (None: superceded by previous)
+f.in <- 0  # 
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
 sp.6mos <- clip.series(sp, n.days=round(0.5*250))
-plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
+q <- plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
+qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0.1  # Both ext
@@ -335,6 +375,12 @@ fracs.in <- c(fracs.in, f.in)
 
 # 0.81  # init amt: $18463
 plot.for.ts(sp.1yr, long=round(1*250), proj=F)
+
+
+w <- c(2.6, 1.6, 2.5, 1.5, 2.4, 1.4, 2.3, 1.3, 2.2, 1.2, 2.1, 1.1, 2, 1)
+w <- w / sum(w)
+(q.final <- w %*% qs)
+(pct.in <- q.to.percent.in(q.final))
 #=============================================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
 	cat('STOP: missing a fraction out.  Rerun')

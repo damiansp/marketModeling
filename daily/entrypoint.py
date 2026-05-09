@@ -18,40 +18,40 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
 
 # Daily inputs:
-FID_VALUE =   282665  # [261288, 299111]
-ET_VALUE =    259980  # [241152, 273467]
+FID_VALUE =   285431  # [261288, 299111]
+ET_VALUE =    262758  # [241152, 273467]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  193545
-SIM2_VALUE =  189881
-SIM3_VALUE =  185253
-SIM4_VALUE =  193449
-SIM5_VALUE =  205555
-DM_VALUE   =   59085  # [ 53420,  65277]
+SIM1_VALUE =  197627
+SIM2_VALUE =  193981
+SIM3_VALUE =  187323
+SIM4_VALUE =  195331
+SIM5_VALUE =  209432
+DM_VALUE   =   59527  # [ 53420,  65277]
 BEST_SIM = 5  # update daily
-SECOND_BEST_SIM = 1
-# n weeks needed: 5 / 40 market days - shrink if new; expand if same
+SECOND_BEST_SIM = 2
+# n weeks needed: 10 / 40 market days - shrink if new; expand if same
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   1    4 wk  #  since other
-# 2 -  0   4    0 wk
-# 3 -  0   0    0 wk
+# 1 -  0   5    5 wk  #  since other
+# 2 -  0   5    3 wk
+# 3 -  0   0    1 wk
 # 4 -  0   0    1 wk
-# 5 -  5   0    0 wk
+# 5 - 10   0    0 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,0,0,0,5, 1,4,0,0,0, 4,0,0,1,0), nrow=5)
+M <- matrix(c(0,0,0,0,10, 5,5,0,0,0, 5,3,1,1,0), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.855,     1,      1,     1,      1])
+fracs     = np.array([0.7268, 0.9823,    1,     1,    0.9973])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
-THUMB_FRAC = 0.57  # 1 = no thumb (current min: 50, current max: 88)
+#THUMB_FRAC = 0.47  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
-FRAC_IN = THUMB_FRAC * base_frac_in
-
-print('Base frac:', base_frac_in, 'FRAC IN:', FRAC_IN)
+frac_in = 0.2017 #THUMB_FRAC * base_frac_in
+FRAC_IN = min(base_frac_in, frac_in)
+print('base frac:', base_frac_in, 'FRAC:', FRAC_IN)
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)

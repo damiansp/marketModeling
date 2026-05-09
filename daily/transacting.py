@@ -148,7 +148,9 @@ class TransactionDeterminer:
         sell_level = self.params[account]['sell_level']
         bid_ask_multiplier = (
             self
-            ._df[['direction', f'{account}_status_scaled', f'{account}_diff']]
+            ._df[['sim1_direction',
+                  f'{account}_status_scaled',
+                  f'{account}_diff']]
             .apply(
                 lambda row: self._get_bid_ask(
                     row, account, buy_level, sell_level), axis=1))
@@ -187,7 +189,7 @@ class TransactionDeterminer:
 
     def _get_status_distribution(self, row, account):
         symbol = row.name
-        trend = row.direction
+        trend = row.sim1_direction
         high_low = 'low' if row[f'{account}_diff'] > 0 else 'high'
         try:
             distr = self.next_day_distributions.loc[
