@@ -338,7 +338,7 @@ q <- plot.for.ts(sp.1k.days, long=5*250)
 qs <- c(qs, q)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
-f.out <- 0 #
+f.out <- 0.10 # bottom near
 f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
@@ -381,7 +381,7 @@ w <- c(2.6, 1.6, 2.5, 1.5, 2.4, 1.4, 2.3, 1.3, 2.2, 1.2, 2.1, 1.1, 2, 1)
 w <- w / sum(w)
 (q.final <- w %*% qs)
 (pct.in <- q.to.percent.in(q.final))
-#=============================================================================
+#======================== =====================================================
 if (length(fracs.out) != 7 | length(fracs.in) != 7) {
 	cat('STOP: missing a fraction out.  Rerun')
 }
