@@ -3,6 +3,9 @@ import numpy as np
 from mod_utils import red
 
 
+SELL_ALL_AT = 8  # when scales value hist this number, cash out 100%
+
+
 class TransactionDeterminer:
     def __init__(
             self, metrics, next_day_distributions, frac_in, p_stats0_buy,
@@ -183,7 +186,7 @@ class TransactionDeterminer:
             print(distr)
             print(
                 red(
-                    'Notice this error sometimes due to bad data from Yahoo. '
+                    'Notice: this error sometimes due to bad data from Yahoo. '
                     'Just retry.'))
             raise
 
@@ -285,11 +288,17 @@ class TransactionDeterminer:
     def _handle_transactions(self, account, err, transaction_type, curr_opp):
         self._sort_by_transaction_order(transaction_type, account)
         cum = self._df.exact_amt.cumsum()
-        for i, (trans_total, symbol, shares, bid_ask, status) in enumerate(
+        self._df[f'{account}_q'] = (
+            (
+                (self._df[f'{account}_status_scaled'] / SELL_ALL_AT) ** 2
+            ).clip(lower=0, upper=1)
+            * self._df[f'{account}_nshares'])
+        for i, (trans_total, symbol, shares, q, bid_ask, status) in enumerate(
                 zip(
                     cum,
                     self._df.index,
                     self._df[f'{account}_nshares'],
+                    self._df[f'{account}_q'],
                     self._df[f'{account}_bid_ask'],
                     self._df[f'{account}_status_scaled'])):
             if shares == 0:
@@ -297,10 +306,10 @@ class TransactionDeterminer:
             if ((transaction_type == 'buy' and shares > 0)
                 or (transaction_type == 'sell' and shares < 0)):
                 print(
-                    f'{transaction_type.title():4s} {shares:+4d} '
+                    f'{transaction_type.title():4s} {shares:+4d} -> {q:4.0f} '
                     f'of {symbol:5s} at ${bid_ask:7,.2f} (Total: '
                     f'${abs(shares) * bid_ask:9,.2f}) '
-                    f'Status: {status:.3f}')
+                    f'Status: {status:+.3f}')
             if abs(trans_total) >= abs(err):
                 return
 
@@ -312,8 +321,7 @@ class TransactionDeterminer:
         else:
             raise ValueError('transaction_type must be "buy" or "sell"')
         self._df.sort_values(
-            ['up_down', f'{account}_status_scaled'],
-            ascending=ascending,
-            inplace=True)
+            ['up_down', f'{account}_diff'], ascending=ascending, inplace=True)
+           
 
         

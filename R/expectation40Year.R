@@ -368,7 +368,7 @@ q <- plot.for.ts(sp.6mos, long=round(0.5*250), proj=F)
 qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
-f.out <- 0.1  # Both ext
+f.out <- 0.1  # top ext
 f.in <- 0   #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)

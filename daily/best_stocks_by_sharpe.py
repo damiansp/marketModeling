@@ -88,6 +88,9 @@ def load_data():
     # file created by ../notebooks/stock_symbol_scrape.py
     with open(f'{DATA}/all_symbols.pkl', 'rb') as f:
         symbols = pickle.load(f)
+        print(f'{DATA}/all_symbols.pkl')
+        print(sorted(symbols))
+        print(len(symbols))
     return set(symbols)
 
 
