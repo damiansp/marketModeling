@@ -9,7 +9,7 @@
         "D", "DAL", "DASH", "DASTY", "DD", "DDOG", "DE", "DECK", "DELL", "DEO", "DG", "DGX", "DHI", "DHR", "DIS", "DKNG", "DKS", "DLTR", "DOCS", "DOCU", "DOV", "DOW", "DPZ", "DRD", "DRI", "DTE", "DTST", "DUK", "DUOL", "DVA", "DVN", "DXCM",
         "EA", "EBAY", "EC", "ECL", "ED", "EDIT", "EEM", "EIX", "EL", "ELF", "ELV", "EMBJ", "EME", "EMR", "ENPH", "ENSG", "EOG", "EPAM", "EQT", "ERIE", "ES", "ETN", "ETR", "EVRG", "EW", "EWT", "EWY", "EXC", "EXE", "EXPD", "EXPE",
 
-        "F", "FANG", "FAST", "FCX", "FDS", "FDX", "FE", "FICO", "FIS", "FISV", "FITB", "FIVN", "FIX", "FN", "FNV", "FOX", "FOXA", "FRT", "FSLR", "FSBW", "FTNT", "FTV", "FXI",
+        "F", "FANG", "FAST", "FCX", "FDS", "FDX", "FE", "FICO", "FIS", "FISV", "FITB", "FIVN", "FIX", "FN", "FNV", "FOX", "FOXA", "FPS", "FRT", "FSLR", "FSBW", "FTNT", "FTV", "FXI",
 
         "GD", "GDDY", "GDX", "GE", "GEHC", "GEN", "GEV", "GFI", "GIL", "GILD", "GIS", "GL", "GLD", "GLW", "GM", "GMED", "GNRC", "GOOG", "GPC", "GPN", "GRAB", "GRMN", "GS", "GSK", "GWW",
 
@@ -17,10 +17,42 @@
 
         "IBIT", "IBKR", "IBM", "IBN", "ICE", "IDXX", "IEFA", "IEX", "IFF", "IHS", "IMPUY", "INCY", "INDL", "INFY", "INTC", "INTU", "IONQ", "IVV", "IX", "IP", "IQV", "IR", "IRSG", "IT", "ITW", "IVZ",
 
-        "JD", "JMIA", "JNJ", "JPM", "JPXN", "KB", "KD", "KKR", "KLAR", "KNSL", "KO", "KOS", "KR", "KRMD", "KRYS", "KSA", "KTEC", "LEU", "LFMD", "LGIH", "LI", "LIN", "LIXT", "LOW", "LPLA", "LRCX", "LULU", "LVMUY", "LYB", "MA", "MASI", "MCD", "MCHP", "MCK", "MDT", "MDXG", "MELI", "META", "MFG", "MIY", "MMYT", "MO", "MOGA", "MOH", "MP", "MPC", "MPWR", "MRK", "MSCI", "MSFT", "MTDR", "MTSI", "MUSA", "NB", "NEM", "NET", "NFLX", "NFTY", "NICE", "NIO", "NKE", "NLR", "NMR", "NOW", "NSIT", "NTDOY", "NTES", "NVDA", "NVO", "NWN", "NXPI", "NYT", "O", "OKLO", "ONON", "OPEN", "ORCL", "ORLY", "OTGLY", "PAAS", "PAC", "PATH", "PCTY", "PDD", "PEP", "PG", "PGR", "PLTR", "POOL", "POWW", "PRI", "PROSY", "PRYMY", "PSTG", "PTC", "PTON", "PWR", "QBTS", "QLYS", "QSR", "QTUM", "RACE", "RBGLY", "RBLX", "RDY", "RGC", "RGTI", "RHHBY", "RIO", "RIVN", "RKLB", "RMD", "ROK", "ROKU", "ROP", "RTX", "RVLV", "SAIA", "SAIC", "SAN", "SAP", "SBAC", "SBSW", "SBUX", "SCCO", "SERV", "SHG", "SLV", "SMCI", "SNPS", "SONY", "SPOT", "SPSC", "SPY", "SRGHY", "SSL", "STE", "STLA", "STN", "STRL", "STZ", "SYK", "SYY", "TCEHY", "TCOM", "TDG", "TECH", "TECK", "TER", "TJX", "TKLF", "TLK", "TM", "TME", "TMO", "TMUS", "TOST", "TSCO", "TSLA", "TSM", "TTAN", "TTC", "TTD", "TYL", "U", "UBSI", "UL", "UNH", "UVV", "V", "VGK", "VLTO", "VEEV", "VRTX", "VTRS", "WFC", "WING", "WIT", "WM", "WMT", "WPM", "XPEV", "YTRA", "YUMC", "ZBRA", "ZM"
+        "J", "JBHT", "JBL", "JCI", "JD", "JKHY", "JMIA", "JNJ", "JPM", "JPXN",
+
+        "KB", "KD", "KDP", "KEY", "KEYS", "KHC", "KKR", "KLAC", "KLAR", "KMB", "KMI", "KNSL", "KO", "KOS", "KR", "KRMD", "KRYS", "KSA", "KTEC", "KVUE",
+
+        "L", "LDOS", "LEN", "LEU", "LFMD", "LGIH", "LH", "LHX", "LI", "LII", "LIN", "LIXT", "LLY", "LMT", "LNT", "LOW", "LPLA", "LRCX", "LULU", "LUV", "LVMUY", "LVS", "LW", "LYB", "LYV",
+
+        "MA", "MAR", "MAS", "MASI", "MCD", "MCHP", "MCK", "MCO", "MDLZ", "MDT", "MDXG", "MELI", "MET", "META", "MFG", "MGM", "MIY", "MKC", "MLM", "MMM", "MMYT", "MNST", "MO", "MOH", "MOS", "MP", "MPC", "MPWR", "MRK", "MRNA", "MS", "MSCI", "MSFT", "MSI", "MTB", "MTCH", "MTD", "MTDR", "MTSI", "MU", "MUSA",
+
+        "NB", "NCLH", "NDAQ", "NDSN", "NEE", "NEM", "NET", "NFLX", "NFTY", "NI", "NICE", "NIO", "NKE", "NLR", "NMR", "NOC", "NOW", "NRG", "NSC", "NSIT", "NTAP", "NTDOY", "NTES", "NTRS", "NUE", "NVDA", "NVO", "NVR", "NWN", "NWS", "NXPI", "NYT",
+
+        "O", "ODFL", "OKE", "OKLO", "OMC", "ON", "ONON", "OPEN", "ORCL", "ORLY", "OTGLY", "OTIS", "OXY",
+
+        "PAAS", "PAC", "PANW", "PATH", "PAYC", "PAYX", "PCAR", "PCG", "PCTY", "PDD", "PEG", "PEP", "PFE", "PFG", "PG", "PGR", "PH", "PHM", "PKG", "PLTR", "PM", "PNC", "PNR", "PNW", "PODD", "POOL", "POWW", "PPG", "PPL", "PRI", "PROSY", "PRU", "PRYMY", "PSKY", "PSTG", "PTC", "PTON", "PWR", "PYPL",
+
+        "Q", "QBTS", "QCOM", "QLYS", "QSR", "QTUM",
+
+        "RACE", "RBGLY", "RBLX", "RCL", "RDY", "REGN", "RF", "RGC", "RGTI", "RHHBY", "RIO", "RIVN", "RJF", "RKLB", "RL", "RMD", "ROK", "ROKU", "ROL", "ROP", "ROST", "RSG", "RTX", "RVLV", "RVYY",
+
+        "SAIA", "SAIC", "SAN", "SAP", "SBAC", "SBSW", "SBUX", "SBUX", "SCCO", "SCHW", "SERV", "SHG", "SHW", "SJM", "SLB", "SLV", "SMCI", "SMCI", "SNA", "SNDK", "SNPS", "SNPS", "SO", "SOLV", "SONY", "SPGI", "SPOT", "SPSC", "SPY", "SRE", "SRGHY", "SSL", "STE", "STE", "STLA", "STLD", "STN", "STRL", "STT", "STX", "STZ", "STZ", "SW", "SWK", "SWKS", "SYF", "SYK", "SYK", "SYY", "SYY",
+
+        "T", "TAP", "TCEHY", "TCOM", "TDG", "TDG", "TDY", "TECH", "TECH", "TECK", "TEL", "TER", "TER", "TFC", "TGT", "TJX", "TJX", "TKLF", "TKO", "TLK", "TM", "TME", "TMO", "TMO", "TMUS", "TMUS", "TOST", "TPL", "TPR", "TRGP", "TRMB", "TROW", "TRV", "TSCO", "TSCO", "TSLA", "TSLA", "TSM", "TSN", "TT", "TTAN", "TTC", "TTD", "TTD", "TTWO", "TXN", "TXT", "TYL", "TYL",
+
+        "U", "UAL", "UBER", "UBSI", "UHS", "UL", "ULTA", "UNH", "UNH", "UNP", "UPS", "URI", "USB", "UVV",
+
+        "V", "V", "VEEV", "VGK", "VLO", "VLTO", "VLTO", "VMC", "VRSK", "VRSN", "VRTX", "VRTX", "VST", "VTRS", "VTRS", "VZ",
+
+        "WAB", "WAT", "WBD", "WDAY", "WDC", "WEC", "WFC", "WFC", "WING", "WIT", "WM", "WM", "WMB", "WMT", "WMT", "WPM", "WRB", "WSM", "WST", "WTW", "WYNN",
+
+        "XEL", "XOM", "XPEV", "XYL", "XYZ",
+
+        "YTRA", "YUM", "YUMC",
+
+        "ZBH", "ZBRA", "ZBRA", "ZM", "ZTS"
     ],
     "lingerers": [
-        "CIGI", "GLOB", "HGBL", "IPM", "MDB", "MTCH", "NCPL", "NVCR", "NXE", "PAYC", "PINS", "PROP", "PYPL", "RCAT", "RLI", "SCNX", "SHOP", "TDOC", "TEAM", "TREX", "UPST", "WK", "WMS", "ZG"
+        "CIGI", "GLOB", "HGBL", "IPM", "MDB", "MTCH", "NCPL", "NVCR", "NXE", "PAYC", "PINS", "PROP", "RCAT", "RLI", "SCNX", "SHOP", "TDOC", "TEAM", "TREX", "UPST", "WK", "WMS", "ZG"
     ], 
     "best_weighted": []
 }
