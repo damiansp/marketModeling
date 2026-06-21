@@ -369,7 +369,7 @@ qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0.0  #
-f.in <- 0.01     # Bottom near
+f.in <- 0.0   #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 

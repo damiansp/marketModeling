@@ -18,38 +18,38 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   288248  # [261288, 299111]
-ET_VALUE =    264907  # [241152, 273467]
+FID_VALUE =   287546  # [261288, 299111]
+ET_VALUE =    265409  # [241152, 273467]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  203937
-SIM2_VALUE =  199093
-SIM3_VALUE =  192721
-SIM4_VALUE =  201970
-SIM5_VALUE =  217004
-DM_VALUE   =   60338  # [ 53420,  65277] 64515 soy
+SIM1_VALUE =  204313
+SIM2_VALUE =  200991
+SIM3_VALUE =  191197
+SIM4_VALUE =  203473
+SIM5_VALUE =  220606
+DM_VALUE   =   60604  # [ 53420,  65277] 64515 soy
 BEST_SIM = 5  # update daily
 SECOND_BEST_SIM = 4
-# n weeks needed: 34 / 40 market days - shrink if new; expand if same
+# n weeks needed: 38 / 40 market days - shrink if new; expand if same
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0  24    9 wk  #  since other
-# 2 -  0   6   19 wk
+# 1 -  0  24   12 wk  #  since other
+# 2 -  0   6   20 wk
 # 3 -  1   2    5 wk
-# 4 -  0   2    1 wk
-# 5 - 33   0    0 wk
+# 4 -  0   6    1 wk
+# 5 - 37   0    0 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,0,1,0,33, 24,6,2,2,0, 9,19,5,1,0), nrow=5)
+M <- matrix(c(0,0,1,0,37, 24,6,2,6,0, 12,20,5,1,0), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.5738,    1,    1,       1,    1])
+fracs     = np.array([0.5738,    1,      1,     1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 #THUMB_FRAC = 0.47  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
-frac_in = 0.6840 #THUMB_FRAC * base_frac_in
+frac_in = 0.5602 #THUMB_FRAC * base_frac_in
 FRAC_IN = min(base_frac_in, frac_in)
 print('base frac:', base_frac_in, 'FRAC:', FRAC_IN)
 
