@@ -101,6 +101,12 @@ class HoldingsLoader:
             tomorrow = datetime.strftime(TOMORROW, '%b-%d-%Y')
             filename = filename.replace(today, tomorrow)
             fidelity = pd.read_csv(f'{DOWNLOADS}/{filename}')
+        fidelity.rename(
+            columns={
+                'Last price': 'Last Price',
+                'Account name': 'Account Name',
+                'Current value': 'Current Value'},
+            inplace=True)
         fidelity = fidelity[fidelity['Last Price'].notnull()]
         fidelity = fidelity[fidelity['Last Price'] != '--']
         fidelity = (
