@@ -338,7 +338,7 @@ q <- plot.for.ts(sp.1k.days, long=5*250)
 qs <- c(qs, q)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
-f.out <- 0.10 # bottom near
+f.out <- 0.06 # bottom near--
 f.in <- 0  #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
