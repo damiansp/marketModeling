@@ -175,7 +175,10 @@ class TransactionDeterminer:
                 q = 0.01
             elif q > 0.99:
                 q = 0.99
-            multiplier = distr.quantile(q=q)
+            try:
+                multiplier = distr.quantile(q=q)
+            except ValueError:
+                multiplier = np.nan
             return multiplier
         except:
             print('row:')
@@ -321,7 +324,10 @@ class TransactionDeterminer:
         else:
             raise ValueError('transaction_type must be "buy" or "sell"')
         self._df.sort_values(
-            ['up_down', f'{account}_diff'], ascending=ascending, inplace=True)
+            #['up_down', f'{account}_diff'], ascending=ascending, inplace=True)
+            ['up_down', f'{account}_status_scaled'],
+            ascending=ascending,
+            inplace=True)
            
 
         
