@@ -22,6 +22,10 @@ class TransactionDeterminer:
         return self._df
 
     def compile_data(self):
+        print('\n\n     NOTE: setting all "in" fields to 1\n\n')
+        ins = ['inEt', 'inFid', 'in_self_managed', 'currentlyActive']
+        self._df[ins] = 1
+        self._df.loc[self._df.price < 2, ins] = 0
         self._add_status()
         self._add_scaled_sharpes()
         self._get_status_weights()
@@ -289,13 +293,13 @@ class TransactionDeterminer:
                 self._handle_transactions(account, secondary, 'sell', 'opp')
 
     def _handle_transactions(self, account, err, transaction_type, curr_opp):
-        self._sort_by_transaction_order(transaction_type, account)
-        cum = self._df.exact_amt.cumsum()
         self._df[f'{account}_q'] = (
             (
                 (self._df[f'{account}_status_scaled'] / SELL_ALL_AT) ** 2
             ).clip(lower=0, upper=1)
             * self._df[f'{account}_nshares'])
+        self._sort_by_transaction_order(transaction_type, account)
+        cum = self._df.exact_amt.cumsum()
         for i, (trans_total, symbol, shares, q, bid_ask, status) in enumerate(
                 zip(
                     cum,
@@ -318,14 +322,19 @@ class TransactionDeterminer:
 
     def _sort_by_transaction_order(self, transaction_type, account):
         if transaction_type == 'sell':
-            ascending = [True, True]
+            ascending = [True, True, True]
         elif transaction_type == 'buy':
-            ascending = [False, False]
+            ascending = [False, False, False]
         else:
             raise ValueError('transaction_type must be "buy" or "sell"')
+        ###
+        self._df[f'{account}_sort_col'] = (
+            self._df[f'{account}_q'].round() * self._df[f'{account}_bid_ask'])
+        ###
         self._df.sort_values(
+            ['up_down', f'{account}_sort_col', f'{account}_status_scaled'],
             #['up_down', f'{account}_diff'], ascending=ascending, inplace=True)
-            ['up_down', f'{account}_status_scaled'],
+            #['up_down', f'{account}_status_scaled'],
             ascending=ascending,
             inplace=True)
            
