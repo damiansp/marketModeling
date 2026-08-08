@@ -25,7 +25,7 @@
 
         "MA", "MAR", "MAS", "MASI", "MCD", "MCHP", "MCK", "MCO", "MDLZ", "MDT", "MDXG", "MDY", "MELI", "MET", "META", "MFG", "MGM", "MIY", "MKC", "MLM", "MMM", "MMYT", "MNST", "MO", "MOH", "MOS", "MP", "MPC", "MPWR", "MRK", "MRNA", "MS", "MSCI", "MSFT", "MSI", "MTB", "MTCH", "MTD", "MTDR", "MTSI", "MU", "MUSA",
 
-        "NB", "NCLH", "NDAQ", "NDSN", "NEE", "NEM", "NET", "NFLX", "NFTY", "NI", "NICE", "NIO", "NKE", "NLR", "NMR", "NOC", "NOW", "NRG", "NSC", "NSIT", "NTAP", "NTDOY", "NTES", "NTRS", "NUE", "NVDA", "NVO", "NVR", "NWN", "NWS", "NXPI", "NYT",
+        "NB", "NCLH", "NDAQ", "NDSN", "NEE", "NEM", "NET", "NFLX", "NFTY", "NI", "NICE", "NIO", "NKE", "NLR", "NMR", "NOC", "NOK", "NOW", "NRG", "NSC", "NSIT", "NTAP", "NTDOY", "NTES", "NTRS", "NUE", "NVDA", "NVO", "NVR", "NWN", "NWS", "NXPI", "NYT",
 
         "O", "ODFL", "OKE", "OKLO", "OMC", "ON", "ONON", "OPEN", "ORCL", "ORLY", "OTGLY", "OTIS", "OXY",
 
@@ -35,7 +35,7 @@
 
         "RACE", "RBGLY", "RBLX", "RCL", "RDY", "REGN", "RF", "RGC", "RGTI", "RHHBY", "RIO", "RIVN", "RJF", "RKLB", "RL", "RMD", "ROK", "ROKU", "ROL", "ROP", "ROST", "RSG", "RTX", "RVLV", "RVYY",
 
-        "SAIA", "SAIC", "SAN", "SAP", "SBAC", "SBSW", "SBUX", "SBUX", "SCCO", "SCHW", "SERV", "SHG", "SHW", "SJM", "SLB", "SLV", "SMCI", "SMCI", "SNA", "SNDK", "SNPS", "SNPS", "SO", "SOLV", "SONY", "SPGI", "SPOT", "SPSC", "SPY", "SRE", "SRGHY", "SSL", "STE", "STE", "STLA", "STLD", "STN", "STRL", "STT", "STX", "STZ", "STZ", "SW", "SWK", "SWKS", "SYF", "SYK", "SYK", "SYY", "SYY",
+        "SAIA", "SAIC", "SAN", "SAP", "SBAC", "SBSW", "SBUX", "SBUX", "SCCO", "SCHW", "SERV", "SHG", "SHW", "SJM", "SLB", "SLV", "SMCI", "SMCI", "SNA", "SNDK", "SNPS", "SNPS", "SO", "SOLV", "SONY", "SPCX", "SPGI", "SPOT", "SPSC", "SPY", "SRE", "SRGHY", "SSL", "STE", "STE", "STLA", "STLD", "STN", "STRL", "STT", "STX", "STZ", "STZ", "SW", "SWK", "SWKS", "SYF", "SYK", "SYK", "SYY", "SYY",
 
         "T", "TAP", "TCEHY", "TCOM", "TDG", "TDG", "TDY", "TECH", "TECH", "TECK", "TEL", "TER", "TER", "TFC", "TGT", "TJX", "TJX", "TKLF", "TKO", "TLK", "TM", "TME", "TMO", "TMO", "TMUS", "TMUS", "TOST", "TPL", "TPR", "TRGP", "TRMB", "TROW", "TRV", "TSCO", "TSCO", "TSLA", "TSLA", "TSM", "TSN", "TT", "TTAN", "TTC", "TTD", "TTD", "TTWO", "TXN", "TXT", "TYL", "TYL",
 
