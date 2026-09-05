@@ -322,9 +322,9 @@ class TransactionDeterminer:
 
     def _sort_by_transaction_order(self, transaction_type, account):
         if transaction_type == 'sell':
-            ascending = [True, True, True]
+            ascending = [True, True] #, True]
         elif transaction_type == 'buy':
-            ascending = [False, False, False]
+            ascending = [False, False] #, False]
         else:
             raise ValueError('transaction_type must be "buy" or "sell"')
         ###
@@ -332,9 +332,9 @@ class TransactionDeterminer:
             self._df[f'{account}_q'].round() * self._df[f'{account}_bid_ask'])
         ###
         self._df.sort_values(
-            ['up_down', f'{account}_sort_col', f'{account}_status_scaled'],
+            #['up_down', f'{account}_sort_col', f'{account}_status_scaled'],
             #['up_down', f'{account}_diff'], ascending=ascending, inplace=True)
-            #['up_down', f'{account}_status_scaled'],
+            ['up_down', f'{account}_status_scaled'],
             ascending=ascending,
             inplace=True)
            
