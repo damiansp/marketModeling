@@ -348,10 +348,10 @@ q <- plot.for.ts(sp.1k.days, long=round(2.5*250))
 qs <- c(qs, q)
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
-f.out <- 0.15  # top near
+f.out <- 0  #
 f.in <- 0   #
 fracs.out <- c(fracs.out, f.out)
-fracs.in <- c(fracs.in, f.in)
+fracs.in <- c(fracs.in, f.in)ß
 
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 q <- plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)

@@ -15,42 +15,42 @@ from stock_metrics_calculating import StockMetricsCalculator
 from transacting import TransactionDeterminer
 
 
-MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][-1]
+MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   300418  # [261288, 317208]
-ET_VALUE =    276077  # [241152, 278031]
+FID_VALUE =   297903  # [261288, 317208]
+ET_VALUE =    274027  # [241152, 278031]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  208105
-SIM2_VALUE =  205533
-SIM3_VALUE =  197801
-SIM4_VALUE =  210337
-SIM5_VALUE =  236019
-DM_VALUE   =   68232  # [ 53420,  70106] 66989 soy
+SIM1_VALUE =  201949
+SIM2_VALUE =  199339
+SIM3_VALUE =  191061
+SIM4_VALUE =  204389
+SIM5_VALUE =  227671
+DM_VALUE   =   67062  # [ 53420,  70106] 66989 soy
 BEST_SIM = 5  # update daily
 SECOND_BEST_SIM = 4
-# n weeks needed: 35 / 39 market days - shrink 1 if new; expand 2 if same
+# n weeks needed: 0 / 38 market days - shrink 1 if new; expand 2 if same
 # min 30 days
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   2   11 wk  #  since other
-# 2 -  1  11   16 wk
-# 3 -  2   2    6 wk
-# 4 -  6  18    2 wk
-# 5 - 26   2    0 wk
+# 1 -  0   0    0 wk  #  since other
+# 2 -  0   0    0 wk
+# 3 -  0   0    0 wk
+# 4 -  0   0    0 wk
+# 5 -  0   0    0 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,1,2,6,26, 2,11,2,18,2, 11,16,6,2,0), nrow=5)
+M <- matrix(c(0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.6375,    1,      1,     1,      1])
+fracs     = np.array([0.75  ,    1,      1,     1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 #THUMB_FRAC = 0.47  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
-frac_in = 0.7882 #THUMB_FRAC * base_frac_in
+frac_in = 0.9526 #THUMB_FRAC * base_frac_in
 FRAC_IN = min(base_frac_in, frac_in)
 print('base frac:', base_frac_in, 'FRAC:', FRAC_IN)
 
@@ -76,16 +76,19 @@ P_STATS0_BUY = {
     'sim5':   {'buy': 0.01, 'sell': 0.01},  #         5 simz
     'dm':     {'buy': 0.01, 'sell': 0.01}}  # static
 
+# weights: RSI, fair_val_mlt, geom
 PARAMS = {
     'et': {
-        'buy_level': 5,
-        'macd': (56, 83, 81),  # RSI, fair_val_mlt, geomn
-        'max_prop_per_stock': 0.0786,
-        # adj how weighted score (on [0, 1] gets converted to (-inf, +inf)
-        'scaling': {'method': 'tan', 'scaler': 0.465},
-        'sell_level': 5,
-        'sharpe_scaled_exp': 3.42,
-        'status_weights': [364.021, 1317.955, 1.0]},
+        'buy_level': 4.5695,
+        'macd': (65, 87, 69),
+        'max_prop_per_stock': 0.06,
+        'scaling': {
+            'intercept': -5.6325,
+            'method': 'linear',
+            'slope': -7.1601},
+        'sell_level': 4.9864,
+        'sharpe_scaled_exp': 3.7011,
+        'status_weights': [410.483, 131.856, 1.0]},
     'fid': {
         'status_weights': [144.677, 663.65, 1.0],
         'sharpe_scaled_exp': 4.001,
@@ -102,47 +105,47 @@ PARAMS = {
         'buy_level': 5,
         'sell_level': 5,
         'macd': (60, 90, 80)},
-    'sim1': { 
-        'buy_level': 5,
-        'macd': (56, 83, 81),
-        'max_prop_per_stock': 0.0786,
-        'scaling': {'method': 'tan', 'scaler': 0.465},
-        'sell_level': 5,
-        'sharpe_scaled_exp': 3.42,
-        'status_weights': [364.021, 1317.955, 1.0]},
-    'sim2': {
-        'buy_level': 5,
-        'macd': (60, 90, 80),
-        'max_prop_per_stock': 0.0646,
-        'scaling': {'method': 'tan', 'scaler': 0.5158},
-        'sell_level': 5,
-        'sharpe_scaled_exp': 4.0042,
-        'status_weights': [734.014, 3318.66, 1.0]},
-    'sim3': {
-        'buy_level': 5.3491,
-        'macd': (52, 93, 66),
-        'max_prop_per_stock': 0.0531,
-        'scaling': {'method': 'tan', 'scaler': 0.4357},
-        'sell_level': 4.8778,
-        'sharpe_scaled_exp': 3.7444,
-        'status_weights': [187.891, 2060.931, 1.0]},
-    'sim4': {
-        'buy_level': 4.661,
-        'macd': (54, 79, 93),
-        'max_prop_per_stock': 0.0988,
-        'scaling': {'method': 'tan', 'scaler': 0.39},
-        'sell_level': 5.1893,
-        'sharpe_scaled_exp': 2.9609,
-        'status_weights': [697.21, 2054.991, 1.0]},
-    'sim5': {
+    'sim1': {
         'buy_level': 4.5695,
         'macd': (65, 87, 69),
         'max_prop_per_stock': 0.06,
         'scaling': {
-            'intercept': -5.6325, 'method': 'linear', 'slope': -7.1601},
+            'intercept': -5.6325,
+            'method': 'linear',
+            'slope': -7.1601},
         'sell_level': 4.9864,
         'sharpe_scaled_exp': 3.7011,
-        'status_weights': [410.483, 131.856, 1.0]}}
+        'status_weights': [410.483, 131.856, 1.0]},
+    'sim2': {'buy_level': 4.661,
+             'macd': (54, 79, 93),
+             'max_prop_per_stock': 0.0988,
+             'scaling': {'method': 'tan', 'scaler': 0.39},
+             'sell_level': 5.1893,
+             'sharpe_scaled_exp': 2.9609,
+             'status_weights': [697.21, 2054.991, 1.0]},
+    'sim3': {'buy_level': 4.451,
+             'macd': (71, 70, 72),
+             'max_prop_per_stock': 0.0331,
+             'scaling': {'center': 0.7988, 'method': 'quadratic', 'negpos': -1},
+             'sell_level': 4.8833,
+             'sharpe_scaled_exp': 3.9349,
+             'status_weights': [739.774, 215.159, 1.0]},
+    'sim4': {'buy_level': 4.6572,
+             'macd': (64, 96, 72),
+             'max_prop_per_stock': 0.0701,
+             'scaling': {'intercept': -6.0049,
+                         'method': 'linear',
+                         'slope': -7.3511},
+             'sell_level': 4.1688,
+             'sharpe_scaled_exp': 4.1105,
+             'status_weights': [296.76, 95.165, 1.0]},
+    'sim5': {'buy_level': 4.5972,
+             'macd': (60, 68, 110),
+             'max_prop_per_stock': 0.0978,
+             'scaling': {'center': 0.2239, 'method': 'quadratic', 'negpos': -1},
+             'sell_level': 5.2716,
+             'sharpe_scaled_exp': 2.5807,
+             'status_weights': [623.073, 771.01, 1.0]}}
 
 PARAMS['dm'] = PARAMS['et']
 
