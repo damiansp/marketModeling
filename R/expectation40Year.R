@@ -351,7 +351,7 @@ qs <- c(qs, q)
 f.out <- 0  #
 f.in <- 0   #
 fracs.out <- c(fracs.out, f.out)
-fracs.in <- c(fracs.in, f.in)ß
+fracs.in <- c(fracs.in, f.in)
 
 sp.1yr <- clip.series(sp, n.days=round(1.25*250))
 q <- plot.for.ts(sp.1yr, long=round(1.25*250), proj=F)

@@ -18,39 +18,39 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   297903  # [261288, 317208]
-ET_VALUE =    274027  # [241152, 278031]
+FID_VALUE =   295488  # [261288, 317208]
+ET_VALUE =    229211  # [227110, 278031]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  201949
-SIM2_VALUE =  199339
-SIM3_VALUE =  191061
-SIM4_VALUE =  204389
-SIM5_VALUE =  227671
-DM_VALUE   =   67062  # [ 53420,  70106] 66989 soy
-BEST_SIM = 5  # update daily
-SECOND_BEST_SIM = 4
-# n weeks needed: 0 / 38 market days - shrink 1 if new; expand 2 if same
+SIM1_VALUE =  197359
+SIM2_VALUE =  195513
+SIM3_VALUE =  185705
+SIM4_VALUE =  201215
+SIM5_VALUE =  223347
+DM_VALUE   =   66339  # [ 53420,  70106] 66989 soy
+BEST_SIM = 2  # update daily
+SECOND_BEST_SIM = 5
+# n weeks needed: 5 / 38 market days - shrink 1 if new; expand 2 if same
 # min 30 days
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   0    0 wk  #  since other
-# 2 -  0   0    0 wk
-# 3 -  0   0    0 wk
-# 4 -  0   0    0 wk
-# 5 -  0   0    0 wk
+# 1 -  0   0    1 wk  #  since other
+# 2 -  1   4    0 wk
+# 3 -  0   0    3 wk
+# 4 -  0   0    1 wk
+# 5 -  4   1    0 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0), nrow=5)
+M <- matrix(c(0,1,0,0,4, 0,4,0,0,1, 1,0,3,1,0), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.75  ,    1,      1,     1,      1])
+fracs     = np.array([0.75,      1,      1,     1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 #THUMB_FRAC = 0.47  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
-frac_in = 0.9526 #THUMB_FRAC * base_frac_in
+frac_in = 0.9735 #THUMB_FRAC * base_frac_in
 FRAC_IN = min(base_frac_in, frac_in)
 print('base frac:', base_frac_in, 'FRAC:', FRAC_IN)
 
@@ -204,18 +204,20 @@ def make_sure_files_downloaded():
         [x for x in os.listdir(DOWNLOADS) if x.endswith('.csv')])
     print('DOWNLOADS:', DOWNLOADS)
     print('Downloads:', downloads)
-    expected = ['PCRA', 'Portfolio_Positions', 'Positions', 'Positions(1)']
-    for file_start in expected:
+    for file_start, name in zip(
+            ['PCRA', 'Portfolio_Positions', 'Positions', 'Positions(1)'],
+            ['schwab', 'fidelity', 'etrade (mine)', 'etrade (dm)']):
         found = False
         for f in downloads:
             if f.startswith(file_start):
                 found = True
                 continue
         if not found:
-            raise RuntimeError(f'File starting with {file_start} not found')
+            raise RuntimeError(
+                f'File {name}, starting with {file_start} not found')
     sims = [x for x in downloads if x.startswith('Holdings')]
     if len(sims) != 5:
-        raise RuntimeError('One or more download missing.')
+        raise RuntimeError('One or more simulation download missing.')
 
 
 def load_current_stocks():
