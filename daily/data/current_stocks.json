@@ -2,14 +2,14 @@
     "stock_watcher": [
         "A", "AAON", "AAPL", "ABBV", "ABEV", "ABNB", "ABT", "ACGBY", "ACGL", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADUS", "ADYEY", "AEE", "AEP", "AEO", "AES", "AFL", "AG", "AIG", "AIZ", "AJG", "AKAM", "ALB", "ALGN", "ALL", "ALLE", "AMAT", "AMBA", "AMCR", "AMD", "AME", "AMGN", "AMP", "AMT", "AMZN", "ANET", "AON", "AOS", "APA", "APD", "APH", "APO", "APP", "APTV", "ARES", "ASML", "ASST", "ASX", "ATO", "ATZAF", "AU", "AVGO", "AVY", "AWK", "AXON", "AXP", "AZN", "AZO",
 
-        "B", "BA", "BABA", "BAC", "BAESY", "BAH", "BALL", "BAX", "BBY", "BCC", "BDX", "BEKE", "BEN", "BG", "BHP", "BIDU", "BIIB", "BK", "BKH", "BKNG", "BKR", "BLD", "BLDR", "BLFS", "BLK", "BMY", "BR", "BRO", "BROS", "BSX", "BTG", "BURL", "BX",  "BXP",  "BYDDY", "BYND", "BYRN",
+        "B", "BA", "BABA", "BAC", "BAESY", "BAH", "BALL", "BAX", "BBY", "BCC", "BDX", "BEKE", "BEN", "BG", "BHP", "BIDU", "BIIB", "BK", "BKH", "BKNG", "BKR", "BLD", "BLDR", "BLFS", "BLK", "BMY", "BNDW", "BR", "BRO", "BROS", "BSX", "BTG", "BURL", "BX",  "BXP",  "BYDDY", "BYND", "BYRN",
 
         "C", "CAG", "CAH", "CARR", "CART", "CASY", "CAT", "CB", "CBRE", "CCI", "CCL", "CDNS", "CDW", "CEG", "CELH", "CF", "CFG", "CHD", "CHRW", "CHTR", "CHWY", "CI", "CINF", "CICHY", "CL", "CLX", "CLPBY", "CMCSA", "CME", "CMG", "CMI", "CMS", "CNC", "CNP", "CNQ", "COF", "COIN", "COO", "COP", "COR", "COST", "CP", "CPAY", "CPB", "CPNG", "CPRT", "CRH", "CRL", "CRM", "CROX", "CRWD", "CSCO", "CSGP", "CSX", "CTAS", "CTRA", "CTSH", "CTVA", "CVCO", "CVNA", "CVS", "CVX",
 
         "D", "DAL", "DASH", "DASTY", "DD", "DDOG", "DE", "DECK", "DELL", "DEO", "DG", "DGX", "DHI", "DHR", "DIS", "DKNG", "DKS", "DLTR", "DOCS", "DOCU", "DOV", "DOW", "DPZ", "DRD", "DRI", "DTE", "DTST", "DUK", "DUOL", "DVA", "DVN", "DXCM",
         "EA", "EBAY", "EC", "ECL", "ED", "EDIT", "EEM", "EIX", "EL", "ELF", "ELV", "EMBJ", "EME", "EMR", "ENPH", "ENSG", "EOG", "EPAM", "EQT", "ERIE", "ES", "ETN", "ETR", "EVRG", "EW", "EWT", "EWY", "EXC", "EXE", "EXPD", "EXPE",
 
-        "F", "FANG", "FAST", "FCX", "FDS", "FDX", "FE", "FICO", "FIS", "FISV", "FITB", "FIVN", "FIX", "FN", "FNV", "FOX", "FOXA", "FPS", "FRT", "FSLR", "FSBW", "FTNT", "FTV", "FXI",
+        "F", "FANG", "FAST", "FCX", "FDS", "FDX", "FE", "FICO", "FIS", "FISV", "FITB", "FIVN", "FIX", "FN", "FNV", "FOX", "FOXA", "FPS", "FRT", "FSKAX", "FSLR", "FSBW", "FTNT", "FTV", "FXI",
 
         "GD", "GDDY", "GDX", "GE", "GEHC", "GEN", "GEV", "GFI", "GIL", "GILD", "GIS", "GL", "GLD", "GLW", "GM", "GMED", "GNRC", "GOOG", "GPC", "GPN", "GRAB", "GRMN", "GS", "GSK", "GWW",
 
@@ -41,7 +41,7 @@
 
         "U", "UAL", "UBER", "UBSI", "UHS", "UL", "ULTA", "UNH", "UNH", "UNP", "UPS", "URI", "USB", "UVV",
 
-        "V", "V", "VEEV", "VGK", "VLO", "VLTO", "VLTO", "VMC", "VRSK", "VRSN", "VRTX", "VRTX", "VST", "VTI", "VTRS", "VTRS", "VYLR", "VZ",
+        "V", "V", "VEEV", "VGK", "VKSAX", "VLO", "VLTO", "VLTO", "VMC", "VRSK", "VRSN", "VRTX", "VRTX", "VST", "VT", "VTI", "VTRS", "VTRS", "VYLR", "VZ",
 
         "WAB", "WAT", "WBD", "WDAY", "WDC", "WEC", "WFC", "WFC", "WING", "WIT", "WM", "WM", "WMB", "WMT", "WMT", "WPM", "WRB", "WSM", "WST", "WTW", "WYNN",
 
