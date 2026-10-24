@@ -18,39 +18,39 @@ from transacting import TransactionDeterminer
 MAIN_START = ['beginning', 'transactions', 'metrics', 'transactions2'][1]
 
 # Daily inputs:
-FID_VALUE =   300910  # [261288, 317208]
-ET_VALUE =    232575  # [227110, 278031]
+FID_VALUE =   296959  # [261288, 317208]
+ET_VALUE =    232745  # [227110, 278031]
 SCHWAB_VALUE = 34947  # [ 33814,  36901]
-SIM1_VALUE =  204685
-SIM2_VALUE =  194951
-SIM3_VALUE =  175068
-SIM4_VALUE =  210573
-SIM5_VALUE =  226160
-DM_VALUE   =   67624  # [ 53420,  70106] 66989 soy
+SIM1_VALUE =  203912
+SIM2_VALUE =  186943
+SIM3_VALUE =  173115
+SIM4_VALUE =  209628
+SIM5_VALUE =  227765
+DM_VALUE   =   67954  # [ 53420,  70106] 66989 soy
 BEST_SIM = 4  # update daily
 SECOND_BEST_SIM = 1
-# n weeks needed: 15 / 38 days - shrink 1 if new; expand 2 if same (or 2nd)
+# n weeks needed: 20 / 38 days - shrink 1 if new; expand 2 if same (or 2nd)
 # min 30 days
 #      1st 2nd 3rd
 #      3   2    1     #  points
-# 1 -  0   3    1 wk  #  since other
+# 1 -  0   8    1 wk  #  since other
 # 2 -  3   9    1 wk
 # 3 -  0   1    2 wk
-# 4 - 10   1    3 wk
-# 5 -  2   1    8 wk
+# 4 - 15   1    3 wk
+# 5 -  2   1   13 wk
 '''
 w <- c(3, 2, 1)
-M <- matrix(c(0,3,0,10,2, 3,9,1,1,1, 1,1,2,3,8), nrow=5)
+M <- matrix(c(0,3,0,15,2, 8,9,1,1,1, 1,1,2,3,13), nrow=5)
 M %*% w
 '''
 
 
 #                     mine,   sp,     nas,    dow,    rus
-fracs     = np.array([0.88,      1,    1,     1,      1])
+fracs     = np.array([0.93,      1,      1,     1,      1])
 f_weights = np.array([0.3,    0.25,   0.25,   0.1,    0.1])
 #THUMB_FRAC = 0.47  # 1 = no thumb (current min: 50, current max: 88)
 base_frac_in = np.dot(fracs, f_weights)
-frac_in = 0.9891 #THUMB_FRAC * base_frac_in
+frac_in = 1 #THUMB_FRAC * base_frac_in
 FRAC_IN = min(base_frac_in, frac_in)
 print('base frac:', base_frac_in, 'FRAC:', FRAC_IN)
 
@@ -337,11 +337,9 @@ def get_transactions(stock_metrics, next_day_distributions):
         stock_metrics, next_day_distributions, FRAC_IN, P_STATS0_BUY, PARAMS)
     determiner.compile_data()
     for account, amt in zip(
-            ['et', 'fid', 'schwab', 'sim1', 'sim2', 'sim3', 'sim4', 'sim5',
-             'dm'],
-            [ET_VALUE, FID_VALUE, SCHWAB_VALUE, SIM1_VALUE, SIM2_VALUE,
-             SIM3_VALUE, SIM4_VALUE, SIM5_VALUE, DM_VALUE]):
-        stock_metrics.to_csv('~/Desktop/stock_metrics_test.csv')
+            ['et', 'fid', 'sim1', 'sim2', 'sim3', 'sim4', 'sim5', 'dm'],
+            [ET_VALUE, FID_VALUE, SIM1_VALUE, SIM2_VALUE, SIM3_VALUE, SIM4_VALUE,
+             SIM5_VALUE, DM_VALUE]):
         print('\n\n' + '=' * 50)
         print(f'{account.upper()} Transactions')
         print('=' * 50)
