@@ -287,7 +287,7 @@ q.to.percent.in <- function(q) {
 		pct.in <- 0.5 * sin(2*pi*(q - 0.25)) + 0.5
 	} else {
 		cat('100% of portfolio in. Percent of savings in:\n')
-		pct.in <- 0.5 * sin(2*pi*(q - 0.25)) + 0.5
+		pct.in <- 1 - (0.5 * sin(2*pi*(q - 0.25)) + 0.5)
 	}
 	pct.in
 }
@@ -328,7 +328,7 @@ q <- plot.for.ts(sp.1k.days, long=10*250)
 qs <- c(qs, q)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
 # 25%12% out; 38/19% in; Near-Extreme (top/bottom)
-f.out <- 0.08  # top near-ext --
+f.out <- 0.02  # top near-ext --
 f.in <- 0   #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
@@ -369,7 +369,7 @@ qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0.0  #
-f.in <- 0.0   #
+f.in <- 0.03   #
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -407,3 +407,4 @@ add.subsequent.fractions <- function(fractions) {
 (pct.reserves.to.add <- add.subsequent.fractions(fracs.in))
 
 
+# in 9.53% ($1031) of $10,817
