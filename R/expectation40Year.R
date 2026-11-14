@@ -287,7 +287,7 @@ q.to.percent.in <- function(q) {
 		pct.in <- 0.5 * sin(2*pi*(q - 0.25)) + 0.5
 	} else {
 		cat('100% of portfolio in. Percent of savings in:\n')
-		pct.in <- 1 - (0.5 * sin(2*pi*(q - 0.25)) + 0.5)
+		pct.in <- -(1 - (0.5 * sin(2*pi*(q - 0.25)) + 0.5))
 	}
 	pct.in
 }
@@ -369,7 +369,7 @@ qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0.0  #
-f.in <- 0.06   # extrL both
+f.in <- 0.06   # extr top
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
