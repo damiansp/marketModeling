@@ -329,7 +329,7 @@ qs <- c(qs, q)
 # 50%25% out; 75/38% in; Extreme (top/bottom)
 # 25%12% out; 38/19% in; Near-Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0   #
+f.in <- 0.19   # near extr: bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -339,7 +339,7 @@ qs <- c(qs, q)
 # 40%/20% out; 50/25% in; Extreme (top/bottom)
 # 20%/10% out; 25/13% in; Near-Extreme (top/bottom)
 f.out <- 0 #
-f.in <- 0  #
+f.in <- 0.13  # near extr: bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -349,7 +349,7 @@ qs <- c(qs, q)
 # 30%/15% out; 25/13% in; Extreme (top/bottom)
 # 15/7% out; 12/6% in; Near Extreme (top/bottom)
 f.out <- 0  #
-f.in <- 0.06   # near: bottom
+f.in <- 0.13   # near: top; extr bottom
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -359,7 +359,7 @@ qs <- c(qs, q)
 # 20%/10% out; 12/6% in; Extreme (top/bottom)
 # 10/5% out; 6/3% in; Near Extreme (top/bottom)
 f.out <- 0.0 #
-f.in <- 0.06  # extr bott; near top
+f.in <- 0.12  # extr both
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -369,7 +369,7 @@ qs <- c(qs, q)
 # 10%/5% out; 6/3% in; Extreme (top/bottom)
 # 5%/2% out; 3/1% in; Near Extreme (top/bottom)
 f.out <- 0.0  #
-f.in <- 0.06   # extr top
+f.in <- 0.06   # extr both
 fracs.out <- c(fracs.out, f.out)
 fracs.in <- c(fracs.in, f.in)
 
@@ -406,4 +406,4 @@ add.subsequent.fractions <- function(fractions) {
 (pct.invested <- remove.subsequent.fractions(fracs.out))
 (pct.reserves.to.add <- add.subsequent.fractions(fracs.in))
 
-# in 30.16% ($3072) of $10,817
+# in 62.69% ($6781) of $10,817
